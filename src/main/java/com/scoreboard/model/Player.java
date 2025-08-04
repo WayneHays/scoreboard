@@ -6,20 +6,26 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Setter
-@Getter
 
 @Entity
-@Table (name = "Players")
+@Table(name = "Players")
 public class Player {
     @Id
-    @Column (name = "id")
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    @Column (name = "name")
+    @Column(
+            name = "name",
+            nullable = false,
+            unique = true,
+            columnDefinition = "VARCHAR"
+    )
     private String name;
 
     public Player(String name) {
         this.name = name;
     }
 }
+
+

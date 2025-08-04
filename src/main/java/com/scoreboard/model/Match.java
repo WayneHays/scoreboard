@@ -1,37 +1,34 @@
 package com.scoreboard.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Getter
-@Setter
 
 @Entity
 @Table(name = "Matches")
 public class Match {
-
     @Id
-    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", columnDefinition = "BIGINT")
     private Long id;
 
-    @Column(name = "player1")
-    private Long firstPlayerId;
+    @ManyToOne
+    @JoinColumn(name = "firstPlayer", referencedColumnName = "id")
+    private Player firstPlayer;
 
-    @Column(name = "player2")
-    private Long secondPlayerId;
+    @ManyToOne
+    @JoinColumn(name = "secondPlayer", referencedColumnName = "id")
+    private Player secondPlayer;
 
-    @Column(name = "winner")
-    private Long winnerId;
+    @ManyToOne
+    @JoinColumn(name = "winner", referencedColumnName = "id")
+    private Player winner;
 
-    public Match(Long firstPlayerId, Long secondPlayerId, Long winnerId) {
-        this.firstPlayerId = firstPlayerId;
-        this.secondPlayerId = secondPlayerId;
-        this.winnerId = winnerId;
+    public Match(Player firstPlayer, Player secondPlayer) {
+        this.firstPlayer = firstPlayer;
+        this.secondPlayer = secondPlayer;
     }
 }
