@@ -7,24 +7,27 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 public class PlayerService {
-    public PlayersDao playersDao;
+    private PlayersDao playersDao;
 
     public PlayerService() {
         this.playersDao = new PlayersDao();
     }
 
-    public void create(String name) {
+    public Player create(String name) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
         Transaction transaction = session.beginTransaction();
+        Player created = null;
 
         try {
             Player player = new Player(name);
             Player found = playersDao.findByName(player);
 
             if (found == null) {
-                playersDao.save(player);
+                created = playersDao.save(player);
             }
             transaction.commit();
+            return created;
+
         } catch (Exception e) {
             transaction.rollback();
             throw new RuntimeException("Failed to create player", e);
