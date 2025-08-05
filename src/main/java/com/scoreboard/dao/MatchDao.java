@@ -9,20 +9,24 @@ import org.hibernate.query.Query;
 import java.util.List;
 
 public class MatchDao {
-    private static final String FIND_LIST_BY_PLAYER = """
-            FROM Match WHERE firstPlayer = :player OR secondPlayer = :player
-            """;
+    private static final String FIND_ALL = "FROM Match";
+    private static final String FIND_BY_PLAYER = "FROM Match WHERE firstPlayer = :player OR secondPlayer = :player";
 
-    public Match save(Match match) {
+    public void save(Match match) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.persist(match);
-        return match;
     }
 
     public List<Match> findByPlayer(Player player) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-        Query<Match> query = session.createQuery(FIND_LIST_BY_PLAYER, Match.class);
+        Query<Match> query = session.createQuery(FIND_BY_PLAYER, Match.class);
         query.setParameter("player", player);
+        return query.getResultList();
+    }
+
+    public List<Match> findAll() {
+        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+        Query<Match> query = session.createQuery(FIND_ALL, Match.class);
         return query.getResultList();
     }
 }
