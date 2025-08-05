@@ -4,8 +4,13 @@ import com.scoreboard.exception.DaoException;
 import com.scoreboard.model.Player;
 import com.scoreboard.util.HibernateUtil;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
+
+import java.util.List;
+import java.util.Optional;
 
 public class PlayersDao {
+    private static final String FIND_BY_NAME_SQL = "FROM Player WHERE name = :name";
 
     public Player save(Player player) {
         try {
@@ -17,10 +22,17 @@ public class PlayersDao {
         }
     }
 
-    public Player findByName(Player player) {
+    public Optional<Player> findByName(String name) {
         try {
             Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-            return session.find(Player.class, player);
+            Query<Player> query = session.createQuery(FIND_BY_NAME_SQL);
+            query.setParameter("name", name);
+            List<Player> resultList = query.getResultList();
+
+            if (resultList.isEmpty()) {
+                return Optional.empty();
+            }
+            return Optional.of(resultList.getFirst());
         } catch (Exception e) {
             throw new DaoException("Failed to find player", e);
         }
