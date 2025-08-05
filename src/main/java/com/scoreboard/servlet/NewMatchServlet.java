@@ -25,5 +25,7 @@ public class NewMatchServlet extends HttpServlet {
         Player player1 = playerService.create(firstPlayerName);
         Player player2 = playerService.create(secondPlayerName);
         ongoingMatchesService.create(player1, player2, new Score());
+
+        // TODO: redirect -> /match-score?uuid=$match_id
     }
 }
