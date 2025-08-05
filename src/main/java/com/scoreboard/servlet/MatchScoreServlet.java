@@ -1,7 +1,6 @@
 package com.scoreboard.servlet;
 
 import com.scoreboard.model.MatchWithScore;
-import com.scoreboard.model.Score;
 import com.scoreboard.service.OngoingMatchesService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -15,16 +14,20 @@ import java.util.UUID;
 @WebServlet("/match-score")
 public class MatchScoreServlet extends HttpServlet {
     private OngoingMatchesService ongoingMatchesService = new OngoingMatchesService();
-    private ScoreCalculationService scoreCalculationService = new ScoreCalculationService();
+//    private ScoreCalculationService scoreCalculationService = new ScoreCalculationService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String uuidStr = req.getParameter("uuid");
         UUID uuid = UUID.fromString(uuidStr);
         MatchWithScore matchWithScore = ongoingMatchesService.find(uuid);
-        Score score = matchWithScore.getScore();
 
-
+        req.setAttribute("matchWithScore", matchWithScore);
+        req.setAttribute("currentScore", matchWithScore.getScore());
+        req.setAttribute("player1", matchWithScore.getFirstPlayer());
+        req.setAttribute("player2", matchWithScore.getSecondPlayer());
+        req.setAttribute("uuid", uuid);
+        getServletContext().getRequestDispatcher("/WEB-INF/scoreboard.jsp").forward(req, resp);
     }
 
     @Override
@@ -33,6 +36,6 @@ public class MatchScoreServlet extends HttpServlet {
         String playerWonPointId = req.getParameter("playerWonPointId");
         UUID uuid = UUID.fromString(uuidStr);
         MatchWithScore matchWithScore = ongoingMatchesService.find(uuid);
-        scoreCalculationService.calculatePoints(matchWithScore, playerWonPointId);
+//        scoreCalculationService.calculatePoints(matchWithScore, playerWonPointId);
     }
 }
