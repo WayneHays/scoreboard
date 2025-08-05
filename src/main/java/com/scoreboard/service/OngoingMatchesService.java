@@ -1,35 +1,31 @@
 package com.scoreboard.service;
 
-import com.scoreboard.dao.MatchDao;
-import com.scoreboard.dao.PlayersDao;
-import com.scoreboard.model.Match;
-import com.scoreboard.util.HibernateUtil;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import com.scoreboard.model.MatchWithScore;
+import com.scoreboard.model.Player;
+import com.scoreboard.model.Score;
 
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class OngoingMatchesService {
-    private final PlayersDao playersDao;
-    private final Map<UUID, Match> ongoingMatches;
+    private final Map<UUID, MatchWithScore> ongoingMatches;
 
     public OngoingMatchesService() {
-        this.playersDao = new PlayersDao();
         this.ongoingMatches = new ConcurrentHashMap<>();
     }
 
-    public void save(Match match) {
+    public void create(Player first, Player second, Score score) {
         try {
+            MatchWithScore matchWithScore = new MatchWithScore(first, second, score);
             UUID uuid = UUID.randomUUID();
-            ongoingMatches.put(uuid, match);
+            ongoingMatches.put(uuid, matchWithScore);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to save match", e);
+            throw new RuntimeException("Failed to create match", e);
         }
     }
 
-    public Match find(UUID uuid) {
+    public MatchWithScore find(UUID uuid) {
         return ongoingMatches.get(uuid);
     }
 }
