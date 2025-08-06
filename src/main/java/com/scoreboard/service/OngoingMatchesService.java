@@ -1,5 +1,6 @@
 package com.scoreboard.service;
 
+import com.scoreboard.model.Match;
 import com.scoreboard.model.MatchWithScore;
 import com.scoreboard.model.Player;
 import com.scoreboard.model.Score;
@@ -22,7 +23,8 @@ public class OngoingMatchesService {
 
     public UUID create(Player first, Player second, Score score) {
         try {
-            MatchWithScore matchWithScore = new MatchWithScore(first, second, score);
+            Match match = new Match(first, second);
+            MatchWithScore matchWithScore = new MatchWithScore(match, score);
             UUID uuid = UUID.randomUUID();
             ongoingMatches.put(uuid, matchWithScore);
             return uuid;
@@ -33,5 +35,9 @@ public class OngoingMatchesService {
 
     public MatchWithScore find(UUID uuid) {
         return ongoingMatches.get(uuid);
+    }
+
+    public void delete(UUID uuid) {
+        ongoingMatches.remove(uuid);
     }
 }
