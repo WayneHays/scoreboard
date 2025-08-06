@@ -9,17 +9,23 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class OngoingMatchesService {
+    private static final OngoingMatchesService INSTANCE = new OngoingMatchesService();
     private final Map<UUID, MatchWithScore> ongoingMatches;
 
     public OngoingMatchesService() {
         this.ongoingMatches = new ConcurrentHashMap<>();
     }
 
-    public void create(Player first, Player second, Score score) {
+    public static OngoingMatchesService getInstance() {
+        return INSTANCE;
+    }
+
+    public UUID create(Player first, Player second, Score score) {
         try {
             MatchWithScore matchWithScore = new MatchWithScore(first, second, score);
             UUID uuid = UUID.randomUUID();
             ongoingMatches.put(uuid, matchWithScore);
+            return uuid;
         } catch (Exception e) {
             throw new RuntimeException("Failed to create match", e);
         }
