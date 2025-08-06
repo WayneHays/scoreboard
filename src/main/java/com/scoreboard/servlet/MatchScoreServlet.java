@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @WebServlet("/match-score")
 public class MatchScoreServlet extends HttpServlet {
-    private OngoingMatchesService ongoingMatchesService = new OngoingMatchesService();
+    private OngoingMatchesService ongoingMatchesService = OngoingMatchesService.getInstance();
 //    private ScoreCalculationService scoreCalculationService = new ScoreCalculationService();
 
     @Override
@@ -27,7 +27,7 @@ public class MatchScoreServlet extends HttpServlet {
         req.setAttribute("player1", matchWithScore.getFirstPlayer());
         req.setAttribute("player2", matchWithScore.getSecondPlayer());
         req.setAttribute("uuid", uuid);
-        getServletContext().getRequestDispatcher("/WEB-INF/scoreboard.jsp").forward(req, resp);
+        getServletContext().getRequestDispatcher("/WEB-INF/match-score.jsp").forward(req, resp);
     }
 
     @Override
