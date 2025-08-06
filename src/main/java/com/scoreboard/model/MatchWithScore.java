@@ -9,7 +9,6 @@ import lombok.Setter;
 @Setter
 
 public class MatchWithScore {
-    private Player firstPlayer;
-    private Player secondPlayer;
+    private Match match;
     private Score score;
 }
