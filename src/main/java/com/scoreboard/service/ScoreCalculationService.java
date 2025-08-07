@@ -28,17 +28,43 @@ public class ScoreCalculationService {
 
         if (score.isTieBreak()) {
             calculateTieBreak(pointWinner, score, firstPlayer, secondPlayer);
+
+            if (!score.isTieBreak()) {
+                return score;
+            }
         } else {
             calculateNonTieBreak(pointWinner, score, firstPlayer, secondPlayer);
         }
         return score;
     }
 
+    private void calculateTieBreak(Player pointWinner, Score score, Player firstPlayer, Player secondPlayer) {
+        int currentTieBreakPoints = score.getTieBreakPoints(pointWinner);
+        score.setTieBreakPoints(pointWinner, currentTieBreakPoints + 1);
+
+        if (isTieBreakWon(pointWinner, score, firstPlayer, secondPlayer)) {
+            score.setTieBreak(false);
+            handleTieBreakWin(pointWinner, score, firstPlayer, secondPlayer);
+        }
+    }
+
+    private void handleTieBreakWin(Player pointWinner, Score score, Player firstPlayer, Player secondPlayer) {
+        winGame(pointWinner, score);
+        winSet(pointWinner, score);
+        score.resetGames(firstPlayer, secondPlayer);
+        score.resetTieBreakPoints(firstPlayer, secondPlayer);
+
+        if (isMatchFinished(pointWinner, score)) {
+            score.setMatchFinished(true);
+        }
+    }
+
     private void calculateNonTieBreak(Player pointWinner, Score score, Player firstPlayer, Player secondPlayer) {
         winPoint(pointWinner, score);
 
-        if (isDeuce(score, firstPlayer, secondPlayer)) {
+        if (isDeuce(score, firstPlayer, secondPlayer) && !score.isDeuce()) {
             score.setDeuce(true);
+            return;
         }
 
         if (score.isDeuce()) {
@@ -79,24 +105,6 @@ public class ScoreCalculationService {
         }
     }
 
-    private void calculateTieBreak(Player pointWinner, Score score, Player firstPlayer, Player secondPlayer) {
-        int currentTieBreakPoints = score.getTieBreakPoints(pointWinner);
-        score.setTieBreakPoints(pointWinner, currentTieBreakPoints + 1);
-
-        if (isTieBreakWon(pointWinner, score, firstPlayer, secondPlayer)) {
-            winGame(pointWinner, score);
-            score.setTieBreak(false);
-            score.resetTieBreakPoints(firstPlayer, secondPlayer);
-
-            winSet(pointWinner, score);
-            score.resetGames(firstPlayer, secondPlayer);
-
-            if (isMatchFinished(pointWinner, score)) {
-                score.setMatchFinished(true);
-            }
-        }
-    }
-
     private boolean isMatchFinished(Player pointWinner, Score score) {
         return score.getSets(pointWinner) >= SETS_TO_WIN_MATCH;
     }
@@ -132,6 +140,11 @@ public class ScoreCalculationService {
 
     private void winPoint(Player player, Score score) {
         int currentPlayerPoints = score.getPoints(player);
+
+        if (score.isDeuce() && currentPlayerPoints >= 40) {
+            return;
+        }
+
         switch (currentPlayerPoints) {
             case 0 -> {
                 score.setPoints(player, 15);
