@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class OngoingMatchesService {
     private static final OngoingMatchesService INSTANCE = new OngoingMatchesService();
+    private static final int INITIAL_SCORE = 0;
     private final Map<UUID, MatchWithScore> ongoingMatches;
 
     public OngoingMatchesService() {
@@ -21,9 +22,10 @@ public class OngoingMatchesService {
         return INSTANCE;
     }
 
-    public UUID create(Player first, Player second, Score score) {
+    public UUID create(Player first, Player second) {
         try {
             Match match = new Match(first, second);
+            Score score = createInitialScore(first, second);
             MatchWithScore matchWithScore = new MatchWithScore(match, score);
             UUID uuid = UUID.randomUUID();
             ongoingMatches.put(uuid, matchWithScore);
@@ -31,6 +33,20 @@ public class OngoingMatchesService {
         } catch (Exception e) {
             throw new RuntimeException("Failed to create match", e);
         }
+    }
+
+    private Score createInitialScore(Player first, Player second) {
+        Score score = new Score();
+        initializePlayerScore(score, first);
+        initializePlayerScore(score, second);
+        return score;
+    }
+
+    private void initializePlayerScore(Score score, Player player) {
+        score.setPoints(player, INITIAL_SCORE);
+        score.setGames(player, INITIAL_SCORE);
+        score.setSets(player, INITIAL_SCORE);
+        score.setTieBreakPoints(player, INITIAL_SCORE);
     }
 
     public MatchWithScore find(UUID uuid) {
