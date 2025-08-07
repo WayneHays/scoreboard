@@ -1,7 +1,11 @@
 package com.scoreboard.servlet;
 
 import com.scoreboard.model.MatchWithScore;
+import com.scoreboard.model.Player;
+import com.scoreboard.service.FinishedMatchService;
 import com.scoreboard.service.OngoingMatchesService;
+import com.scoreboard.service.PlayerService;
+import com.scoreboard.service.ScoreCalculationService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -14,7 +18,9 @@ import java.util.UUID;
 @WebServlet("/match-score")
 public class MatchScoreServlet extends HttpServlet {
     private OngoingMatchesService ongoingMatchesService = OngoingMatchesService.getInstance();
-//    private ScoreCalculationService scoreCalculationService = new ScoreCalculationService();
+    private ScoreCalculationService scoreCalculationService = ScoreCalculationService.getInstance();
+    private FinishedMatchService finishedMatchService = FinishedMatchService.getInstance();
+    private PlayerService playerService = PlayerService.getInstance();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -23,9 +29,9 @@ public class MatchScoreServlet extends HttpServlet {
         MatchWithScore matchWithScore = ongoingMatchesService.find(uuid);
 
         req.setAttribute("matchWithScore", matchWithScore);
-        req.setAttribute("currentScore", matchWithScore.getScore());
-        req.setAttribute("player1", matchWithScore.getFirstPlayer());
-        req.setAttribute("player2", matchWithScore.getSecondPlayer());
+        req.setAttribute("currentScore", matchWithScore.score());
+        req.setAttribute("player1", matchWithScore.match().getFirstPlayer());
+        req.setAttribute("player2", matchWithScore.match().getSecondPlayer());
         req.setAttribute("uuid", uuid);
         getServletContext().getRequestDispatcher("/WEB-INF/match-score.jsp").forward(req, resp);
     }
@@ -36,6 +42,15 @@ public class MatchScoreServlet extends HttpServlet {
         String playerWonPointId = req.getParameter("playerWonPointId");
         UUID uuid = UUID.fromString(uuidStr);
         MatchWithScore matchWithScore = ongoingMatchesService.find(uuid);
-//        scoreCalculationService.calculatePoints(matchWithScore, playerWonPointId);
+        Player pointWinner = playerService.findById(Long.valueOf(playerWonPointId));
+
+        scoreCalculationService.calculate(matchWithScore, pointWinner);
+
+        if (scoreCalculationService.isMatchFinished(matchWithScore.score())) {
+            ongoingMatchesService.delete(uuid);
+            finishedMatchService.saveToDatabase(matchWithScore.match());
+            getServletContext().getRequestDispatcher("/WEB-INF/match-result.jsp").forward(req, resp);
+        }
+        getServletContext().getRequestDispatcher("/WEB-INF/match-score.jsp").forward(req, resp);
     }
 }
