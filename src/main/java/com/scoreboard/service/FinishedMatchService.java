@@ -4,7 +4,6 @@ import com.scoreboard.dao.MatchDao;
 import com.scoreboard.exception.DaoException;
 import com.scoreboard.exception.ScoreboardServiceException;
 import com.scoreboard.model.Match;
-import com.scoreboard.model.MatchWithScore;
 import com.scoreboard.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -17,8 +16,7 @@ public class FinishedMatchService {
         return INSTANCE;
     }
 
-    public void saveToDatabase(MatchWithScore matchWithScore) {
-        Match match = matchWithScore.getMatch();
+    public void saveToDatabase(Match match) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
         Transaction transaction = session.beginTransaction();
 

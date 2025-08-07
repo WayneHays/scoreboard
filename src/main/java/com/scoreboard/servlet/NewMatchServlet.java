@@ -33,6 +33,5 @@ public class NewMatchServlet extends HttpServlet {
         UUID uuid = ongoingMatchesService.create(player1, player2, new Score());
 
         resp.sendRedirect("/match-score?uuid=" + uuid);
-        // TODO: redirect -> /match-score?uuid=$match_id
     }
 }

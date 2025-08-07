@@ -5,7 +5,7 @@ import lombok.*;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Getter
 
 @Entity
 @Table(name = "Players")
