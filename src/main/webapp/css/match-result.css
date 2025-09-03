@@ -1,0 +1,155 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.container {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+}
+
+.title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #48bb78;
+    margin-bottom: 20px;
+}
+
+.winner-announcement {
+    font-size: 1.5rem;
+    color: #2d3748;
+    margin-bottom: 30px;
+}
+
+.winner-name {
+    color: #667eea;
+    font-weight: 700;
+}
+
+/* Final Scoreboard */
+.final-scoreboard {
+    background: #f8f9fa;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+
+.score-title {
+    background: #667eea;
+    color: white;
+    padding: 15px;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.final-score-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.final-score-row:last-child {
+    border-bottom: none;
+}
+
+.final-score-row.winner-row {
+    background: #e6fffa;
+    border-left: 4px solid #48bb78;
+}
+
+.player-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.player-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.crown {
+    font-size: 1.2rem;
+}
+
+.sets-score {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #667eea;
+}
+
+/* Navigation Links */
+.navigation-links {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.nav-link {
+    text-decoration: none;
+    background: #667eea;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.nav-link:hover {
+    background: #5a67d8;
+}
+
+.matches-link {
+    background: darkslateblue;
+}
+
+.matches-link:hover {
+    background: #c53030;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 30px 20px;
+        margin: 10px;
+    }
+
+    .title {
+        font-size: 2rem;
+    }
+
+    .winner-announcement {
+        font-size: 1.3rem;
+    }
+
+    .navigation-links {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .nav-link {
+        width: 100%;
+        max-width: 200px;
+        text-align: center;
+    }
+}
+

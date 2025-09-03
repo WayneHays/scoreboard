@@ -25,7 +25,7 @@ public class OngoingMatchesService {
     public UUID create(Player first, Player second) {
         try {
             Match match = new Match(first, second);
-            Score score = createInitialScore(first, second);
+            Score score = initStartScore(first, second);
             MatchWithScore matchWithScore = new MatchWithScore(match, score);
             UUID uuid = UUID.randomUUID();
             ongoingMatches.put(uuid, matchWithScore);
@@ -35,10 +35,18 @@ public class OngoingMatchesService {
         }
     }
 
-    private Score createInitialScore(Player first, Player second) {
+    public MatchWithScore find(UUID uuid) {
+        return ongoingMatches.get(uuid);
+    }
+
+    public void delete(UUID uuid) {
+        ongoingMatches.remove(uuid);
+    }
+
+    private Score initStartScore(Player player1, Player player2) {
         Score score = new Score();
-        initializePlayerScore(score, first);
-        initializePlayerScore(score, second);
+        initializePlayerScore(score, player1);
+        initializePlayerScore(score, player2);
         return score;
     }
 
@@ -47,13 +55,5 @@ public class OngoingMatchesService {
         score.setGames(player, INITIAL_SCORE);
         score.setSets(player, INITIAL_SCORE);
         score.setTieBreakPoints(player, INITIAL_SCORE);
-    }
-
-    public MatchWithScore find(UUID uuid) {
-        return ongoingMatches.get(uuid);
-    }
-
-    public void delete(UUID uuid) {
-        ongoingMatches.remove(uuid);
     }
 }

@@ -1,0 +1,37 @@
+<%--
+  Created by IntelliJ IDEA.
+  User: Veretennikov
+  Date: 09.08.2025
+  Time: 14:56
+  To change this template use File | Settings | File Templates.
+--%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tennis Scoreboard</title>
+    <link href="${pageContext.request.contextPath}/css/home.css" rel="stylesheet">
+</head>
+<body>
+<h1>Welcome to Tennis Scoreboard!</h1>
+<h2>Manage your tennis matches, record results and track rankings!</h2>
+
+<img src="https://images.unsplash.com/photo-1554068865-24cecd4e34b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="tennis player">
+
+<div class="buttons-container">
+    <form method="GET" action="${pageContext.request.contextPath}/new-match">
+        <button class="new-match-button" type="submit">New Match</button>
+    </form>
+
+    <form method="GET" action="${pageContext.request.contextPath}/matches">
+        <button class="results-button" type="submit">Results</button>
+    </form>
+</div>
+
+<footer>
+    <p>© Tennis Scoreboard, project from <a href="https://zhukovsd.github.io/java-backend-learning-course/projects/tennis-scoreboard/">Java Backend Roadmap</a></p>
+</footer>
+</body>
+</html>

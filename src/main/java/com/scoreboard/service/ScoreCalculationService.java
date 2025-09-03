@@ -38,6 +38,10 @@ public class ScoreCalculationService {
         return score;
     }
 
+    private boolean isMatchFinished(Player pointWinner, Score score) {
+        return score.getSets(pointWinner) >= SETS_TO_WIN_MATCH;
+    }
+
     private void calculateTieBreak(Player pointWinner, Score score, Player firstPlayer, Player secondPlayer) {
         int currentTieBreakPoints = score.getTieBreakPoints(pointWinner);
         score.setTieBreakPoints(pointWinner, currentTieBreakPoints + 1);
@@ -103,10 +107,6 @@ public class ScoreCalculationService {
                 checkIfSetAndMatchWon(pointWinner, score, firstPlayer, secondPlayer);
             }
         }
-    }
-
-    private boolean isMatchFinished(Player pointWinner, Score score) {
-        return score.getSets(pointWinner) >= SETS_TO_WIN_MATCH;
     }
 
     private boolean isGameWon(Player pointWinner, Score score) {

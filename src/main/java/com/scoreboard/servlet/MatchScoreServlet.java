@@ -5,7 +5,6 @@ import com.scoreboard.model.Player;
 import com.scoreboard.model.Score;
 import com.scoreboard.service.FinishedMatchService;
 import com.scoreboard.service.OngoingMatchesService;
-import com.scoreboard.service.PlayerService;
 import com.scoreboard.service.ScoreCalculationService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -52,9 +51,18 @@ public class MatchScoreServlet extends HttpServlet {
 
         if (calculatedScore.isMatchFinished()) {
             ongoingMatchesService.delete(uuid);
+            matchWithScore.match().setWinner(pointWinner);
             finishedMatchService.saveToDatabase(matchWithScore.match());
+
+            req.setAttribute("winner", pointWinner);
+            req.setAttribute("player1", firstPlayer);
+            req.setAttribute("player2", secondPlayer);
+            req.setAttribute("player1sets", matchWithScore.score().getSets(firstPlayer));
+            req.setAttribute("player2sets", matchWithScore.score().getSets(secondPlayer));
+
             getServletContext().getRequestDispatcher("/WEB-INF/match-result.jsp").forward(req, resp);
+        } else {
+            resp.sendRedirect("/match-score?uuid=" + uuid);
         }
-        resp.sendRedirect("/match-score?uuid=" + uuid);
     }
 }

@@ -37,15 +37,4 @@ public class PlayersDao {
             throw new DaoException("Failed to find player", e);
         }
     }
-
-    public Optional<Player> findById(Long id) {
-        try {
-            Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-            Player player = session.find(Player.class, id);
-
-            return Optional.ofNullable(player);
-        } catch (Exception e) {
-            throw new DaoException("Failed to find player by id", e);
-        }
-    }
 }

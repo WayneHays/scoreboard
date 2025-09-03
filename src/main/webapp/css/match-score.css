@@ -1,0 +1,139 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Verdana, sans-serif;
+    background-size: cover;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    position: relative;
+}
+
+.container {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    max-width: 600px;
+    width: 100%;
+}
+
+.title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2d3748;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* Scoreboard */
+.scoreboard {
+    background: #f8f9fa;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+
+.score-header {
+    background: #667eea;
+    color: white;
+    padding: 15px;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 15px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.score-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 15px;
+    padding: 15px;
+    border-bottom: 1px solid #e9ecef;
+    align-items: center;
+}
+
+.score-row:last-child {
+    border-bottom: none;
+}
+
+.player-name {
+    font-weight: 600;
+    color: #2d3748;
+    font-size: 1.1rem;
+}
+
+.sets-score, .games-score, .points-score {
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: #2d3748;
+    text-align: center;
+}
+
+/* Action Buttons */
+.actions-container {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.action-button {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 15px 25px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.action-button:hover {
+    background: #5a67d8;
+}
+
+.player2-button {
+    background: #e53e3e;
+}
+
+.player2-button:hover {
+    background: #c53030;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 20px;
+        margin: 10px;
+    }
+
+    .title {
+        font-size: 1.5rem;
+    }
+
+    .actions-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .action-button {
+        width: 100%;
+        max-width: 250px;
+    }
+
+    .score-header, .score-row {
+        grid-template-columns: 1.5fr 1fr 1fr 1fr;
+        gap: 10px;
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+}
