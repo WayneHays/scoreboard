@@ -21,13 +21,8 @@
 <img src="https://images.unsplash.com/photo-1554068865-24cecd4e34b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="tennis player">
 
 <div class="buttons-container">
-    <form method="GET" action="${pageContext.request.contextPath}/new-match">
-        <button class="new-match-button" type="submit">New Match</button>
-    </form>
-
-    <form method="GET" action="${pageContext.request.contextPath}/matches">
-        <button class="results-button" type="submit">Results</button>
-    </form>
+    <a href="${pageContext.request.contextPath}/new-match" class="new-match-button">New match</a>
+    <a href="${pageContext.request.contextPath}/matches" class="results-button">Results</a>
 </div>
 
 <footer>

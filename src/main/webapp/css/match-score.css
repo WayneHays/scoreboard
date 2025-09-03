@@ -102,11 +102,11 @@ body {
 }
 
 .player2-button {
-    background: #e53e3e;
+    background: #962bda;
 }
 
 .player2-button:hover {
-    background: #c53030;
+    background: #5925a5;
 }
 
 /* Responsive */

@@ -43,37 +43,24 @@ img {
     margin-bottom: 40px;
 }
 
-form {
-    margin: 10px;
+.buttons-container {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 40px;
 }
 
 .new-match-button, .results-button {
-    background: white;
-    color: #667eea;
-    border: none;
-    padding: 15px 40px;
-    font-size: 1.1rem;
+    text-decoration: none;
+    background: #3757ea;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 5px;
     font-weight: 600;
-    border-radius: 8px;
-    cursor: pointer;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
-    margin: 0 10px;
-    min-width: 150px;
+    font-size: 1rem;
 }
 
 .new-match-button:hover, .results-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-}
-
-.results-button {
-    background: #48bb78;
-    color: white;
-}
-
-.results-button:hover {
-    background: #38a169;
+    background: #5a67d8;
 }
 
 footer {
@@ -113,11 +100,16 @@ footer a:hover {
         height: 160px;
     }
 
+    .buttons-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+
     .new-match-button, .results-button {
-        display: block;
         width: 100%;
         max-width: 250px;
-        margin: 10px auto;
+        margin: 0;
     }
 }
 

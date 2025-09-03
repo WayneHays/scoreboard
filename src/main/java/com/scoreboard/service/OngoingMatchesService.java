@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class OngoingMatchesService {
     private static final OngoingMatchesService INSTANCE = new OngoingMatchesService();
-    private static final int INITIAL_SCORE = 0;
+    private static final int START_SCORE = 0;
     private final Map<UUID, MatchWithScore> ongoingMatches;
 
     public OngoingMatchesService() {
@@ -51,9 +51,9 @@ public class OngoingMatchesService {
     }
 
     private void initializePlayerScore(Score score, Player player) {
-        score.setPoints(player, INITIAL_SCORE);
-        score.setGames(player, INITIAL_SCORE);
-        score.setSets(player, INITIAL_SCORE);
-        score.setTieBreakPoints(player, INITIAL_SCORE);
+        score.setPoints(player, START_SCORE);
+        score.setGames(player, START_SCORE);
+        score.setSets(player, START_SCORE);
+        score.setTieBreakPoints(player, START_SCORE);
     }
 }

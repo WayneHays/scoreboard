@@ -9,9 +9,10 @@ import org.hibernate.query.Query;
 import java.util.List;
 
 public class MatchDao {
+    public static final int PAGE_SIZE = 10;
     private static final String FIND_ALL = "FROM Match";
     private static final String FIND_BY_PLAYER = "FROM Match WHERE firstPlayer = :player OR secondPlayer = :player";
-    public static final int PAGE_SIZE = 10;
+    private static final String PLAYER = "player";
 
     public void save(Match match) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
@@ -21,7 +22,7 @@ public class MatchDao {
     public List<Match> findByPlayer(Player player) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
         Query<Match> query = session.createQuery(FIND_BY_PLAYER, Match.class);
-        query.setParameter("player", player);
+        query.setParameter(PLAYER, player);
         return query.getResultList();
     }
 
@@ -43,7 +44,7 @@ public class MatchDao {
     public List<Match> findMatchesByPlayerByPage(Player player, int pageNumber) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
         Query<Match> query = session.createQuery(FIND_BY_PLAYER, Match.class);
-        query.setParameter("player", player);
+        query.setParameter(PLAYER, player);
         query.setMaxResults(10);
         query.setFirstResult((pageNumber - 1) * 10);
 
@@ -67,7 +68,7 @@ public class MatchDao {
     private int getTotalCountOfMatchesByPlayer(Player player) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
         Query<Long> query = session.createQuery("SELECT COUNT(*) " + FIND_BY_PLAYER, Long.class);
-        query.setParameter("player", player);
+        query.setParameter(PLAYER, player);
         return query.getSingleResult().intValue();
     }
 }
