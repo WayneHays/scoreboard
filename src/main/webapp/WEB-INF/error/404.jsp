@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%@ page isErrorPage="true" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,7 +16,14 @@
     <h2 class="error-title">Page Not Found</h2>
 
     <div class="error-message">
-        The page you are looking for doesn't exist or has been moved.
+        <c:choose>
+            <c:when test="${not empty errorMessage}">
+                ${errorMessage}
+            </c:when>
+            <c:otherwise>
+                The page you are looking for doesn't exist or has been moved.
+            </c:otherwise>
+        </c:choose>
     </div>
 
     <!-- Показываем запрошенный URL если доступен -->

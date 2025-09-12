@@ -4,6 +4,7 @@ import com.scoreboard.exception.ScoreboardServiceException;
 import com.scoreboard.model.Player;
 import com.scoreboard.service.OngoingMatchesService;
 import com.scoreboard.service.PlayerService;
+import com.scoreboard.util.JspPaths;
 import com.scoreboard.util.PlayerNameValidator;
 import com.scoreboard.util.ValidationResult;
 import jakarta.servlet.ServletException;
@@ -17,17 +18,27 @@ import java.util.UUID;
 
 @WebServlet("/new-match")
 public class NewMatchServlet extends HttpServlet {
-    private static final String NEW_MATCH = "/WEB-INF/new-match.jsp";
-    private static final String MATCH_SCORE_UUID = "/match-score?uuid=";
+    private static final String NEW_MATCH_JSP = JspPaths.NEW_MATCH;
+
+    private static final String MATCH_SCORE_URL = "/match-score?uuid=";
+
     private static final String PLAYER_1_NAME_PARAM = "player1name";
     private static final String PLAYER_2_NAME_PARAM = "player2name";
+
+    private static final String GENERAL_ERROR_ATTR = "generalError";
+    private static final String PLAYER_1_ERROR_ATTR = "player1Error";
+    private static final String PLAYER_2_ERROR_ATTR = "player2Error";
+    private static final String PLAYER_1_VALUE_ATTR = "player1Value";
+    private static final String PLAYER_2_VALUE_ATTR = "player2Value";
+
+    private static final String DUPLICATE_NAMES_MSG = "Players cannot have the same name";
 
     private PlayerService playerService = PlayerService.getInstance();
     private OngoingMatchesService ongoingMatchesService = OngoingMatchesService.getInstance();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        getServletContext().getRequestDispatcher(NEW_MATCH).forward(req, resp);
+        getServletContext().getRequestDispatcher(NEW_MATCH_JSP).forward(req, resp);
     }
 
     @Override
@@ -52,38 +63,43 @@ public class NewMatchServlet extends HttpServlet {
         Player player1 = playerService.create(player1Result.value());
         Player player2 = playerService.create(player2Result.value());
         UUID uuid = ongoingMatchesService.createMatch(player1, player2);
-        resp.sendRedirect(MATCH_SCORE_UUID + uuid);
+        resp.sendRedirect(MATCH_SCORE_URL + uuid);
     }
 
-    private void handleDuplicateNames(
-            HttpServletRequest req,
-            HttpServletResponse resp,
-            String player1Input,
-            String player2Input)
+    private void handleDuplicateNames(HttpServletRequest req, HttpServletResponse resp,
+                                      String player1Input, String player2Input)
             throws ServletException, IOException {
-        req.setAttribute("generalError", "Players cannot have the same name");
-        req.setAttribute("player1Value", player1Input);
-        req.setAttribute("player2Value", player2Input);
-        getServletContext().getRequestDispatcher(NEW_MATCH).forward(req, resp);
+        setPlayerValues(req, player1Input, player2Input);
+        req.setAttribute(GENERAL_ERROR_ATTR, DUPLICATE_NAMES_MSG);
+        forwardToNewMatchPage(req, resp);
     }
 
-    private void handleValidationErrors(
-            HttpServletRequest req,
-            HttpServletResponse resp,
-            ValidationResult player1Result,
-            ValidationResult player2Result,
-            String player1Input,
-            String player2Input)
+    private void handleValidationErrors(HttpServletRequest req, HttpServletResponse resp,
+                                        ValidationResult player1Result, ValidationResult player2Result,
+                                        String player1Input, String player2Input)
             throws ServletException, IOException {
+        setPlayerValues(req, player1Input, player2Input);
+        setValidationErrors(req, player1Result, player2Result);
+        forwardToNewMatchPage(req, resp);
+    }
+
+    private void setPlayerValues(HttpServletRequest req, String player1Input, String player2Input) {
+        req.setAttribute(PLAYER_1_VALUE_ATTR, player1Input);
+        req.setAttribute(PLAYER_2_VALUE_ATTR, player2Input);
+    }
+
+    private void setValidationErrors(HttpServletRequest req, ValidationResult player1Result, ValidationResult player2Result) {
         if (player1Result.errorMessage() != null) {
-            req.setAttribute("player1Error", player1Result.errorMessage());
+            req.setAttribute(PLAYER_1_ERROR_ATTR, player1Result.errorMessage());
         }
         if (player2Result.errorMessage() != null) {
-            req.setAttribute("player2Error", player2Result.errorMessage());
+            req.setAttribute(PLAYER_2_ERROR_ATTR, player2Result.errorMessage());
         }
-        req.setAttribute("player1Value", player1Input);
-        req.setAttribute("player2Value", player2Input);
-        getServletContext().getRequestDispatcher(NEW_MATCH).forward(req, resp);
+    }
+
+    private void forwardToNewMatchPage(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        getServletContext().getRequestDispatcher(NEW_MATCH_JSP).forward(req, resp);
     }
 
     private boolean hasDuplicatedNames(ValidationResult player1Result, ValidationResult player2Result) {

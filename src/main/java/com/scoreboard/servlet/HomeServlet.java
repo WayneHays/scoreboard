@@ -1,5 +1,6 @@
 package com.scoreboard.servlet;
 
+import com.scoreboard.util.JspPaths;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -10,7 +11,7 @@ import java.io.IOException;
 
 @WebServlet ("/home")
 public class HomeServlet extends HttpServlet {
-    private static final String HOME_JSP = "/WEB-INF/home.jsp";
+    private static final String HOME_JSP = JspPaths.HOME;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)

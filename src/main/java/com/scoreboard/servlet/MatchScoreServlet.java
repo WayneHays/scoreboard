@@ -6,6 +6,7 @@ import com.scoreboard.model.Score;
 import com.scoreboard.service.FinishedMatchService;
 import com.scoreboard.service.OngoingMatchesService;
 import com.scoreboard.service.ScoreCalculationService;
+import com.scoreboard.util.JspPaths;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -17,32 +18,32 @@ import java.util.UUID;
 
 @WebServlet("/match-score")
 public class MatchScoreServlet extends HttpServlet {
-    private static final String MATCH_SCORE_JSP = "/WEB-INF/match-score.jsp";
-    private static final String MATCH_RESULT_JSP = "/WEB-INF/match-result.jsp";
-    private static final String MATCH_ERROR_JSP = "/WEB-INF/error/match-error.jsp";
+    private static final String MATCH_SCORE_JSP = JspPaths.MATCH_SCORE;
+    private static final String MATCH_RESULT_JSP = JspPaths.MATCH_RESULT;
+    private static final String MATCH_ERROR_JSP = JspPaths.MATCH_ERROR;
 
-    public static final String UUID_PARAM = "uuid";
-    public static final String PLAYER_WON_POINT_ID_PARAM = "playerWonPointId";
+    private static final String UUID_PARAM = "uuid";
+    private static final String PLAYER_WON_POINT_ID_PARAM = "playerWonPointId";
 
-    public static final String MATCH_WITH_SCORE_ATTR = "matchWithScore";
-    public static final String CURRENT_SCORE_ATTR = "currentScore";
-    public static final String PLAYER_1_ATTR = "player1";
-    public static final String PLAYER_2_ATTR = "player2";
+    private static final String MATCH_WITH_SCORE_ATTR = "matchWithScore";
+    private static final String CURRENT_SCORE_ATTR = "currentScore";
+    private static final String PLAYER_1_ATTR = "player1";
+    private static final String PLAYER_2_ATTR = "player2";
     private static final String UUID_ATTR = "uuid";
-    public static final String POINT_WINNER_ATTR = "winner";
-    public static final String PLAYER_1_SETS_ATTR = "player1sets";
-    public static final String PLAYER_2_SETS_ATTR = "player2sets";
-    public static final String ERROR_TITLE_ATTR = "errorTitle";
-    public static final String ERROR_DESCRIPTION_ATTR = "errorDescription";
-    public static final String REQUESTED_URL_ATTR = "requestedUrl";
+    private static final String POINT_WINNER_ATTR = "winner";
+    private static final String PLAYER_1_SETS_ATTR = "player1sets";
+    private static final String PLAYER_2_SETS_ATTR = "player2sets";
+    private static final String ERROR_TITLE_ATTR = "errorTitle";
+    private static final String ERROR_DESCRIPTION_ATTR = "errorDescription";
+    private static final String REQUESTED_URL_ATTR = "requestedUrl";
 
-    public static final String MATCH_ID_REQUIRED_TITLE = "Match ID is required";
-    public static final String MATCH_ID_REQUIRED_DESCRIPTION = "Please provide a valid match ID in the URL.";
-    public static final String INVALID_FORMAT_TITLE = "Invalid match ID format";
-    public static final String INVALID_FORMAT_DESCRIPTION = "The provided match ID is not in the correct format.";
-    public static final String MATCH_NOT_FOUND_TITLE = "Match not found";
-    public static final String MATCH_NOT_FOUND_DESCRIPTION = "No active match found with this ID. The match may have ended or the ID is incorrect.";
-    public static final String MATCH_SCORE_REDIRECT_LINK = "/match-score?uuid=";
+    private static final String MATCH_ID_REQUIRED_TITLE = "Match ID is required";
+    private static final String INVALID_FORMAT_TITLE = "Invalid match ID format";
+    private static final String MATCH_NOT_FOUND_TITLE = "Match not found";
+    private static final String MATCH_ID_REQUIRED_MSG = "Please provide a valid match ID in the URL.";
+    private static final String INVALID_FORMAT_MSG = "The provided match ID is not in the correct format.";
+    private static final String MATCH_NOT_FOUND_MSG = "No active match found with this ID. The match may have ended or the ID is incorrect.";
+    private static final String MATCH_SCORE_REDIRECT_LINK = "/match-score?uuid=";
 
     private OngoingMatchesService ongoingMatchesService = OngoingMatchesService.getInstance();
     private ScoreCalculationService scoreCalculationService = ScoreCalculationService.getInstance();
@@ -54,23 +55,23 @@ public class MatchScoreServlet extends HttpServlet {
 
         if (uuidStr == null || uuidStr.trim().isEmpty()) {
             handleMatchError(req, resp, MATCH_ID_REQUIRED_TITLE,
-                    MATCH_ID_REQUIRED_DESCRIPTION);
+                    MATCH_ID_REQUIRED_MSG);
             return;
         }
 
         UUID uuid;
         try {
-            uuid = java.util.UUID.fromString(uuidStr);
+            uuid = UUID.fromString(uuidStr);
         } catch (IllegalArgumentException e) {
             handleMatchError(req, resp, INVALID_FORMAT_TITLE,
-                    INVALID_FORMAT_DESCRIPTION);
+                    INVALID_FORMAT_MSG);
             return;
         }
 
         MatchWithScore matchWithScore = ongoingMatchesService.find(uuid);
         if (matchWithScore == null) {
             handleMatchError(req, resp, MATCH_NOT_FOUND_TITLE,
-                    MATCH_NOT_FOUND_DESCRIPTION);
+                    MATCH_NOT_FOUND_MSG);
             return;
         }
 
@@ -86,7 +87,7 @@ public class MatchScoreServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String uuidStr = req.getParameter("uuid");
         String playerWonPointId = req.getParameter(PLAYER_WON_POINT_ID_PARAM);
-        UUID uuid = java.util.UUID.fromString(uuidStr);
+        UUID uuid = UUID.fromString(uuidStr);
         MatchWithScore matchWithScore = ongoingMatchesService.find(uuid);
 
         Player firstPlayer = matchWithScore.match().getFirstPlayer();

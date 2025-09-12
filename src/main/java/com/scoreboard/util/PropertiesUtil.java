@@ -5,7 +5,8 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public final class PropertiesUtil {
-    public static final String PROPERTIES_FILE_NAME = "hibernate.properties";
+    private static final String PROPERTIES_FILE_NAME = "hibernate.properties";
+    private static final String PROPERTIES_NOT_FOUND_MSG = "Properties file not found";
 
     private static final Properties PROPERTIES = new Properties();
 
@@ -25,7 +26,7 @@ public final class PropertiesUtil {
     private static void loadProperties() {
         try (InputStream resourceAsStream = PropertiesUtil.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE_NAME)) {
             if (resourceAsStream == null) {
-                throw new RuntimeException("Properties file not found");
+                throw new RuntimeException(PROPERTIES_NOT_FOUND_MSG);
             }
             PROPERTIES.load(resourceAsStream);
         } catch (IOException e) {
