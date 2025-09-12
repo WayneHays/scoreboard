@@ -1,7 +1,7 @@
 package com.scoreboard.service;
 
 import com.scoreboard.dao.PlayersDao;
-import com.scoreboard.exception.DaoException;
+import com.scoreboard.exception.ScoreboardServiceException;
 import com.scoreboard.model.Player;
 import com.scoreboard.util.HibernateUtil;
 import org.hibernate.Session;
@@ -26,13 +26,13 @@ public class PlayerService {
         Transaction transaction = session.beginTransaction();
 
         try {
-            Optional<Player> found = playersDao.findByName(name);
-            Player result = found.orElseGet(() -> playersDao.save(new Player(name)));
+            Optional<Player> result = playersDao.findByName(name);
+            Player player = result.orElseGet(() -> playersDao.save(new Player(name)));
             transaction.commit();
-            return result;
-        } catch (DaoException e) {
+            return player;
+        } catch (RuntimeException e) {
             transaction.rollback();
-            throw new RuntimeException("Failed to create player", e);
+            throw new ScoreboardServiceException("Failed to create player", e);
         }
     }
 
@@ -41,10 +41,12 @@ public class PlayerService {
         Transaction transaction = session.beginTransaction();
 
         try {
-            return playersDao.findByName(name);
-        } catch (DaoException e) {
+            Optional<Player> result = playersDao.findByName(name);
+            transaction.commit();
+            return result;
+        }  catch (RuntimeException e) {
             transaction.rollback();
-            throw new RuntimeException("Failed to find player", e);
+            throw new ScoreboardServiceException("Failed to find player with name " + name, e);
         }
     }
 }

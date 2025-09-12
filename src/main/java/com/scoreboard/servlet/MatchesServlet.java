@@ -17,81 +17,70 @@ import java.util.Optional;
 
 @WebServlet("/matches")
 public class MatchesServlet extends HttpServlet {
-    public static final String PAGE = "page";
-    public static final String FILTER_BY_PLAYER_NAME = "filter_by_player_name";
-    public static final String MATCHES_JSP = "/WEB-INF/matches.jsp";
-    public static final String MATCHES = "matches";
-    public static final String TOTAL_COUNT_OF_PAGES = "totalCountOfPages";
+    private static final String PAGE_ATTRIBUTE = "page";
+    private static final String MATCHES_ATTRIBUTE = "matches";
+    private static final String TOTAL_COUNT_OF_PAGES_ATTRIBUTE = "totalCountOfPages";
+    private static final String ERROR_MESSAGE_ATTRIBUTE = "errorMessage";
+    private static final String FILTER_BY_PLAYER_NAME_ATTRIBUTE = "filter_by_player_name";
+    private static final String PLAYER_NOT_FOUND_MESSAGE = "Player not found : ";
+    private static final String MATCHES_JSP = "/WEB-INF/matches.jsp";
 
     private FindMatchesService findMatchesService = FindMatchesService.getInstance();
     private PlayerService playerService = PlayerService.getInstance();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String playerName = req.getParameter(FILTER_BY_PLAYER_NAME);
+        String playerName = req.getParameter(FILTER_BY_PLAYER_NAME_ATTRIBUTE);
+        String pageNumberStr = req.getParameter(PAGE_ATTRIBUTE);
+        int pageNumber;
 
-        if (playerName == null) {
-            showAllMatchesByPage(req, resp);
+        try {
+            pageNumber = Integer.parseInt(pageNumberStr);
+        } catch (NumberFormatException e) {
+            pageNumber = 1;
+        }
+
+        if (playerName == null || playerName.trim().isEmpty()) {
+            showMatchesByPage(req, resp, pageNumber);
         } else {
-            showPlayerMatchesByPage(req, resp);
+            showMatchesByPlayerByPage(req, resp, playerName, pageNumber);
         }
     }
 
-    private void showAllMatchesByPage(HttpServletRequest req, HttpServletResponse resp)
+    private void showMatchesByPage(HttpServletRequest req, HttpServletResponse resp, int pageNumber)
             throws ServletException, IOException {
-        int pageNumber = parsePageNumber(req);
         List<Match> matches = findMatchesService.findMatchesByPage(pageNumber);
         int totalCountOfPages = findMatchesService.getTotalCountOfPages();
 
-        req.setAttribute(PAGE, pageNumber);
-        req.setAttribute(MATCHES, matches);
-        req.setAttribute(TOTAL_COUNT_OF_PAGES, totalCountOfPages);
+        req.setAttribute(PAGE_ATTRIBUTE, pageNumber);
+        req.setAttribute(MATCHES_ATTRIBUTE, matches);
+        req.setAttribute(TOTAL_COUNT_OF_PAGES_ATTRIBUTE, totalCountOfPages);
         getServletContext().getRequestDispatcher(MATCHES_JSP).forward(req, resp);
     }
 
-    private void showPlayerMatchesByPage(HttpServletRequest req, HttpServletResponse resp)
+    private void showMatchesByPlayerByPage(HttpServletRequest req, HttpServletResponse resp, String playerName, int pageNumber)
             throws ServletException, IOException {
-        int pageNumber = parsePageNumber(req);
-        String playerName = req.getParameter(FILTER_BY_PLAYER_NAME);
-        if (playerName == null || playerName.trim().isEmpty()) {
-            showAllMatchesByPage(req, resp);
-            return;
-        }
-
         Optional<Player> maybePlayer = playerService.find(playerName);
+
         if (maybePlayer.isEmpty()) {
-            req.setAttribute("errorMessage", "Matches not found with player: " + playerName);
-            req.setAttribute(MATCHES, new ArrayList<>());
-            req.setAttribute(TOTAL_COUNT_OF_PAGES, 0);
+            req.setAttribute(ERROR_MESSAGE_ATTRIBUTE, PLAYER_NOT_FOUND_MESSAGE + playerName);
+            req.setAttribute(MATCHES_ATTRIBUTE, new ArrayList<>());
+            req.setAttribute(TOTAL_COUNT_OF_PAGES_ATTRIBUTE, 0);
             getServletContext().getRequestDispatcher(MATCHES_JSP).forward(req, resp);
             return;
         }
 
-        showPlayerMatches(req, resp, pageNumber, maybePlayer.get());
+        showMatches(req, resp, pageNumber, maybePlayer.get());
     }
 
-    private void showPlayerMatches(HttpServletRequest req, HttpServletResponse resp, int pageNumber, Player player)
+    private void showMatches(HttpServletRequest req, HttpServletResponse resp, int pageNumber, Player player)
             throws ServletException, IOException {
         List<Match> matches = findMatchesService.findMatchesByPlayerByPage(player, pageNumber);
         int totalCountOfPages = findMatchesService.getTotalCountOfPagesByPlayer(player);
 
-        req.setAttribute("playerName", player);
-        req.setAttribute(PAGE, pageNumber);
-        req.setAttribute(MATCHES, matches);
-        req.setAttribute(TOTAL_COUNT_OF_PAGES, totalCountOfPages);
-
+        req.setAttribute(PAGE_ATTRIBUTE, pageNumber);
+        req.setAttribute(MATCHES_ATTRIBUTE, matches);
+        req.setAttribute(TOTAL_COUNT_OF_PAGES_ATTRIBUTE, totalCountOfPages);
         getServletContext().getRequestDispatcher(MATCHES_JSP).forward(req, resp);
-    }
-
-    private int parsePageNumber(HttpServletRequest req) {
-        String pageNumberStr = req.getParameter(PAGE);
-        if (pageNumberStr == null || pageNumberStr.isEmpty()) {
-            return 1;
-        }
-        try {
-            return Integer.parseInt(pageNumberStr);
-        } catch (NumberFormatException e) {
-            return 1;
-        }
     }
 }

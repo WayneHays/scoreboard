@@ -1,0 +1,250 @@
+/* Общие стили в стиле проекта */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    color: #333;
+}
+
+.container {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    max-width: 600px;
+    width: 100%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin: 0 auto;
+    position: relative;
+}
+
+/* Иконка ошибки */
+.error-icon {
+    font-size: 60px;
+    margin-bottom: 20px;
+    opacity: 0.8;
+}
+
+/* Код ошибки */
+.error-code {
+    font-size: 80px;
+    font-weight: 900;
+    color: #e74c3c;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    letter-spacing: -2px;
+}
+
+/* Заголовок */
+.error-title {
+    font-size: 28px;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+/* Основное сообщение */
+.error-message {
+    font-size: 16px;
+    color: #7f8c8d;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+/* Запрошенный URL */
+.requested-url {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 20px 0;
+    font-size: 14px;
+    color: #495057;
+}
+
+.url-text {
+    font-family: 'Courier New', monospace;
+    background: #e9ecef;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #2c3e50;
+    word-break: break-all;
+}
+
+/* Кнопки действий */
+.actions {
+    margin: 30px 0;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    min-width: 140px;
+    justify-content: center;
+}
+
+.button-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.button-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.button-secondary {
+    background: #f8f9fa;
+    color: #495057;
+    border: 2px solid #e9ecef;
+}
+
+.button-secondary:hover {
+    background: #e9ecef;
+    transform: translateY(-2px);
+}
+
+/* Предложения */
+.suggestions {
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 1px solid #e9ecef;
+}
+
+.suggestions h3 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.suggestion-list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.suggestion-list li {
+    background: #f8f9fa;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.suggestion-list li:hover {
+    background: #e9ecef;
+    transform: translateY(-1px);
+}
+
+.suggestion-list a {
+    display: block;
+    padding: 12px 16px;
+    color: #495057;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.suggestion-list a:hover {
+    color: #2c3e50;
+}
+
+/* Debug информация */
+.debug-info {
+    margin-top: 40px;
+    padding: 20px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    text-align: left;
+    font-size: 12px;
+}
+
+.debug-info h4 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.debug-item {
+    margin: 8px 0;
+    padding: 5px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.debug-item:last-child {
+    border-bottom: none;
+}
+
+.debug-item strong {
+    color: #495057;
+    display: inline-block;
+    min-width: 120px;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .container {
+        padding: 30px 20px;
+        margin: 10px;
+    }
+
+    .error-code {
+        font-size: 60px;
+    }
+
+    .error-title {
+        font-size: 24px;
+    }
+
+    .actions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .button {
+        width: 100%;
+        max-width: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    .error-code {
+        font-size: 48px;
+    }
+
+    .error-title {
+        font-size: 20px;
+    }
+
+    .container {
+        padding: 20px 15px;
+    }
+}

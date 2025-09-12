@@ -1,5 +1,6 @@
 package com.scoreboard.servlet;
 
+import com.scoreboard.exception.ScoreboardServiceException;
 import com.scoreboard.model.Player;
 import com.scoreboard.service.OngoingMatchesService;
 import com.scoreboard.service.PlayerService;
@@ -30,7 +31,8 @@ public class NewMatchServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException, ServletException, ScoreboardServiceException {
         String player1Input = req.getParameter(PLAYER_1_NAME_PARAM);
         String player2Input = req.getParameter(PLAYER_2_NAME_PARAM);
 
@@ -49,7 +51,7 @@ public class NewMatchServlet extends HttpServlet {
 
         Player player1 = playerService.create(player1Result.value());
         Player player2 = playerService.create(player2Result.value());
-        UUID uuid = ongoingMatchesService.create(player1, player2);
+        UUID uuid = ongoingMatchesService.createMatch(player1, player2);
         resp.sendRedirect(MATCH_SCORE_UUID + uuid);
     }
 

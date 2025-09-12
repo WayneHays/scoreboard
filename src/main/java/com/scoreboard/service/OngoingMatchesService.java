@@ -22,17 +22,13 @@ public class OngoingMatchesService {
         return INSTANCE;
     }
 
-    public UUID create(Player first, Player second) {
-        try {
-            Match match = new Match(first, second);
-            Score score = initStartScore(first, second);
-            MatchWithScore matchWithScore = new MatchWithScore(match, score);
-            UUID uuid = UUID.randomUUID();
-            ongoingMatches.put(uuid, matchWithScore);
-            return uuid;
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to create match", e);
-        }
+    public UUID createMatch(Player first, Player second) {
+        Match match = new Match(first, second);
+        Score score = initStartScore(first, second);
+        MatchWithScore matchWithScore = new MatchWithScore(match, score);
+        UUID uuid = UUID.randomUUID();
+        ongoingMatches.put(uuid, matchWithScore);
+        return uuid;
     }
 
     public MatchWithScore find(UUID uuid) {

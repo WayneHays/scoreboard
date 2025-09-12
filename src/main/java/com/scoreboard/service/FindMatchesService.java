@@ -1,15 +1,15 @@
 package com.scoreboard.service;
 
 import com.scoreboard.dao.MatchDao;
-import com.scoreboard.exception.DaoException;
+import com.scoreboard.exception.ScoreboardServiceException;
 import com.scoreboard.model.Match;
 import com.scoreboard.model.Player;
 import com.scoreboard.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class FindMatchesService {
     private static final FindMatchesService INSTANCE = new FindMatchesService();
@@ -19,81 +19,45 @@ public class FindMatchesService {
         return INSTANCE;
     }
 
-    public List<Match> findMatchesByPlayer(Player player) {
-        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-        Transaction transaction = session.beginTransaction();
-        List<Match> matches;
-        try {
-            matches = matchDao.findByPlayer(player);
-            transaction.commit();
-        } catch (DaoException e) {
-            throw new RuntimeException("Failed to find matches by player", e);
-        }
-        return matches;
-    }
-
-    public List<Match> findAll() {
-        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-        Transaction transaction = session.beginTransaction();
-        List<Match> matches;
-        try {
-            matches = matchDao.findAll();
-            transaction.commit();
-        } catch (DaoException e) {
-            throw new RuntimeException("Failed to find all matches", e);
-        }
-        return matches;
-    }
-
     public int getTotalCountOfPages() {
-        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-        Transaction transaction = session.beginTransaction();
-        int totalCountOfPages;
-        try {
-            totalCountOfPages = matchDao.getTotalCountOfPages();
-            transaction.commit();
-        } catch (DaoException e) {
-            throw new RuntimeException("Failed to get total count of pages", e);
-        }
-        return totalCountOfPages;
+        return executeInTransaction(
+                matchDao::getTotalCountOfPages,
+                "Failed to get total count of pages"
+        );
     }
 
     public int getTotalCountOfPagesByPlayer(Player player) {
-        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-        Transaction transaction = session.beginTransaction();
-        int totalCountOfPages;
-        try {
-            totalCountOfPages = matchDao.getTotalCountOfPagesByPlayer(player);
-            transaction.commit();
-        } catch (DaoException e) {
-            throw new RuntimeException("Failed to get total count of pages", e);
-        }
-        return totalCountOfPages;
+        return executeInTransaction(
+                () -> matchDao.getTotalCountOfPagesByPlayer(player),
+                "Failed to get total count of pages by player"
+        );
     }
 
     public List<Match> findMatchesByPage(int pageNumber) {
-        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-        Transaction transaction = session.beginTransaction();
-        List<Match> matches;
-        try {
-            matches = matchDao.findMatchesByPage(pageNumber);
-            transaction.commit();
-        } catch (DaoException e) {
-            throw new RuntimeException("Failed to find matches by page", e);
-        }
-        return matches;
+        return executeInTransaction(
+                () -> matchDao.findMatchesByPage(pageNumber),
+                "Failed to find matches by page"
+        );
     }
 
     public List<Match> findMatchesByPlayerByPage(Player player, int pageNumber) {
+        return executeInTransaction(
+                () -> matchDao.findMatchesByPlayerByPage(player, pageNumber),
+                "Failed to find matches by page"
+        );
+    }
+
+    private <T> T executeInTransaction(Supplier<T> operation, String errorMessage) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
         Transaction transaction = session.beginTransaction();
-        List<Match> matches;
+
         try {
-            matches = matchDao.findMatchesByPlayerByPage(player, pageNumber);
+            T result = operation.get();
             transaction.commit();
-        } catch (DaoException e) {
-            throw new RuntimeException("Failed to find matches by player", e);
+            return result;
+        } catch (RuntimeException e) {
+            transaction.rollback();
+            throw new ScoreboardServiceException(errorMessage, e);
         }
-        return matches;
     }
 }

@@ -1,7 +1,6 @@
 package com.scoreboard.service;
 
 import com.scoreboard.dao.MatchDao;
-import com.scoreboard.exception.DaoException;
 import com.scoreboard.exception.ScoreboardServiceException;
 import com.scoreboard.model.Match;
 import com.scoreboard.util.HibernateUtil;
@@ -23,7 +22,8 @@ public class FinishedMatchService {
         try {
             matchDao.save(match);
             transaction.commit();
-        } catch (DaoException e) {
+        } catch (RuntimeException e) {
+            transaction.rollback();
             throw new ScoreboardServiceException("Failed to save match in database", e);
         }
     }
