@@ -12,6 +12,10 @@ import java.util.List;
 import java.util.function.Supplier;
 
 public class FindMatchesService {
+    private static final String FAILED_TO_GET_TOTAL_PAGES = "Failed to get total count of pages";
+    private static final String FAILED_TO_GET_TOTAL_PAGES_BY_PLAYER = "Failed to get total count of pages by player";
+    private static final String FAILED_TO_FIND_MATCHES_BY_PAGE = "Failed to find matches by page";
+
     private static final FindMatchesService INSTANCE = new FindMatchesService();
     private final MatchDao matchDao = new MatchDao();
 
@@ -22,28 +26,28 @@ public class FindMatchesService {
     public int getTotalCountOfPages() {
         return executeInTransaction(
                 matchDao::getTotalCountOfPages,
-                "Failed to get total count of pages"
+                FAILED_TO_GET_TOTAL_PAGES
         );
     }
 
     public int getTotalCountOfPagesByPlayer(Player player) {
         return executeInTransaction(
                 () -> matchDao.getTotalCountOfPagesByPlayer(player),
-                "Failed to get total count of pages by player"
+                FAILED_TO_GET_TOTAL_PAGES_BY_PLAYER
         );
     }
 
     public List<Match> findMatchesByPage(int pageNumber) {
         return executeInTransaction(
                 () -> matchDao.findMatchesByPage(pageNumber),
-                "Failed to find matches by page"
+                FAILED_TO_FIND_MATCHES_BY_PAGE
         );
     }
 
     public List<Match> findMatchesByPlayerByPage(Player player, int pageNumber) {
         return executeInTransaction(
                 () -> matchDao.findMatchesByPlayerByPage(player, pageNumber),
-                "Failed to find matches by page"
+                FAILED_TO_FIND_MATCHES_BY_PAGE
         );
     }
 

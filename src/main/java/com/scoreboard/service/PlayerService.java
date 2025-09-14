@@ -10,6 +10,9 @@ import org.hibernate.Transaction;
 import java.util.Optional;
 
 public class PlayerService {
+    private static final String FAILED_TO_FIND_PLAYER_MSG = "Failed to find player with name ";
+    private static final String FAILED_TO_CREATE_PLAYER_MSG = "Failed to create player";
+
     private static final PlayerService INSTANCE = new PlayerService();
     private final PlayersDao playersDao;
 
@@ -32,7 +35,7 @@ public class PlayerService {
             return player;
         } catch (RuntimeException e) {
             transaction.rollback();
-            throw new ScoreboardServiceException("Failed to create player", e);
+            throw new ScoreboardServiceException(FAILED_TO_CREATE_PLAYER_MSG, e);
         }
     }
 
@@ -46,7 +49,7 @@ public class PlayerService {
             return result;
         }  catch (RuntimeException e) {
             transaction.rollback();
-            throw new ScoreboardServiceException("Failed to find player with name " + name, e);
+            throw new ScoreboardServiceException(FAILED_TO_FIND_PLAYER_MSG + name, e);
         }
     }
 }

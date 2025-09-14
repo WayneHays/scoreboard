@@ -1,5 +1,7 @@
 package com.scoreboard.util;
 
+import com.scoreboard.servlet.ValidationResult;
+
 import java.util.regex.Pattern;
 
 public final class PlayerNameValidator {
@@ -13,6 +15,7 @@ public final class PlayerNameValidator {
     private static final String NAME_TOO_LONG_TEMPLATE = "Name too long (maximum %d characters";
 
     private PlayerNameValidator() {
+        throw new UnsupportedOperationException("Utility class cannot be instantiated");
     }
 
     public static ValidationResult validate(String name) {

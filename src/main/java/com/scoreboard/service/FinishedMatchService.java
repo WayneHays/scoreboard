@@ -8,6 +8,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 public class FinishedMatchService {
+    private static final String SAVE_MATCH_FAILED = "Failed to save match in database";
     private static final FinishedMatchService INSTANCE = new FinishedMatchService();
     private final MatchDao matchDao = new MatchDao();
 
@@ -24,7 +25,7 @@ public class FinishedMatchService {
             transaction.commit();
         } catch (RuntimeException e) {
             transaction.rollback();
-            throw new ScoreboardServiceException("Failed to save match in database", e);
+            throw new ScoreboardServiceException(SAVE_MATCH_FAILED, e);
         }
     }
 }

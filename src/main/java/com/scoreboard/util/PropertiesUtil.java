@@ -11,6 +11,7 @@ public final class PropertiesUtil {
     private static final Properties PROPERTIES = new Properties();
 
     private PropertiesUtil() {
+        throw new UnsupportedOperationException("Utility class cannot be instantiated");
     }
 
     static {

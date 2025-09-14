@@ -6,7 +6,6 @@ import com.scoreboard.service.OngoingMatchesService;
 import com.scoreboard.service.PlayerService;
 import com.scoreboard.util.JspPaths;
 import com.scoreboard.util.PlayerNameValidator;
-import com.scoreboard.util.ValidationResult;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -18,7 +17,7 @@ import java.util.UUID;
 
 @WebServlet("/new-match")
 public class NewMatchServlet extends HttpServlet {
-    private static final String NEW_MATCH_JSP = JspPaths.NEW_MATCH;
+    private static final String NEW_MATCH_JSP = JspPaths.NEW_MATCH_JSP;
 
     private static final String MATCH_SCORE_URL = "/match-score?uuid=";
 

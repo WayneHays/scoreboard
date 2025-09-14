@@ -12,6 +12,7 @@ public class MatchDao {
     private static final int PAGE_SIZE = 10;
     private static final String FIND_ALL = "FROM Match";
     private static final String FIND_BY_PLAYER = "FROM Match WHERE firstPlayer = :player OR secondPlayer = :player";
+    public static final String SELECT_COUNT = "SELECT COUNT(*) ";
     private static final String PLAYER = "player";
 
     public void save(Match match) {
@@ -59,14 +60,14 @@ public class MatchDao {
 
     private int getTotalCountOfMatches() {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-        return session.createQuery("SELECT COUNT(*) " + FIND_ALL, Long.class)
+        return session.createQuery(SELECT_COUNT + FIND_ALL, Long.class)
                        .getSingleResult()
                        .intValue();
     }
 
     private int getTotalCountOfMatchesByPlayer(Player player) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-        return session.createQuery("SELECT COUNT(*) " + FIND_BY_PLAYER, Long.class)
+        return session.createQuery(SELECT_COUNT + FIND_BY_PLAYER, Long.class)
                        .setParameter(PLAYER, player)
                        .getSingleResult()
                        .intValue();

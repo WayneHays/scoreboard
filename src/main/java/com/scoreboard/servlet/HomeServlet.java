@@ -11,7 +11,7 @@ import java.io.IOException;
 
 @WebServlet ("/home")
 public class HomeServlet extends HttpServlet {
-    private static final String HOME_JSP = JspPaths.HOME;
+    private static final String HOME_JSP = JspPaths.HOME_JSP;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
