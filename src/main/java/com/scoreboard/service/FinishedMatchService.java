@@ -14,7 +14,8 @@ public class FinishedMatchService extends BaseTransactionalService{
     }
 
     public void saveToDatabase(Match match) {
-        executeInTransaction(() -> matchDao.save(match),
+        executeInTransaction(
+                () -> matchDao.save(match),
                 SAVE_MATCH_FAILED);
     }
 }

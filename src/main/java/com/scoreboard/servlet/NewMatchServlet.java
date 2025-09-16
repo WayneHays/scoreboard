@@ -38,12 +38,25 @@ public class NewMatchServlet extends HttpServlet {
         ValidationResult player2Result = validate(player2Input);
 
         if (hasValidationErrors(player1Result, player2Result)) {
-            showFormWithErrors(req, resp, player1Result, player2Result, player1Input, player2Input, null);
+            showFormWithErrors(
+                    req,
+                    resp,
+                    player1Result,
+                    player2Result,
+                    player1Input,
+                    player2Input,
+                    null);
             return;
         }
 
         if (hasDuplicateNames(player1Result, player2Result)) {
-            showFormWithErrors(req, resp, player1Result, player2Result, player1Input, player2Input,
+            showFormWithErrors(
+                    req,
+                    resp,
+                    player1Result,
+                    player2Result,
+                    player1Input,
+                    player2Input,
                     "Players cannot have the same name");
             return;
         }
@@ -53,8 +66,8 @@ public class NewMatchServlet extends HttpServlet {
 
     private void createMatchAndRedirect(HttpServletResponse resp, ValidationResult player1Result,
                                         ValidationResult player2Result) throws IOException {
-        Player player1 = playerService.create(player1Result.value());
-        Player player2 = playerService.create(player2Result.value());
+        Player player1 = playerService.findByNameOrCreate(player1Result.value());
+        Player player2 = playerService.findByNameOrCreate(player2Result.value());
         UUID uuid = ongoingMatchesService.createMatch(player1, player2);
         resp.sendRedirect("/match-score?uuid=" + uuid);
     }
@@ -63,8 +76,13 @@ public class NewMatchServlet extends HttpServlet {
                                     ValidationResult player1Result, ValidationResult player2Result,
                                     String player1Input, String player2Input, String generalError)
             throws ServletException, IOException {
-        RequestAttributeHelper.setNewMatchAttributes(req, player1Result, player2Result,
-                player1Input, player2Input, generalError);
+        RequestAttributeHelper.setNewMatchAttributes(
+                req,
+                player1Result,
+                player2Result,
+                player1Input,
+                player2Input,
+                generalError);
         getServletContext().getRequestDispatcher(NEW_MATCH_JSP).forward(req, resp);
     }
 

@@ -9,7 +9,8 @@ import java.io.IOException;
 public final class ErrorHandler {
 
     private ErrorHandler() {
-        throw new UnsupportedOperationException("Utility class cannot be instantiated");
+        throw new UnsupportedOperationException(
+                "Utility class cannot be instantiated");
     }
 
     public static void handleHttpError(HttpServletRequest req, HttpServletResponse resp,
@@ -20,7 +21,9 @@ public final class ErrorHandler {
         req.setAttribute("errorMessage", message);
         req.setAttribute("requestedUrl", buildUrl(req));
         setErrorPageAttributes(req, statusCode);
-        req.getServletContext().getRequestDispatcher("/WEB-INF/error.jsp").forward(req, resp);
+        req.getServletContext()
+                .getRequestDispatcher("/WEB-INF/error.jsp")
+                .forward(req, resp);
     }
 
     public static void setErrorPageAttributes(HttpServletRequest request, int statusCode) {
@@ -29,20 +32,21 @@ public final class ErrorHandler {
         String defaultMessage;
 
         switch (statusCode) {
-            case 400:
+            case HttpServletResponse.SC_BAD_REQUEST:
                 errorIcon = "⚠️";
                 errorTitle = "Bad Request";
                 defaultMessage = "Your request contains invalid data or parameters.";
                 break;
-            case 404:
+            case HttpServletResponse.SC_NOT_FOUND:
                 errorIcon = "❌";
                 errorTitle = "Page Not Found";
                 defaultMessage = "The page you are looking for doesn't exist or has been moved.";
                 break;
-            case 500:
+            case HttpServletResponse.SC_INTERNAL_SERVER_ERROR:
                 errorIcon = "💥";
                 errorTitle = "Internal Server Error";
-                defaultMessage = "Something went wrong on our server. We're working to fix this issue.";
+                defaultMessage = "Something went wrong on our server. "
+                                 + "We're working to fix this issue.";
                 break;
             default:
                 errorIcon = "⚠️";
@@ -57,7 +61,7 @@ public final class ErrorHandler {
     }
 
     private static String buildUrl(HttpServletRequest req) {
-        return req.getRequestURI() +
-               (req.getQueryString() != null ? "?" + req.getQueryString() : "");
+        return req.getRequestURI()
+               + (req.getQueryString() != null ? "?" + req.getQueryString() : "");
     }
 }

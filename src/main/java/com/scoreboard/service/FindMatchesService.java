@@ -15,24 +15,27 @@ public class FindMatchesService extends BaseTransactionalService {
     }
 
     public int getTotalCountOfPages() {
-        return executeInTransaction(matchDao::getTotalCountOfPages, "Failed to get total count of pages");
+        return executeInTransaction(
+                matchDao::getTotalCountOfPages,
+                "Failed to get total count of pages");
     }
 
     public int getTotalCountOfPagesByPlayer(Player player) {
-        return executeInTransaction(() -> matchDao.getTotalCountOfPagesByPlayer(player),
+        return executeInTransaction(
+                () -> matchDao.getTotalCountOfPagesByPlayer(player),
                 "Failed to get total count of pages by player");
     }
 
     public List<Match> findMatchesByPage(int pageNumber) {
         return executeInTransaction(
-                () -> matchDao.findMatchesByPage(pageNumber),
+                () -> matchDao.find(pageNumber),
                 "Failed to find matches by page"
         );
     }
 
     public List<Match> findMatchesByPlayerByPage(Player player, int pageNumber) {
         return executeInTransaction(
-                () -> matchDao.findMatchesByPlayerByPage(player, pageNumber),
+                () -> matchDao.find(player, pageNumber),
                 "Failed to find matches by player and page"
         );
     }

@@ -25,7 +25,10 @@ public class UrlValidationFilter implements Filter {
     );
 
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+    public void doFilter(
+            ServletRequest servletRequest,
+            ServletResponse servletResponse,
+            FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) servletRequest;
         HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
 
@@ -41,7 +44,11 @@ public class UrlValidationFilter implements Filter {
         if (isValidUrl(path)) {
             filterChain.doFilter(httpRequest, httpResponse);
         } else {
-            ErrorHandler.handleHttpError(httpRequest, httpResponse, HttpServletResponse.SC_NOT_FOUND, "Page not found");
+            ErrorHandler.handleHttpError(
+                    httpRequest,
+                    httpResponse,
+                    HttpServletResponse.SC_NOT_FOUND,
+                    "Page not found");
         }
     }
 

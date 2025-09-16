@@ -28,14 +28,14 @@ public class MatchDao {
         session.persist(match);
     }
 
-    public List<Match> findMatchesByPage(int pageNumber) {
+    public List<Match> find(int pageNumber) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
         Query<Match> query = session.createQuery(FIND_ALL, Match.class);
         applyPagination(pageNumber, query);
         return query.getResultList();
     }
 
-    public List<Match> findMatchesByPlayerByPage(Player player, int pageNumber) {
+    public List<Match> find(Player player, int pageNumber) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
         Query<Match> query = session.createQuery(FIND_BY_PLAYER, Match.class);
         query.setParameter(PLAYER, player);

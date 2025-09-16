@@ -8,7 +8,6 @@
     <artifactId>scoreboard</artifactId>
     <version>1.0</version>
     <packaging>war</packaging>
-
     <dependencies>
         <dependency>
             <groupId>org.hibernate.orm</groupId>

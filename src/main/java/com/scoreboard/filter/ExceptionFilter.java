@@ -2,7 +2,6 @@ package com.scoreboard.filter;
 
 import com.scoreboard.exception.ScoreboardServiceException;
 import com.scoreboard.util.ErrorHandler;
-import com.scoreboard.util.RequestAttributeHelper;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,16 +21,28 @@ public class ExceptionFilter implements Filter {
         try {
             chain.doFilter(request, response);
         } catch (ScoreboardServiceException e) {
-            ErrorHandler.handleHttpError((HttpServletRequest) request,
-                    (HttpServletResponse) response, SC_INTERNAL_SERVER_ERROR, "Service error occurred: " + e.getMessage());
+            ErrorHandler.handleHttpError(
+                    (HttpServletRequest) request,
+                    (HttpServletResponse) response,
+                    SC_INTERNAL_SERVER_ERROR,
+                    "Service error occurred: " + e.getMessage());
         } catch (NumberFormatException e) {
-            ErrorHandler.handleHttpError((HttpServletRequest) request,
-                    (HttpServletResponse) response, SC_BAD_REQUEST, "Invalid number format: " + e.getMessage());
+            ErrorHandler.handleHttpError(
+                    (HttpServletRequest) request,
+                    (HttpServletResponse) response,
+                    SC_BAD_REQUEST,
+                    "Invalid number format: " + e.getMessage());
         } catch (IllegalArgumentException e) {
-            handleValidationError((HttpServletRequest) request, (HttpServletResponse) response, e);
+            handleValidationError(
+                    (HttpServletRequest) request,
+                    (HttpServletResponse) response,
+                    e);
         } catch (Exception e) {
-            ErrorHandler.handleHttpError((HttpServletRequest) request,
-                    (HttpServletResponse) response, SC_INTERNAL_SERVER_ERROR, "Internal server error");
+            ErrorHandler.handleHttpError(
+                    (HttpServletRequest) request,
+                    (HttpServletResponse) response,
+                    SC_INTERNAL_SERVER_ERROR,
+                    "Internal server error");
         }
     }
 
@@ -41,16 +52,36 @@ public class ExceptionFilter implements Filter {
 
         if (message != null) {
             if (message.contains("UUID is required")) {
-                ErrorHandler.handleHttpError(request, response, SC_BAD_REQUEST, "Match ID is required");
+                ErrorHandler.handleHttpError(
+                        request,
+                        response,
+                        SC_BAD_REQUEST,
+                        "Match ID is required");
             } else if (message.contains("36 characters") || message.contains("UUID must be")) {
-                ErrorHandler.handleHttpError(request, response, SC_BAD_REQUEST, "Invalid UUID format");
+                ErrorHandler.handleHttpError(
+                        request,
+                        response,
+                        SC_BAD_REQUEST,
+                        "Invalid UUID format");
             } else if (message.toLowerCase().contains("uuid")) {
-                ErrorHandler.handleHttpError(request, response, SC_BAD_REQUEST, "Invalid UUID: " + message);
+                ErrorHandler.handleHttpError(
+                        request,
+                        response,
+                        SC_BAD_REQUEST,
+                        "Invalid UUID: " + message);
             } else {
-                ErrorHandler.handleHttpError(request, response, SC_BAD_REQUEST, "Invalid parameter: " + message);
+                ErrorHandler.handleHttpError(
+                        request,
+                        response,
+                        SC_BAD_REQUEST,
+                        "Invalid parameter: " + message);
             }
         } else {
-            ErrorHandler.handleHttpError(request, response, SC_BAD_REQUEST, "Invalid request parameter");
+            ErrorHandler.handleHttpError(
+                    request,
+                    response,
+                    SC_BAD_REQUEST,
+                    "Invalid request parameter");
         }
     }
 }

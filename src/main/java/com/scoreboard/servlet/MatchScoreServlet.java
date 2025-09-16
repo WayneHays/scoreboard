@@ -36,7 +36,11 @@ public class MatchScoreServlet extends HttpServlet {
         MatchWithScore matchWithScore = ongoingMatchesService.find(uuid);
 
         if (matchWithScore == null) {
-            ErrorHandler.handleHttpError(req, resp, SC_NOT_FOUND, "Match not found");
+            ErrorHandler.handleHttpError(
+                    req,
+                    resp,
+                    SC_NOT_FOUND,
+                    "Match not found");
             return;
         }
         GameState gameState = scoreCalculationService.getCurrentGameState(matchWithScore);
@@ -51,15 +55,25 @@ public class MatchScoreServlet extends HttpServlet {
         UUID uuid = parseUuid(uuidStr);
 
         if (playerWonPointId == null || playerWonPointId.isBlank()) {
-            ErrorHandler.handleHttpError(req, resp, SC_BAD_REQUEST, "Player ID is required");
+            ErrorHandler.handleHttpError(
+                    req,
+                    resp,
+                    SC_BAD_REQUEST,
+                    "Player ID is required");
             return;
         }
+
         MatchWithScore matchWithScore = ongoingMatchesService.find(uuid);
 
         if (matchWithScore == null) {
-            ErrorHandler.handleHttpError(req, resp, SC_NOT_FOUND, "Match not found");
+            ErrorHandler.handleHttpError(
+                    req,
+                    resp,
+                    SC_NOT_FOUND,
+                    "Match not found");
             return;
         }
+
         processPointWin(req, resp, matchWithScore, playerWonPointId, uuid);
     }
 
@@ -67,15 +81,21 @@ public class MatchScoreServlet extends HttpServlet {
         if (uuidStr == null || uuidStr.isBlank()) {
             throw new IllegalArgumentException("UUID is required");
         }
+
         if (uuidStr.length() != REQUIRED_UUID_LENGTH) {
             throw new IllegalArgumentException("UUID must be 36 characters long");
         }
+
         return UUID.fromString(uuidStr);
     }
 
-    private void processPointWin(HttpServletRequest req, HttpServletResponse resp,
-                                 MatchWithScore matchWithScore, String playerWonPointId, UUID uuid)
-            throws ServletException, IOException {
+    private void processPointWin(
+            HttpServletRequest req,
+            HttpServletResponse resp,
+            MatchWithScore matchWithScore,
+            String playerWonPointId,
+            UUID uuid) throws ServletException, IOException {
+
         Player pointWinner = determinePointWinner(matchWithScore, playerWonPointId);
         GameState gameState = scoreCalculationService.calculate(matchWithScore, pointWinner);
 
@@ -114,9 +134,14 @@ public class MatchScoreServlet extends HttpServlet {
         return scoreCalculationService.isMatchFinished(gameState.score(), firstPlayer, secondPlayer);
     }
 
-    private void finishMatch(HttpServletRequest req, HttpServletResponse resp,
-                             MatchWithScore matchWithScore, UUID uuid, Player pointWinner)
+    private void finishMatch(
+            HttpServletRequest req,
+            HttpServletResponse resp,
+            MatchWithScore matchWithScore,
+            UUID uuid,
+            Player pointWinner)
             throws ServletException, IOException {
+
         ongoingMatchesService.delete(uuid);
         matchWithScore.match().setWinner(pointWinner);
         finishedMatchService.saveToDatabase(matchWithScore.match());

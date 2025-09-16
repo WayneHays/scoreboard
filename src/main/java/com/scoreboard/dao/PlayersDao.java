@@ -24,7 +24,7 @@ public class PlayersDao {
         return player;
     }
 
-    public Optional<Player> findByName(String name) {
+    public Optional<Player> find(String name) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
         return session.createQuery(FIND_BY_NAME_SQL, Player.class)
                 .setParameter(NAME, name)

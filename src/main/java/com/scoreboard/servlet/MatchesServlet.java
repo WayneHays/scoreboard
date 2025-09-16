@@ -53,14 +53,18 @@ public class MatchesServlet extends HttpServlet {
     }
 
     private void showMatches(HttpServletRequest req, HttpServletResponse resp,
-                             int pageNumber, int totalPages, Player player)
-            throws ServletException, IOException {
+                             int pageNumber, int totalPages, Player player) throws ServletException, IOException {
         List<Match> matches = (player == null) ?
                 findMatchesService.findMatchesByPage(pageNumber) :
                 findMatchesService.findMatchesByPlayerByPage(player, pageNumber);
 
-        RequestAttributeHelper.setMatchesPageAttributes(req, pageNumber, matches, totalPages,
-                player != null ? player.getName() : null, null);
+        RequestAttributeHelper.setMatchesPageAttributes(
+                req,
+                pageNumber,
+                matches,
+                totalPages,
+                player != null ? player.getName() : null,
+                null);
         getServletContext().getRequestDispatcher(MATCHES_JSP).forward(req, resp);
     }
 
@@ -71,8 +75,13 @@ public class MatchesServlet extends HttpServlet {
 
         if (maybePlayer.isEmpty()) {
             String errorMessage = "Player not found: " + playerName;
-            RequestAttributeHelper.setMatchesPageAttributes(req, DEFAULT_PAGE_NUMBER,
-                    new ArrayList<>(), 0, playerName, errorMessage);
+            RequestAttributeHelper.setMatchesPageAttributes(
+                    req,
+                    DEFAULT_PAGE_NUMBER,
+                    new ArrayList<>(),
+                    0,
+                    playerName,
+                    errorMessage);
             getServletContext().getRequestDispatcher(MATCHES_JSP).forward(req, resp);
             return;
         }

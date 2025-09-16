@@ -104,16 +104,9 @@ public class ScoreCalculationService {
         } else {
             calculateRegularGame(pointWinner, score, firstPlayer, secondPlayer);
         }
-
-        System.out.println("Points after logic: " + score.getPoints(firstPlayer) + ":" + score.getPoints(secondPlayer));
-        System.out.println("Games after logic: " + score.getGames(firstPlayer) + ":" + score.getGames(secondPlayer));
     }
 
     private void calculateDeuceLogic(Player pointWinner, Score score, Player firstPlayer, Player secondPlayer, Optional<Player> advantagePlayerBefore) {
-        System.out.println("=== calculateDeuceLogic ===");
-        System.out.println("Points before: " + score.getPoints(firstPlayer) + ":" + score.getPoints(secondPlayer));
-        System.out.println("advantagePlayerBefore: " + advantagePlayerBefore.orElse(null));
-
         if (advantagePlayerBefore.isEmpty()) {
             return;
         }
