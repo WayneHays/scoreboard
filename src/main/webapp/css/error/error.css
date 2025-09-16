@@ -1,0 +1,228 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.container {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    max-width: 600px;
+    width: 100%;
+    text-align: center;
+}
+
+.error-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.error-code {
+    font-size: 4rem;
+    font-weight: 700;
+    color: #667eea;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.error-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 20px;
+}
+
+.error-message {
+    font-size: 1.1rem;
+    color: #4a5568;
+    margin-bottom: 30px;
+    line-height: 1.6;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+
+.requested-url {
+    font-size: 0.9rem;
+    color: #718096;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #edf2f7;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+}
+
+.url-text {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: #667eea;
+    word-break: break-all;
+}
+
+.exception-message {
+    font-size: 0.9rem;
+    color: #e53e3e;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #fed7d7;
+    border-radius: 6px;
+    border-left: 4px solid #e53e3e;
+    text-align: left;
+}
+
+.validation-errors {
+    font-size: 0.9rem;
+    color: #d69e2e;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #fefcbf;
+    border-radius: 6px;
+    border-left: 4px solid #d69e2e;
+    text-align: left;
+}
+
+.validation-errors ul {
+    margin-top: 10px;
+    padding-left: 20px;
+}
+
+.validation-errors li {
+    margin-bottom: 5px;
+}
+
+.actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.button {
+    display: inline-block;
+    padding: 12px 24px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    min-width: 120px;
+}
+
+.button-primary {
+    background: #667eea;
+    color: white;
+}
+
+.button-primary:hover {
+    background: #5a67d8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.button-secondary {
+    background: #962bda;
+    color: white;
+}
+
+.button-secondary:hover {
+    background: #5925a5;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(150, 43, 218, 0.4);
+}
+
+/* Специальные стили для разных типов ошибок */
+.error-400 .error-code {
+    color: #d69e2e;
+}
+
+.error-400 .error-message {
+    border-left-color: #d69e2e;
+}
+
+.error-404 .error-code {
+    color: #667eea;
+}
+
+.error-404 .error-message {
+    border-left-color: #667eea;
+}
+
+.error-500 .error-code {
+    color: #e53e3e;
+}
+
+.error-500 .error-message {
+    border-left-color: #e53e3e;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 30px 20px;
+        margin: 10px;
+    }
+
+    .error-code {
+        font-size: 3rem;
+    }
+
+    .error-title {
+        font-size: 1.5rem;
+    }
+
+    .error-message {
+        font-size: 1rem;
+        padding: 15px;
+    }
+
+    .actions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .button {
+        width: 100%;
+        max-width: 280px;
+    }
+
+    .requested-url,
+    .exception-message,
+    .validation-errors {
+        font-size: 0.8rem;
+        padding: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 20px 15px;
+    }
+
+    .error-icon {
+        font-size: 3rem;
+    }
+
+    .error-code {
+        font-size: 2.5rem;
+    }
+
+    .error-title {
+        font-size: 1.3rem;
+    }
+}

@@ -4,9 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @NoArgsConstructor
-@AllArgsConstructor
 @Getter
-@Setter
 
 @Entity
 @Table(name = "Matches")
@@ -24,6 +22,7 @@ public class Match {
     @JoinColumn(name = "secondPlayer", referencedColumnName = "id")
     private Player secondPlayer;
 
+    @Setter
     @ManyToOne
     @JoinColumn(name = "winner", referencedColumnName = "id")
     private Player winner;

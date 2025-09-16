@@ -2,23 +2,17 @@ package com.scoreboard.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @AllArgsConstructor
 @Getter
-@Setter
 public class Score {
     private final Map<Player, Integer> playersPoints;
     private final Map<Player, Integer> playersGames;
     private final Map<Player, Integer> playersSets;
     private final Map<Player, Integer> playersTieBreakPoints;
-    private Player advantage;
-    private boolean isDeuce;
-    private boolean isTieBreak;
-    private boolean isMatchFinished;
 
     public Score() {
         this.playersTieBreakPoints = new HashMap<>();

@@ -10,11 +10,7 @@ public class PlayerService extends BaseTransactionalService {
     private static final String FAILED_TO_CREATE_PLAYER_MSG = "Failed to create player";
 
     private static final PlayerService INSTANCE = new PlayerService();
-    private final PlayersDao playersDao;
-
-    public PlayerService() {
-        this.playersDao = new PlayersDao();
-    }
+    private final PlayersDao playersDao = PlayersDao.getInstance();
 
     public static PlayerService getInstance() {
         return INSTANCE;

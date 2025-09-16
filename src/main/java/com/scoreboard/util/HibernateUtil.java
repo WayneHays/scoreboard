@@ -8,6 +8,8 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.service.ServiceRegistry;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 public final class HibernateUtil {
@@ -38,10 +40,24 @@ public final class HibernateUtil {
 
     private static ServiceRegistry configureServiceRegistry() {
         try {
-            Properties properties = PropertiesUtil.getProperties();
+            Properties properties = loadHibernateProperties();
             return new StandardServiceRegistryBuilder().applySettings(properties).build();
         } catch (Exception e) {
             throw new RuntimeException("Failed to configure ServiceRegistry", e);
+        }
+    }
+
+    private static Properties loadHibernateProperties() {
+        Properties properties = new Properties();
+        try (InputStream stream = HibernateUtil.class.getClassLoader()
+                .getResourceAsStream("hibernate.properties")) {
+            if (stream == null) {
+                throw new RuntimeException("hibernate.properties file not found");
+            }
+            properties.load(stream);
+            return properties;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load hibernate.properties", e);
         }
     }
 

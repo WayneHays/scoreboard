@@ -8,6 +8,15 @@ import java.util.Optional;
 
 public class PlayersDao {
     private static final String FIND_BY_NAME_SQL = "FROM Player WHERE name = :name";
+    private static final String NAME = "name";
+
+    private static final PlayersDao INSTANCE = new PlayersDao();
+
+    public static PlayersDao getInstance() {
+        return INSTANCE;
+    }
+
+    private PlayersDao() {}
 
     public Player save(Player player) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
@@ -18,7 +27,7 @@ public class PlayersDao {
     public Optional<Player> findByName(String name) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
         return session.createQuery(FIND_BY_NAME_SQL, Player.class)
-                .setParameter("name", name)
+                .setParameter(NAME, name)
                 .uniqueResultOptional();
     }
 }

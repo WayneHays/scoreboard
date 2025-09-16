@@ -4,7 +4,7 @@ import com.scoreboard.model.Match;
 import com.scoreboard.model.Player;
 import com.scoreboard.service.FindMatchesService;
 import com.scoreboard.service.PlayerService;
-import com.scoreboard.util.JspPaths;
+import com.scoreboard.util.ErrorHandler;
 import com.scoreboard.util.RequestAttributeHelper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -17,24 +17,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static jakarta.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+
 @WebServlet("/matches")
 public class MatchesServlet extends HttpServlet {
-    private static final String PAGE_PARAM = "page";
-    private static final String FILTER_BY_PLAYER_NAME_PARAM = "filter_by_player_name";
-    private static final String PLAYER_NOT_FOUND_MSG = "Player not found: ";
-    private static final String NO_MATCHES_MSG = "No matches found.";
-    private static final String PAGE_NOT_FOUND_TEMPLATE = "Page %d not found. Available pages: 1-%d";
+    private static final String MATCHES_JSP = "/WEB-INF/matches.jsp";
     private static final int DEFAULT_PAGE_NUMBER = 1;
 
-    private FindMatchesService findMatchesService = FindMatchesService.getInstance();
-    private PlayerService playerService = PlayerService.getInstance();
+    private final FindMatchesService findMatchesService = FindMatchesService.getInstance();
+    private final PlayerService playerService = PlayerService.getInstance();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String playerName = req.getParameter(FILTER_BY_PLAYER_NAME_PARAM);
-        String pageNumberStr = req.getParameter(PAGE_PARAM);
+        String playerName = req.getParameter("filter_by_player_name");
+        String pageNumberStr = req.getParameter("page");
 
-        if (playerName == null || playerName.trim().isEmpty()) {
+        if (playerName == null || playerName.isBlank()) {
             handleAllMatches(req, resp, pageNumberStr);
         } else {
             handleMatchesByPlayer(req, resp, playerName, pageNumberStr);
@@ -47,33 +45,11 @@ public class MatchesServlet extends HttpServlet {
         int pageNumber = parsePageNumber(pageNumberStr);
 
         if (isInvalidPage(pageNumber, totalPages)) {
-            handle404Page(req, resp, pageNumber, totalPages, null);
+            handlePageNotFound(req, resp, pageNumber, totalPages);
             return;
         }
 
         showMatches(req, resp, pageNumber, totalPages, null);
-    }
-
-    private void handle404Page(HttpServletRequest req, HttpServletResponse resp,
-                               int requestedPage, int totalPages, String playerName)
-            throws ServletException, IOException {
-        resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-
-        String errorMessage = (totalPages == 0) ? NO_MATCHES_MSG :
-                String.format(PAGE_NOT_FOUND_TEMPLATE, requestedPage, totalPages);
-        String requestedUrl = buildRequestedUrl(req, requestedPage, playerName);
-
-        RequestAttributeHelper.set404ErrorAttributes(req, errorMessage, requestedUrl);
-        getServletContext().getRequestDispatcher(JspPaths.ERROR_404_JSP).forward(req, resp);
-    }
-
-    private String buildRequestedUrl(HttpServletRequest req, int requestedPage, String playerName) {
-        StringBuilder url = new StringBuilder(req.getRequestURI());
-        url.append("?page=").append(requestedPage);
-        if (playerName != null && !playerName.trim().isEmpty()) {
-            url.append("&filter_by_player_name=").append(playerName);
-        }
-        return url.toString();
     }
 
     private void showMatches(HttpServletRequest req, HttpServletResponse resp,
@@ -85,7 +61,7 @@ public class MatchesServlet extends HttpServlet {
 
         RequestAttributeHelper.setMatchesPageAttributes(req, pageNumber, matches, totalPages,
                 player != null ? player.getName() : null, null);
-        getServletContext().getRequestDispatcher(JspPaths.MATCHES_JSP).forward(req, resp);
+        getServletContext().getRequestDispatcher(MATCHES_JSP).forward(req, resp);
     }
 
     private void handleMatchesByPlayer(HttpServletRequest req, HttpServletResponse resp,
@@ -94,10 +70,10 @@ public class MatchesServlet extends HttpServlet {
         Optional<Player> maybePlayer = playerService.find(playerName);
 
         if (maybePlayer.isEmpty()) {
-            String errorMessage = PLAYER_NOT_FOUND_MSG + playerName;
+            String errorMessage = "Player not found: " + playerName;
             RequestAttributeHelper.setMatchesPageAttributes(req, DEFAULT_PAGE_NUMBER,
                     new ArrayList<>(), 0, playerName, errorMessage);
-            getServletContext().getRequestDispatcher(JspPaths.MATCHES_JSP).forward(req, resp);
+            getServletContext().getRequestDispatcher(MATCHES_JSP).forward(req, resp);
             return;
         }
 
@@ -106,7 +82,7 @@ public class MatchesServlet extends HttpServlet {
         int pageNumber = parsePageNumber(pageNumberStr);
 
         if (isInvalidPage(pageNumber, totalPages)) {
-            handle404Page(req, resp, pageNumber, totalPages, playerName);
+            handlePageNotFound(req, resp, pageNumber, totalPages);
             return;
         }
 
@@ -114,14 +90,22 @@ public class MatchesServlet extends HttpServlet {
     }
 
     private int parsePageNumber(String pageNumberStr) {
-        try {
-            return Integer.parseInt(pageNumberStr);
-        } catch (NumberFormatException e) {
+        if (pageNumberStr == null || pageNumberStr.isBlank()) {
             return DEFAULT_PAGE_NUMBER;
         }
+        return Integer.parseInt(pageNumberStr);
     }
 
     private boolean isInvalidPage(int pageNumber, int totalPages) {
         return pageNumber < 1 || (totalPages > 0 && pageNumber > totalPages);
+    }
+
+    private void handlePageNotFound(HttpServletRequest req, HttpServletResponse resp,
+                                    int requestedPage, int totalPages)
+            throws ServletException, IOException {
+        String errorMessage = (totalPages == 0) ? "No matches found"  :
+                String.format("Page %d not found. Available pages: 1-%d", requestedPage, totalPages);
+
+        ErrorHandler.handleHttpError(req, resp, SC_NOT_FOUND, errorMessage);
     }
 }

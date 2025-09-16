@@ -9,11 +9,19 @@ import org.hibernate.query.Query;
 import java.util.List;
 
 public class MatchDao {
-    private static final int PAGE_SIZE = 10;
+    private static final int DEFAULT_PAGE_SIZE = 10;
     private static final String FIND_ALL = "FROM Match";
     private static final String FIND_BY_PLAYER = "FROM Match WHERE firstPlayer = :player OR secondPlayer = :player";
     public static final String SELECT_COUNT = "SELECT COUNT(*) ";
     private static final String PLAYER = "player";
+
+    private static final MatchDao INSTANCE = new MatchDao();
+
+    public static MatchDao getInstance() {
+        return INSTANCE;
+    }
+
+    private MatchDao() {}
 
     public void save(Match match) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
@@ -44,18 +52,18 @@ public class MatchDao {
     }
 
     private void applyPagination(int pageNumber, Query<Match> query) {
-        query.setMaxResults(PAGE_SIZE);
-        query.setFirstResult((pageNumber - 1) * PAGE_SIZE);
+        query.setMaxResults(DEFAULT_PAGE_SIZE);
+        query.setFirstResult((pageNumber - 1) * DEFAULT_PAGE_SIZE);
     }
 
     private int calculateTotalPages(int totalRecords) {
         if (totalRecords == 0) {
             return 0;
         }
-        if (totalRecords < PAGE_SIZE) {
+        if (totalRecords < DEFAULT_PAGE_SIZE) {
             return 1;
         }
-        return (int) Math.ceil((double) totalRecords / PAGE_SIZE);
+        return (int) Math.ceil((double) totalRecords / DEFAULT_PAGE_SIZE);
     }
 
     private int getTotalCountOfMatches() {

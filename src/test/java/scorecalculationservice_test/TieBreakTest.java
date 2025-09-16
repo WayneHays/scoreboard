@@ -1,5 +1,6 @@
 package scorecalculationservice_test;
 
+import com.scoreboard.dto.GameState;
 import com.scoreboard.model.Player;
 import org.junit.jupiter.api.Test;
 
@@ -10,9 +11,9 @@ class TieBreakTest extends ScoreCalculationTestBase {
     @Test
     void shouldStartTiebreakIfGamesCount6_6() {
         setGamesCount(5, 6);
-        winCurrentGame(player1);
+        GameState gameState = winCurrentGame(player1);
 
-        assertTrue(score.isTieBreak());
+        assertTrue(gameState.isTieBreak());
     }
 
     @Test
@@ -37,35 +38,35 @@ class TieBreakTest extends ScoreCalculationTestBase {
     @Test
     void shouldWinTiebreakWithSevenPointsAndTwoPointLead() {
         setGamesCount(6, 6);
-        setTieBreakActive();
-
         setTieBreakPoints(20, 19);
-        service.calculate(matchWithScore, player1);
+
+        GameState gameState = service.calculate(matchWithScore, player1);
 
         assertEquals(0, score.getGames(player1));
         assertEquals(1, score.getSets(player1));
-        assertFalse(score.isTieBreak());
-        assertFalse(score.isDeuce());
+        assertFalse(gameState.isTieBreak());
+        assertNull(gameState.advantagePlayer());
     }
 
     @Test
     void shouldFinishMatchIfTiebreakInThirdSet() {
         setSetsCount(1, 1);
         setGamesCount(6, 6);
-        setTieBreakActive();
         setTieBreakPoints(6, 5);
 
-        service.calculate(matchWithScore, player1);
+        GameState gameState = service.calculate(matchWithScore, player1);
 
-        assertFalse(score.isTieBreak());
-        assertFalse(score.isDeuce());
-        assertTrue(score.isMatchFinished());
+        assertFalse(gameState.isTieBreak());
+        assertNull(gameState.advantagePlayer());
+        assertTrue(service.isMatchFinished(gameState.score(), player1, player2));
     }
 
-    private void winCurrentGame(Player player) {
+    private GameState winCurrentGame(Player player) {
+        GameState gameState = null;
         for (int i = 0; i < 4; i++) {
-            service.calculate(matchWithScore, player);
+            gameState = service.calculate(matchWithScore, player);
         }
+        return gameState;
     }
 
     private void setGamesCount(int player1games, int player2games) {
@@ -81,9 +82,5 @@ class TieBreakTest extends ScoreCalculationTestBase {
     private void setTieBreakPoints(int player1Points, int player2Points) {
         score.setTieBreakPoints(player1, player1Points);
         score.setTieBreakPoints(player2, player2Points);
-    }
-
-    private void setTieBreakActive() {
-        score.setTieBreak(true);
     }
 }

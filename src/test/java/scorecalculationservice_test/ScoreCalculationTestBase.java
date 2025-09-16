@@ -45,11 +45,8 @@ public abstract class ScoreCalculationTestBase {
                 points,
                 games,
                 sets,
-                tieBreakPoints,
-                null,
-                false,
-                false,
-                false);
+                tieBreakPoints
+                );
     }
 
     protected Match createMatch(Player player1, Player player2) {

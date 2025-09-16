@@ -1,6 +1,6 @@
 package com.scoreboard.filter;
 
-import com.scoreboard.util.JspPaths;
+import com.scoreboard.util.ErrorHandler;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,23 +11,18 @@ import java.util.Set;
 
 @WebFilter(filterName = "UrlValidationFilter", urlPatterns = "/*")
 public class UrlValidationFilter implements Filter {
-    private static final String ERROR_CODE_ATTR = "errorCode";
-    private static final String ERROR_MESSAGE_ATTR = "errorMessage";
-    private static final String REQUESTED_URL_ATTR = "requestedUrl";
-    private static final String PAGE_NOT_FOUND_MSG = "Page not found";
-
     private static final Set<String> VALID_URLS = Set.of(
+            "/",
+            "index.html",
             "/home",
             "/matches",
             "/new-match",
             "/match",
             "/match-score"
     );
-
     private static final Set<String> STATIC_EXTENSIONS = Set.of(
             ".css", ".js", ".png", ".jpg", ".jpeg", ".gif", ".ico", ".svg"
     );
-
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -46,7 +41,7 @@ public class UrlValidationFilter implements Filter {
         if (isValidUrl(path)) {
             filterChain.doFilter(httpRequest, httpResponse);
         } else {
-            handle404Error(httpRequest, httpResponse);
+            ErrorHandler.handleHttpError(httpRequest, httpResponse, HttpServletResponse.SC_NOT_FOUND, "Page not found");
         }
     }
 
@@ -65,15 +60,5 @@ public class UrlValidationFilter implements Filter {
                path.startsWith("/js/") ||
                path.startsWith("/images/") ||
                path.startsWith("/static/");
-    }
-
-    private void handle404Error(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        request.setAttribute(ERROR_CODE_ATTR, 404);
-        request.setAttribute(ERROR_MESSAGE_ATTR, PAGE_NOT_FOUND_MSG);
-        request.setAttribute(REQUESTED_URL_ATTR, request.getRequestURI());
-        request.getRequestDispatcher(JspPaths.ERROR_404_JSP).forward(request, response);
     }
 }

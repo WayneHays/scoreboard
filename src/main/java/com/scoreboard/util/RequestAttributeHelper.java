@@ -1,9 +1,10 @@
 package com.scoreboard.util;
 
+import com.scoreboard.dto.GameState;
 import com.scoreboard.model.Match;
 import com.scoreboard.model.MatchWithScore;
 import com.scoreboard.model.Player;
-import com.scoreboard.servlet.UuidErrorType;
+import com.scoreboard.servlet.ValidationResult;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
@@ -15,23 +16,27 @@ public final class RequestAttributeHelper {
         throw new UnsupportedOperationException("Utility class cannot be instantiated");
     }
 
-    public static void setOngoingMatchAttributes(HttpServletRequest req, MatchWithScore match, UUID uuid) {
-        req.setAttribute("matchWithScore", match);
-        req.setAttribute("currentScore", match.score());
-        req.setAttribute("player1", match.match().getFirstPlayer());
-        req.setAttribute("player2", match.match().getSecondPlayer());
+    public static void setOngoingMatchAttributes(HttpServletRequest req, MatchWithScore matchWithScore,
+                                                 UUID uuid, GameState gameState) {
+
+        req.setAttribute("matchWithScore", matchWithScore);
+        req.setAttribute("currentScore", gameState.score());
+        req.setAttribute("player1", matchWithScore.match().getFirstPlayer());
+        req.setAttribute("player2", matchWithScore.match().getSecondPlayer());
         req.setAttribute("uuid", uuid);
+        req.setAttribute("isTieBreak", gameState.isTieBreak());
+        req.setAttribute("advantagePlayer", gameState.advantagePlayer());
     }
 
-    public static void setFinishedMatchAttributes(HttpServletRequest req, MatchWithScore match, Player winner) {
-        Player firstPlayer = match.match().getFirstPlayer();
-        Player secondPlayer = match.match().getSecondPlayer();
+    public static void setFinishedMatchAttributes(HttpServletRequest req, MatchWithScore matchWithScore, Player winner) {
+        Player firstPlayer = matchWithScore.match().getFirstPlayer();
+        Player secondPlayer = matchWithScore.match().getSecondPlayer();
 
         req.setAttribute("winner", winner);
         req.setAttribute("player1", firstPlayer);
         req.setAttribute("player2", secondPlayer);
-        req.setAttribute("player1sets", match.score().getSets(firstPlayer));
-        req.setAttribute("player2sets", match.score().getSets(secondPlayer));
+        req.setAttribute("player1sets", matchWithScore.score().getSets(firstPlayer));
+        req.setAttribute("player2sets", matchWithScore.score().getSets(secondPlayer));
     }
 
     public static void setMatchesPageAttributes(HttpServletRequest req, int pageNumber,
@@ -49,16 +54,20 @@ public final class RequestAttributeHelper {
         }
     }
 
-    public static void set404ErrorAttributes(HttpServletRequest req,
-                                             String errorMessage, String requestedUrl) {
-        req.setAttribute("errorCode", 404);
-        req.setAttribute("errorMessage", errorMessage);
-        req.setAttribute("requestedUrl", requestedUrl);
-    }
+    public static void setNewMatchAttributes(HttpServletRequest req,
+                                             ValidationResult player1Result, ValidationResult player2Result,
+                                             String player1Input, String player2Input, String generalError) {
+        req.setAttribute("player1Value", player1Input);
+        req.setAttribute("player2Value", player2Input);
 
-    public static void setMatchErrorAttributes(HttpServletRequest req, UuidErrorType errorType, String requestedUrl) {
-        req.setAttribute("errorTitle", errorType.getTitle());
-        req.setAttribute("errorDescription", errorType.getMessage());
-        req.setAttribute("requestedUrl", requestedUrl);
+        if (player1Result.errorMessage() != null) {
+            req.setAttribute("player1Error", player1Result.errorMessage());
+        }
+        if (player2Result.errorMessage() != null) {
+            req.setAttribute("player2Error", player2Result.errorMessage());
+        }
+        if (generalError != null) {
+            req.setAttribute("generalError", generalError);
+        }
     }
 }
