@@ -1,6 +1,6 @@
 package scorecalculationservice_test;
 
-import com.scoreboard.dto.GameState;
+import com.scoreboard.model.GameState;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -46,7 +46,7 @@ class DeuceTest extends ScoreCalculationTestBase {
         setPointsToDeuce();
         logScore("After setting to deuce");
 
-        GameState gameState = service.calculate(matchWithScore, player1);
+        GameState gameState = service.calculate(, matchWithScore, player1);
         logScore("After player1 wins point");
 
         boolean isDeuce = service.isDeuce(score, player1, player2);
@@ -68,10 +68,10 @@ class DeuceTest extends ScoreCalculationTestBase {
         setPointsToDeuce();
         logScore("After setting to deuce");
 
-        service.calculate(matchWithScore, player1); // Получаем преимущество (41:40)
+        service.calculate(, matchWithScore, player1); // Получаем преимущество (41:40)
         logScore("After player1 gets advantage");
 
-        GameState gameState = service.calculate(matchWithScore, player1); // Выигрываем гейм (42:40)
+        GameState gameState = service.calculate(, matchWithScore, player1); // Выигрываем гейм (42:40)
         logScore("After player1 wins game");
 
         boolean isDeuce = service.isDeuce(score, player1, player2);
@@ -94,10 +94,10 @@ class DeuceTest extends ScoreCalculationTestBase {
         setPointsToDeuce();
         logScore("After setting to deuce");
 
-        service.calculate(matchWithScore, player1); // player1 получает преимущество (41:40)
+        service.calculate(, matchWithScore, player1); // player1 получает преимущество (41:40)
         logScore("After player1 gets advantage");
 
-        GameState gameState = service.calculate(matchWithScore, player2); // player2 сравнивает
+        GameState gameState = service.calculate(, matchWithScore, player2); // player2 сравнивает
         logScore("After player2 equalizes");
 
         boolean isDeuce = service.isDeuce(score, player1, player2);
@@ -119,21 +119,21 @@ class DeuceTest extends ScoreCalculationTestBase {
         logScore("After setting to deuce");
 
         // player1 получает преимущество
-        GameState gameState1 = service.calculate(matchWithScore, player1);
+        GameState gameState1 = service.calculate(, matchWithScore, player1);
         logScore("After player1 gets advantage");
         System.out.println("gameState1.advantagePlayer: " + gameState1.advantagePlayer());
         assertEquals(player1, gameState1.advantagePlayer());
         assertFalse(service.isDeuce(score, player1, player2)); // При преимуществе уже не деус
 
         // player2 сравнивает, возврат к деусу
-        GameState gameState2 = service.calculate(matchWithScore, player2);
+        GameState gameState2 = service.calculate(, matchWithScore, player2);
         logScore("After player2 equalizes");
         System.out.println("gameState2.advantagePlayer: " + gameState2.advantagePlayer());
         assertNull(gameState2.advantagePlayer());
         assertTrue(service.isDeuce(score, player1, player2)); // Возврат к деусу 40:40
 
         // player2 получает преимущество
-        GameState gameState3 = service.calculate(matchWithScore, player2);
+        GameState gameState3 = service.calculate(, matchWithScore, player2);
         logScore("After player2 gets advantage");
         System.out.println("gameState3.advantagePlayer: " + gameState3.advantagePlayer());
         assertEquals(player2, gameState3.advantagePlayer());
@@ -147,7 +147,7 @@ class DeuceTest extends ScoreCalculationTestBase {
         setPointsToDeuce();
         logScore("After setting to deuce");
 
-        GameState gameState = service.calculate(matchWithScore, player2);
+        GameState gameState = service.calculate(, matchWithScore, player2);
         logScore("After player2 wins point");
 
         boolean isDeuce = service.isDeuce(score, player1, player2);
@@ -170,10 +170,10 @@ class DeuceTest extends ScoreCalculationTestBase {
         setPointsToDeuce();
         logScore("After setting games 5:6 and points to deuce");
 
-        service.calculate(matchWithScore, player1);
+        service.calculate(, matchWithScore, player1);
         logScore("After player1 gets advantage");
 
-        GameState gameState = service.calculate(matchWithScore, player1);
+        GameState gameState = service.calculate(, matchWithScore, player1);
         logScore("After player1 wins game");
 
         boolean isDeuce = service.isDeuce(score, player1, player2);

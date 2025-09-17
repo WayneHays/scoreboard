@@ -1,13 +1,13 @@
 package com.scoreboard.servlet;
 
-import com.scoreboard.dto.GameState;
-import com.scoreboard.model.MatchWithScore;
+import com.scoreboard.dto.OngoingMatch;
+import com.scoreboard.model.Match;
 import com.scoreboard.model.Player;
+import com.scoreboard.model.Score;
 import com.scoreboard.service.FinishedMatchService;
 import com.scoreboard.service.OngoingMatchesService;
 import com.scoreboard.service.ScoreCalculationService;
 import com.scoreboard.util.ErrorHandler;
-import com.scoreboard.util.RequestAttributeHelper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -33,9 +33,9 @@ public class MatchScoreServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String uuidStr = req.getParameter("uuid");
         UUID uuid = parseUuid(uuidStr);
-        MatchWithScore matchWithScore = ongoingMatchesService.find(uuid);
+        OngoingMatch ongoingMatch = ongoingMatchesService.find(uuid);
 
-        if (matchWithScore == null) {
+        if (ongoingMatch == null) {
             ErrorHandler.handleHttpError(
                     req,
                     resp,
@@ -43,8 +43,7 @@ public class MatchScoreServlet extends HttpServlet {
                     "Match not found");
             return;
         }
-        GameState gameState = scoreCalculationService.getCurrentGameState(matchWithScore);
-        RequestAttributeHelper.setOngoingMatchAttributes(req, matchWithScore, uuid, gameState);
+        req.setAttribute("ongoingMatch", ongoingMatch);
         getServletContext().getRequestDispatcher(MATCH_SCORE_JSP).forward(req, resp);
     }
 
@@ -63,9 +62,9 @@ public class MatchScoreServlet extends HttpServlet {
             return;
         }
 
-        MatchWithScore matchWithScore = ongoingMatchesService.find(uuid);
+        OngoingMatch ongoingMatch = ongoingMatchesService.find(uuid);
 
-        if (matchWithScore == null) {
+        if (ongoingMatch == null) {
             ErrorHandler.handleHttpError(
                     req,
                     resp,
@@ -74,7 +73,7 @@ public class MatchScoreServlet extends HttpServlet {
             return;
         }
 
-        processPointWin(req, resp, matchWithScore, playerWonPointId, uuid);
+        processPointWin(req, resp, ongoingMatch, playerWonPointId);
     }
 
     private UUID parseUuid(String uuidStr) {
@@ -92,23 +91,25 @@ public class MatchScoreServlet extends HttpServlet {
     private void processPointWin(
             HttpServletRequest req,
             HttpServletResponse resp,
-            MatchWithScore matchWithScore,
-            String playerWonPointId,
-            UUID uuid) throws ServletException, IOException {
+            OngoingMatch ongoingMatch,
+            String playerWonPointId) throws ServletException, IOException {
 
-        Player pointWinner = determinePointWinner(matchWithScore, playerWonPointId);
-        GameState gameState = scoreCalculationService.calculate(matchWithScore, pointWinner);
+        Player pointWinner = determinePointWinner(ongoingMatch, playerWonPointId);
+        Match match = ongoingMatch.match();
+        Score score = ongoingMatch.gameState().score();
 
-        if (isMatchFinished(gameState)) {
-            finishMatch(req, resp, matchWithScore, uuid, pointWinner);
+        scoreCalculationService.calculate(match, score, pointWinner);
+
+        if (scoreCalculationService.isMatchFinished(score, match.getFirstPlayer(), match.getSecondPlayer())) {
+            finishMatch(req, resp, ongoingMatch, pointWinner);
         } else {
-            continueMatch(req, resp, matchWithScore, uuid, gameState);
+            continueMatch(resp, ongoingMatch);
         }
     }
 
-    private Player determinePointWinner(MatchWithScore matchWithScore, String playerWonPointId) {
-        Player firstPlayer = matchWithScore.match().getFirstPlayer();
-        Player secondPlayer = matchWithScore.match().getSecondPlayer();
+    private Player determinePointWinner(OngoingMatch ongoingMatch, String playerWonPointId) {
+        Player firstPlayer = ongoingMatch.match().getFirstPlayer();
+        Player secondPlayer = ongoingMatch.match().getSecondPlayer();
 
         if (playerWonPointId.equals(firstPlayer.getId().toString())) {
             return firstPlayer;
@@ -119,40 +120,23 @@ public class MatchScoreServlet extends HttpServlet {
         }
     }
 
-    private boolean isMatchFinished(GameState gameState) {
-        Player firstPlayer = null;
-        Player secondPlayer = null;
-
-        for (Player player : gameState.score().getPlayersPoints().keySet()) {
-            if (firstPlayer == null) {
-                firstPlayer = player;
-            } else {
-                secondPlayer = player;
-            }
-        }
-
-        return scoreCalculationService.isMatchFinished(gameState.score(), firstPlayer, secondPlayer);
-    }
-
     private void finishMatch(
             HttpServletRequest req,
             HttpServletResponse resp,
-            MatchWithScore matchWithScore,
-            UUID uuid,
+            OngoingMatch ongoingMatch,
             Player pointWinner)
             throws ServletException, IOException {
 
-        ongoingMatchesService.delete(uuid);
-        matchWithScore.match().setWinner(pointWinner);
-        finishedMatchService.saveToDatabase(matchWithScore.match());
-        RequestAttributeHelper.setFinishedMatchAttributes(req, matchWithScore, pointWinner);
+        ongoingMatchesService.delete(ongoingMatch.uuid());
+        ongoingMatch.match().setWinner(pointWinner);
+        finishedMatchService.saveToDatabase(ongoingMatch.match());
+        req.setAttribute("ongoingMatch", ongoingMatch);
         getServletContext().getRequestDispatcher("/WEB-INF/match-result.jsp").forward(req, resp);
     }
 
-    private void continueMatch(HttpServletRequest req, HttpServletResponse resp,
-                               MatchWithScore matchWithScore, UUID uuid, GameState gameState)
-            throws ServletException, IOException {
-        RequestAttributeHelper.setOngoingMatchAttributes(req, matchWithScore, uuid, gameState);
-        getServletContext().getRequestDispatcher(MATCH_SCORE_JSP).forward(req, resp);
+    private void continueMatch(HttpServletResponse resp,
+                               OngoingMatch ongoingMatch)
+            throws IOException {
+        resp.sendRedirect("/match-score?uuid=" + ongoingMatch.uuid());
     }
 }

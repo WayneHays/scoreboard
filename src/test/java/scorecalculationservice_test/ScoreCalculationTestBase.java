@@ -1,7 +1,6 @@
 package scorecalculationservice_test;
 
 import com.scoreboard.model.Match;
-import com.scoreboard.model.MatchWithScore;
 import com.scoreboard.model.Player;
 import com.scoreboard.model.Score;
 import com.scoreboard.service.ScoreCalculationService;

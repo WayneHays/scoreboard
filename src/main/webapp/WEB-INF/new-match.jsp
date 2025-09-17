@@ -20,9 +20,9 @@
     <div class="game-icon">🎮</div>
     <h1 class="title">New match</h1>
 
-    <c:if test="${not empty generalError}">
+    <c:if test="${newMatchForm.hasGeneralError()}">
         <div class="error-message general-error">
-            ${generalError}
+                ${newMatchForm.generalError}
         </div>
     </c:if>
 
@@ -33,14 +33,14 @@
                     type="text"
                     id="player1"
                     name="player1name"
-                    class="form-input ${not empty player1Error ? 'error' : ''}"
+                    class="form-input ${newMatchForm.hasPlayer1Error() ? 'error' : ''}"
                     placeholder="first player's name"
-                    value="${player1Value}"
+                    value="${newMatchForm.player1Value}"
                     required
             >
-            <c:if test="${not empty player1Error}">
+            <c:if test="${newMatchForm.hasPlayer1Error()}">
                 <div class="error-message field-error">
-                        ${player1Error}
+                        ${newMatchForm.player1Error}
                 </div>
             </c:if>
         </div>
@@ -57,14 +57,14 @@
                     type="text"
                     id="player2"
                     name="player2name"
-                    class="form-input ${not empty player2Error ? 'error' : ''}"
+                    class="form-input ${newMatchForm.hasPlayer2Error() ? 'error' : ''}"
                     placeholder="second player's name"
-                    value="${player2Value}"
+                    value="${newMatchForm.player2Value}"
                     required
             >
-            <c:if test="${not empty player2Error}">
+            <c:if test="${newMatchForm.hasPlayer2Error()}">
                 <div class="error-message field-error">
-                        ${player2Error}
+                        ${newMatchForm.player2Error}
                 </div>
             </c:if>
         </div>

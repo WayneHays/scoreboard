@@ -1,7 +1,8 @@
 package com.scoreboard.service;
 
+import com.scoreboard.dto.OngoingMatch;
+import com.scoreboard.model.GameState;
 import com.scoreboard.model.Match;
-import com.scoreboard.model.MatchWithScore;
 import com.scoreboard.model.Player;
 import com.scoreboard.model.Score;
 
@@ -11,8 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class OngoingMatchesService {
     private static final OngoingMatchesService INSTANCE = new OngoingMatchesService();
-    private static final int START_SCORE = 0;
-    private final Map<UUID, MatchWithScore> ongoingMatches;
+    private final Map<UUID, OngoingMatch> ongoingMatches;
 
     public OngoingMatchesService() {
         this.ongoingMatches = new ConcurrentHashMap<>();
@@ -24,32 +24,19 @@ public class OngoingMatchesService {
 
     public UUID createMatch(Player first, Player second) {
         Match match = new Match(first, second);
-        Score score = initStartScore(first, second);
-        MatchWithScore matchWithScore = new MatchWithScore(match, score);
+        Score score = new Score(first, second);
         UUID uuid = UUID.randomUUID();
-        ongoingMatches.put(uuid, matchWithScore);
+
+        OngoingMatch ongoingMatch = OngoingMatch.createNew(match, score, uuid);
+        ongoingMatches.put(uuid, ongoingMatch);
         return uuid;
     }
 
-    public MatchWithScore find(UUID uuid) {
+    public OngoingMatch find(UUID uuid) {
         return ongoingMatches.get(uuid);
     }
 
     public void delete(UUID uuid) {
         ongoingMatches.remove(uuid);
-    }
-
-    private Score initStartScore(Player player1, Player player2) {
-        Score score = new Score();
-        initializePlayerScore(score, player1);
-        initializePlayerScore(score, player2);
-        return score;
-    }
-
-    private void initializePlayerScore(Score score, Player player) {
-        score.setPoints(player, START_SCORE);
-        score.setGames(player, START_SCORE);
-        score.setSets(player, START_SCORE);
-        score.setTieBreakPoints(player, START_SCORE);
     }
 }

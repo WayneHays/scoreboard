@@ -1,6 +1,7 @@
 package com.scoreboard.service;
 
-import com.scoreboard.dto.GameState;
+import com.scoreboard.dto.OngoingMatch;
+import com.scoreboard.model.GameState;
 import com.scoreboard.model.*;
 
 import java.util.Optional;
@@ -19,9 +20,7 @@ public class ScoreCalculationService {
         return INSTANCE;
     }
 
-    public GameState calculate(MatchWithScore matchWithScore, Player pointWinner) {
-        Score score = matchWithScore.score();
-        Match match = matchWithScore.match();
+    public GameState calculate(Match match, Score score, Player pointWinner) {
         Player firstPlayer = match.getFirstPlayer();
         Player secondPlayer = match.getSecondPlayer();
 
@@ -41,6 +40,10 @@ public class ScoreCalculationService {
     public boolean isMatchFinished(Score score, Player first, Player second) {
         return score.getSets(first) >= SETS_TO_WIN_MATCH ||
                score.getSets(second) >= SETS_TO_WIN_MATCH;
+    }
+
+    public GameState getCurrentGameState(Match match, Score score) {
+        return createGameState(score, match.getFirstPlayer(), match.getSecondPlayer());
     }
 
     public boolean isTieBreak(Score score, Player firstPlayer, Player secondPlayer) {
@@ -65,11 +68,7 @@ public class ScoreCalculationService {
             return Optional.empty();
         }
 
-        if (firstPoints > secondPoints) {
-            return Optional.of(firstPlayer);
-        } else {
-            return Optional.of(secondPlayer);
-        }
+        return firstPoints > secondPoints ? Optional.of(firstPlayer) : Optional.of(secondPlayer);
     }
 
     private void calculateTieBreak(Player pointWinner, Score score, Player firstPlayer, Player secondPlayer) {
@@ -92,10 +91,8 @@ public class ScoreCalculationService {
         boolean wasDeuceBefore = score.getPoints(firstPlayer) >= MAX_POINTS_PER_GAME &&
                                  score.getPoints(secondPlayer) >= MAX_POINTS_PER_GAME;
 
-        Optional<Player> advantagePlayerBefore = Optional.empty();
-        if (wasDeuceBefore) {
-            advantagePlayerBefore = getAdvantagePlayer(score, firstPlayer, secondPlayer);
-        }
+        Optional<Player> advantagePlayerBefore = wasDeuceBefore ?
+                getAdvantagePlayer(score, firstPlayer, secondPlayer) : Optional.empty();
 
         winPoint(pointWinner, score);
 
@@ -120,17 +117,17 @@ public class ScoreCalculationService {
             }
             return;
         }
+
         score.resetPoints(firstPlayer, secondPlayer);
         score.setPoints(firstPlayer, MAX_POINTS_PER_GAME);
         score.setPoints(secondPlayer, MAX_POINTS_PER_GAME);
     }
 
     private void calculateRegularGame(Player pointWinner, Score score, Player firstPlayer, Player secondPlayer) {
-        boolean gameWon = isGameWon(pointWinner, score);
-
-        if (!gameWon) {
+        if (!isGameWon(pointWinner, score)) {
             return;
         }
+
         winGame(pointWinner, score);
         score.resetPoints(firstPlayer, secondPlayer);
 
@@ -167,7 +164,6 @@ public class ScoreCalculationService {
 
     private void winPoint(Player player, Score score) {
         int currentPlayerPoints = score.getPoints(player);
-
         switch (currentPlayerPoints) {
             case 0 -> score.setPoints(player, 15);
             case 15 -> score.setPoints(player, 30);
@@ -177,28 +173,16 @@ public class ScoreCalculationService {
     }
 
     private void winGame(Player player, Score score) {
-        int currentPlayerGames = score.getGames(player);
-        score.setGames(player, currentPlayerGames + 1);
+        score.setGames(player, score.getGames(player) + 1);
     }
 
     private void winSet(Player player, Score score) {
-        int currentPlayerSets = score.getSets(player);
-        score.setSets(player, currentPlayerSets + 1);
+        score.setSets(player, score.getSets(player) + 1);
     }
 
     private GameState createGameState(Score score, Player firstPlayer, Player secondPlayer) {
         boolean isTieBreak = isTieBreak(score, firstPlayer, secondPlayer);
-        Player advantagePlayer = getAdvantagePlayer(score, firstPlayer, secondPlayer)
-                .orElse(null);
-
+        Player advantagePlayer = getAdvantagePlayer(score, firstPlayer, secondPlayer).orElse(null);
         return new GameState(score, isTieBreak, advantagePlayer);
-    }
-
-    public GameState getCurrentGameState(MatchWithScore matchWithScore) {
-        Score score = matchWithScore.score();
-        Player firstPlayer = matchWithScore.match().getFirstPlayer();
-        Player secondPlayer = matchWithScore.match().getSecondPlayer();
-
-        return createGameState(score, firstPlayer, secondPlayer);
     }
 }

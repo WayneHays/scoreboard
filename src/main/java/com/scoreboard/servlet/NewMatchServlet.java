@@ -1,9 +1,9 @@
 package com.scoreboard.servlet;
 
+import com.scoreboard.dto.NewMatchForm;
 import com.scoreboard.model.Player;
 import com.scoreboard.service.OngoingMatchesService;
 import com.scoreboard.service.PlayerService;
-import com.scoreboard.util.RequestAttributeHelper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -34,6 +34,7 @@ public class NewMatchServlet extends HttpServlet {
             throws IOException, ServletException{
         String player1Input = req.getParameter("player1name");
         String player2Input = req.getParameter("player2name");
+
         ValidationResult player1Result = validate(player1Input);
         ValidationResult player2Result = validate(player2Input);
 
@@ -76,13 +77,15 @@ public class NewMatchServlet extends HttpServlet {
                                     ValidationResult player1Result, ValidationResult player2Result,
                                     String player1Input, String player2Input, String generalError)
             throws ServletException, IOException {
-        RequestAttributeHelper.setNewMatchAttributes(
-                req,
-                player1Result,
-                player2Result,
-                player1Input,
-                player2Input,
-                generalError);
+        NewMatchForm form = new NewMatchForm(
+                player1Input != null ? player1Input : "",
+                player2Input != null ? player2Input : "",
+                player1Result.errorMessage(),
+                player2Result.errorMessage(),
+                generalError
+        );
+
+        req.setAttribute("newMatchForm", form);
         getServletContext().getRequestDispatcher(NEW_MATCH_JSP).forward(req, resp);
     }
 

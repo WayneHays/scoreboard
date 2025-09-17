@@ -1,6 +1,6 @@
 package scorecalculationservice_test;
 
-import com.scoreboard.dto.GameState;
+import com.scoreboard.model.GameState;
 import com.scoreboard.model.Player;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,7 @@ class TieBreakTest extends ScoreCalculationTestBase {
         setGamesCount(5, 6);
         winCurrentGame(player1);
 
-        service.calculate(matchWithScore, player1);
+        service.calculate(, matchWithScore, player1);
         assertEquals(0, score.getPoints(player1));
         assertEquals(0, score.getPoints(player2));
     }
@@ -31,7 +31,7 @@ class TieBreakTest extends ScoreCalculationTestBase {
         setGamesCount(5, 6);
         winCurrentGame(player1);
 
-        service.calculate(matchWithScore, player1);
+        service.calculate(, matchWithScore, player1);
         assertEquals(1, score.getTieBreakPoints(player1));
     }
 
@@ -40,7 +40,7 @@ class TieBreakTest extends ScoreCalculationTestBase {
         setGamesCount(6, 6);
         setTieBreakPoints(20, 19);
 
-        GameState gameState = service.calculate(matchWithScore, player1);
+        GameState gameState = service.calculate(, matchWithScore, player1);
 
         assertEquals(0, score.getGames(player1));
         assertEquals(1, score.getSets(player1));
@@ -54,17 +54,17 @@ class TieBreakTest extends ScoreCalculationTestBase {
         setGamesCount(6, 6);
         setTieBreakPoints(6, 5);
 
-        GameState gameState = service.calculate(matchWithScore, player1);
+        GameState gameState = service.calculate(, matchWithScore, player1);
 
         assertFalse(gameState.isTieBreak());
         assertNull(gameState.advantagePlayer());
-        assertTrue(service.isMatchFinished(gameState.score(), player1, player2));
+        assertTrue(service.isMatchFinished(gameState.score()));
     }
 
     private GameState winCurrentGame(Player player) {
         GameState gameState = null;
         for (int i = 0; i < 4; i++) {
-            gameState = service.calculate(matchWithScore, player);
+            gameState = service.calculate(, matchWithScore, player);
         }
         return gameState;
     }

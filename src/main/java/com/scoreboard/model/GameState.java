@@ -1,7 +1,4 @@
-package com.scoreboard.dto;
-
-import com.scoreboard.model.Player;
-import com.scoreboard.model.Score;
+package com.scoreboard.model;
 
 public record GameState(
         Score score,

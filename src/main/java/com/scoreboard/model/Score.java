@@ -21,6 +21,19 @@ public class Score {
         this.playersPoints = new HashMap<>();
     }
 
+    public Score(Player player1, Player player2) {
+        this();
+        initializePlayerScore(player1);
+        initializePlayerScore(player2);
+    }
+
+    private void initializePlayerScore(Player player) {
+        playersPoints.put(player, 0);
+        playersGames.put(player, 0);
+        playersSets.put(player, 0);
+        playersTieBreakPoints.put(player, 0);
+    }
+
     public int getPoints(Player player) {
         return playersPoints.get(player);
     }
