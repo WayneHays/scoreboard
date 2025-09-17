@@ -22,7 +22,7 @@ public final class ErrorHandler {
         req.setAttribute("requestedUrl", buildUrl(req));
         setErrorPageAttributes(req, statusCode);
         req.getServletContext()
-                .getRequestDispatcher("/WEB-INF/error.jsp")
+                .getRequestDispatcher(JspPaths.ERROR_JSP)
                 .forward(req, resp);
     }
 

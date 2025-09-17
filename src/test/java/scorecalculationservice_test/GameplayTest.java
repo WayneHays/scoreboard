@@ -17,37 +17,37 @@ class GameplayTest extends ScoreCalculationTestBase {
         score.setPoints(player1, 40);
         score.setPoints(player2, 0);
 
-        GameState result = service.calculate(, matchWithScore, player1);
+        GameState gameState = service.calculate(match, score, player1);
 
-        assertSame(score, result.score());
-        assertTrue(service.isMatchFinished(result.score()));
+        assertSame(score, gameState.score());
+        assertTrue(service.isMatchFinished(score, player1, player2));
     }
 
     @Test
     void shouldIncrementCountOfPoints() {
-        service.calculate(, matchWithScore, player1);
+        service.calculate(match, score, player1);
         assertEquals(15, score.getPoints(player1));
         assertEquals(0, score.getPoints(player2));
 
-        service.calculate(, matchWithScore, player1);
+        service.calculate(match, score, player1);
         assertEquals(30, score.getPoints(player1));
         assertEquals(0, score.getPoints(player2));
 
-        service.calculate(, matchWithScore, player1);
+        service.calculate(match, score, player1);
         assertEquals(40, score.getPoints(player1));
         assertEquals(0, score.getPoints(player2));
 
-        service.calculate(, matchWithScore, player1);
+        service.calculate(match, score,player1);
         assertEquals(0, score.getPoints(player1));
         assertEquals(0, score.getPoints(player2));
     }
 
     @Test
     void shouldIncrementCountOfGames() {
-        service.calculate(, matchWithScore, player1);
-        service.calculate(, matchWithScore, player1);
-        service.calculate(, matchWithScore, player1);
-        service.calculate(, matchWithScore, player1);
+        service.calculate(match, score, player1);
+        service.calculate(match, score, player1);
+        service.calculate(match, score, player1);
+        service.calculate(match, score, player1);
 
         assertEquals(0, score.getPoints(player1));
         assertEquals(0, score.getPoints(player2));

@@ -4,6 +4,7 @@ import com.scoreboard.dto.NewMatchForm;
 import com.scoreboard.model.Player;
 import com.scoreboard.service.OngoingMatchesService;
 import com.scoreboard.service.PlayerService;
+import com.scoreboard.util.JspPaths;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -19,14 +20,13 @@ public class NewMatchServlet extends HttpServlet {
     private static final int MIN_NAME_LENGTH = 2;
     private static final int MAX_NAME_LENGTH = 30;
     private static final Pattern VALID_NAME_PATTERN = Pattern.compile("^[a-zA-Zа-яёА-ЯЁ\\s-']+$");
-    private static final String NEW_MATCH_JSP = "/WEB-INF/new-match.jsp";
 
     private final PlayerService playerService = PlayerService.getInstance();
     private final OngoingMatchesService ongoingMatchesService = OngoingMatchesService.getInstance();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        getServletContext().getRequestDispatcher(NEW_MATCH_JSP).forward(req, resp);
+        getServletContext().getRequestDispatcher(JspPaths.NEW_MATCH_JSP).forward(req, resp);
     }
 
     @Override
@@ -86,7 +86,7 @@ public class NewMatchServlet extends HttpServlet {
         );
 
         req.setAttribute("newMatchForm", form);
-        getServletContext().getRequestDispatcher(NEW_MATCH_JSP).forward(req, resp);
+        getServletContext().getRequestDispatcher(JspPaths.NEW_MATCH_JSP).forward(req, resp);
     }
 
     private boolean hasDuplicateNames(ValidationResult player1Result, ValidationResult player2Result) {

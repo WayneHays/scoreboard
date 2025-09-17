@@ -9,8 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static jakarta.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+import static jakarta.servlet.http.HttpServletResponse.*;
 
 @WebFilter(filterName = "ExceptionFilter", urlPatterns = "/*")
 public class ExceptionFilter implements Filter {
@@ -50,38 +49,60 @@ public class ExceptionFilter implements Filter {
                                        IllegalArgumentException e) throws ServletException, IOException {
         String message = e.getMessage();
 
-        if (message != null) {
-            if (message.contains("UUID is required")) {
-                ErrorHandler.handleHttpError(
-                        request,
-                        response,
-                        SC_BAD_REQUEST,
-                        "Match ID is required");
-            } else if (message.contains("36 characters") || message.contains("UUID must be")) {
-                ErrorHandler.handleHttpError(
-                        request,
-                        response,
-                        SC_BAD_REQUEST,
-                        "Invalid UUID format");
-            } else if (message.toLowerCase().contains("uuid")) {
-                ErrorHandler.handleHttpError(
-                        request,
-                        response,
-                        SC_BAD_REQUEST,
-                        "Invalid UUID: " + message);
-            } else {
-                ErrorHandler.handleHttpError(
-                        request,
-                        response,
-                        SC_BAD_REQUEST,
-                        "Invalid parameter: " + message);
-            }
-        } else {
+        if (message == null) {
             ErrorHandler.handleHttpError(
                     request,
                     response,
                     SC_BAD_REQUEST,
                     "Invalid request parameter");
+            return;
+        }
+
+        if (message.equals("Match not found") ||
+            message.equals("No matches found") ||
+            message.startsWith("Player not found:") ||
+            (message.contains("Page") && message.contains("not found"))) {
+            ErrorHandler.handleHttpError(
+                    request,
+                    response,
+                    SC_NOT_FOUND,
+                    message);
+        } else if (message.contains("UUID is required")) {
+            ErrorHandler.handleHttpError(
+                    request,
+                    response,
+                    SC_BAD_REQUEST,
+                    "Match ID is required");
+        } else if (message.contains("36 characters") || message.contains("UUID must be")) {
+            ErrorHandler.handleHttpError(
+                    request,
+                    response,
+                    SC_BAD_REQUEST,
+                    "Invalid UUID format");
+        } else if (message.contains("Player ID is required")) {
+            ErrorHandler.handleHttpError(
+                    request,
+                    response,
+                    SC_BAD_REQUEST,
+                    "Player ID is required");
+        } else if (message.contains("Player with ID") && message.contains("not found")) {
+            ErrorHandler.handleHttpError(
+                    request,
+                    response,
+                    SC_BAD_REQUEST,
+                    "Invalid player ID for this match");
+        } else if (message.toLowerCase().contains("uuid")) {
+            ErrorHandler.handleHttpError(
+                    request,
+                    response,
+                    SC_BAD_REQUEST,
+                    "Invalid UUID: " + message);
+        } else {
+            ErrorHandler.handleHttpError(
+                    request,
+                    response,
+                    SC_BAD_REQUEST,
+                    "Invalid parameter: " + message);
         }
     }
 }

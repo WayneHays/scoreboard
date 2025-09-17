@@ -19,7 +19,7 @@
     <h1 class="title">Match Finished!</h1>
 
     <div class="winner-announcement">
-        <span class="winner-name">${matchWithScore.match().winner().name}</span>
+        <span class="winner-name">${ongoingMatch.winnerName}</span>
         wins!
     </div>
 
@@ -27,18 +27,18 @@
     <div class="final-scoreboard">
         <div class="score-title">Final Score</div>
 
-        <div class="final-score-row ${matchWithScore.match().winner().name == matchWithScore.match().firstPlayer().name ? 'winner-row' : ''}">
+        <div class="final-score-row ${ongoingMatch.firstPlayerRowClass}">
             <div class="player-info">
-                <div class="player-name">${matchWithScore.match().firstPlayer().name}</div>
+                <div class="player-name">${ongoingMatch.firstPlayerName}</div>
             </div>
-            <div class="sets-score">${matchWithScore.score().getSets(matchWithScore.match().firstPlayer())}</div>
+            <div class="sets-score">${ongoingMatch.firstPlayerFinalSets}</div>
         </div>
 
-        <div class="final-score-row ${matchWithScore.match().winner().name == matchWithScore.match().secondPlayer().name ? 'winner-row' : ''}">
+        <div class="final-score-row ${ongoingMatch.secondPlayerRowClass}">
             <div class="player-info">
-                <div class="player-name">${matchWithScore.match().secondPlayer().name}</div>
+                <div class="player-name">${ongoingMatch.secondPlayerName}</div>
             </div>
-            <div class="sets-score">${matchWithScore.score().getSets(matchWithScore.match().secondPlayer())}</div>
+            <div class="sets-score">${ongoingMatch.secondPlayerFinalSets}</div>
         </div>
     </div>
 

@@ -29,14 +29,14 @@ public class FindMatchesService extends BaseTransactionalService {
     public List<Match> findMatchesByPage(int pageNumber) {
         return executeInTransaction(
                 () -> matchDao.find(pageNumber),
-                "Failed to find matches by page"
+                "Failed to get matches by page"
         );
     }
 
     public List<Match> findMatchesByPlayerByPage(Player player, int pageNumber) {
         return executeInTransaction(
                 () -> matchDao.find(player, pageNumber),
-                "Failed to find matches by player and page"
+                "Failed to get matches by player and page"
         );
     }
 }

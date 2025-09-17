@@ -5,7 +5,7 @@ import com.scoreboard.model.Match;
 import com.scoreboard.model.Player;
 import com.scoreboard.service.FindMatchesService;
 import com.scoreboard.service.PlayerService;
-import com.scoreboard.util.ErrorHandler;
+import com.scoreboard.util.JspPaths;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -16,11 +16,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import static jakarta.servlet.http.HttpServletResponse.SC_NOT_FOUND;
-
 @WebServlet("/matches")
 public class MatchesServlet extends HttpServlet {
-    private static final String MATCHES_JSP = "/WEB-INF/matches.jsp";
     private static final int DEFAULT_PAGE_NUMBER = 1;
 
     private final FindMatchesService findMatchesService = FindMatchesService.getInstance();
@@ -37,12 +34,11 @@ public class MatchesServlet extends HttpServlet {
                 buildPlayerMatchesPage(playerName, pageNumber);
 
         if (matchesPage.hasError() && shouldReturn404(matchesPage)) {
-            ErrorHandler.handleHttpError(req, resp, SC_NOT_FOUND, matchesPage.errorMessage());
-            return;
+            throw new IllegalArgumentException(matchesPage.errorMessage());
         }
 
         req.setAttribute("matchesPage", matchesPage);
-        getServletContext().getRequestDispatcher(MATCHES_JSP).forward(req, resp);
+        getServletContext().getRequestDispatcher(JspPaths.MATCHES_JSP).forward(req, resp);
     }
 
     private int parsePageNumber(String pageNumberStr) {

@@ -1,7 +1,6 @@
 package com.scoreboard.service;
 
 import com.scoreboard.dto.OngoingMatch;
-import com.scoreboard.model.GameState;
 import com.scoreboard.model.Match;
 import com.scoreboard.model.Player;
 import com.scoreboard.model.Score;
@@ -32,7 +31,7 @@ public class OngoingMatchesService {
         return uuid;
     }
 
-    public OngoingMatch find(UUID uuid) {
+    public OngoingMatch get(UUID uuid) {
         return ongoingMatches.get(uuid);
     }
 
