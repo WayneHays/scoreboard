@@ -1,13 +1,14 @@
 package com.scoreboard.mapper;
 
-import com.scoreboard.dto.MatchProcessingView;
+import com.scoreboard.dto.MatchLiveView;
 import com.scoreboard.dto.OngoingMatch;
 import com.scoreboard.model.Player;
 
-public class MatchProcessingViewMapper {
+public class MatchLiveViewMapper {
+    private static final String ADVANTAGE_VIEW = "AD";
 
-    public MatchProcessingView map(OngoingMatch ongoingMatch) {
-        return MatchProcessingView.builder()
+    public MatchLiveView map(OngoingMatch ongoingMatch) {
+        return MatchLiveView.builder()
                 .firstPlayerName(ongoingMatch.getMatch().getFirstPlayer().getName())
                 .secondPlayerName(ongoingMatch.getMatch().getSecondPlayer().getName())
                 .firstPlayerId(String.valueOf(ongoingMatch.getMatch().getFirstPlayer().getId()))
@@ -24,7 +25,7 @@ public class MatchProcessingViewMapper {
     private String formatPlayerPoints(OngoingMatch match, Player player) {
         if (match.getAdvantage() != null &&
             match.getAdvantage().equals(player)) {
-            return "AD";
+            return ADVANTAGE_VIEW;
         }
 
         if (match.isTieBreak()) {

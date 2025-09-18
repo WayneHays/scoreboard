@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class MatchProcessingView {
+public class MatchLiveView {
     private final String firstPlayerName;
     private final String secondPlayerName;
     private final String firstPlayerId;

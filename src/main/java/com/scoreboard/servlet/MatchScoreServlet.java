@@ -1,13 +1,13 @@
 package com.scoreboard.servlet;
 
-import com.scoreboard.dto.MatchProcessingView;
+import com.scoreboard.dto.MatchLiveView;
 import com.scoreboard.dto.MatchResult;
 import com.scoreboard.dto.OngoingMatch;
 import com.scoreboard.exception.ValidationException;
 import com.scoreboard.service.FinishedMatchService;
 import com.scoreboard.service.MatchGameplayService;
 import com.scoreboard.service.OngoingMatchesService;
-import com.scoreboard.mapper.MatchProcessingViewMapper;
+import com.scoreboard.mapper.MatchLiveViewMapper;
 import com.scoreboard.mapper.MatchResultMapper;
 import com.scoreboard.util.WebPaths;
 import jakarta.servlet.ServletException;
@@ -24,13 +24,13 @@ public class MatchScoreServlet extends HttpServlet {
     private final OngoingMatchesService ongoingMatchesService = OngoingMatchesService.getInstance();
     private final MatchGameplayService matchGameplayService = MatchGameplayService.getInstance();
     private final FinishedMatchService finishedMatchService = FinishedMatchService.getInstance();
-    private final MatchProcessingViewMapper processingViewMapper = new MatchProcessingViewMapper();
+    private final MatchLiveViewMapper liveViewMapper = new MatchLiveViewMapper();
     private final MatchResultMapper resultMapper = new MatchResultMapper();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         OngoingMatch ongoingMatch = findMatch(req);
-        MatchProcessingView matchView = processingViewMapper.map(ongoingMatch);
+        MatchLiveView matchView = liveViewMapper.map(ongoingMatch);
         req.setAttribute("matchView", matchView);
         getServletContext().getRequestDispatcher(WebPaths.MATCH_SCORE_JSP).forward(req, resp);
     }

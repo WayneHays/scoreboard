@@ -1,6 +1,6 @@
 package com.scoreboard.servlet;
 
-import com.scoreboard.dto.MatchesPage;
+import com.scoreboard.dto.FinishedMatchesPage;
 import com.scoreboard.service.MatchesPageService;
 import com.scoreboard.util.WebPaths;
 import jakarta.servlet.ServletException;
@@ -23,11 +23,11 @@ public class MatchesServlet extends HttpServlet {
         String pageNumberStr = req.getParameter("page");
         int pageNumber = parsePageNumber(pageNumberStr);
 
-        MatchesPage matchesPage = (playerName == null || playerName.isBlank()) ?
+        FinishedMatchesPage finishedMatchesPage = (playerName == null || playerName.isBlank()) ?
                 pageService.getAllMatchesPage(pageNumber) :
                 pageService.getPlayerMatchesPage(playerName, pageNumber);
 
-        req.setAttribute("matchesPage", matchesPage);
+        req.setAttribute("matchesPage", finishedMatchesPage);
         getServletContext().getRequestDispatcher(WebPaths.MATCHES_JSP).forward(req, resp);
     }
 

@@ -1,6 +1,6 @@
 package com.scoreboard.service;
 
-import com.scoreboard.dto.MatchesPage;
+import com.scoreboard.dto.FinishedMatchesPage;
 import com.scoreboard.exception.NotFoundException;
 import com.scoreboard.model.Match;
 import com.scoreboard.model.Player;
@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class MatchesPageService {
+    public static final int MINIMAL_VALID_PAGE = 1;
     private static final MatchesPageService INSTANCE = new MatchesPageService();
 
     private final FindMatchesService findMatchesService;
@@ -26,7 +27,7 @@ public class MatchesPageService {
         return INSTANCE;
     }
 
-    public MatchesPage getAllMatchesPage(int pageNumber) {
+    public FinishedMatchesPage getAllMatchesPage(int pageNumber) {
         int totalPages = findMatchesService.getTotalCountOfPages();
 
         if (isInvalidPage(pageNumber, totalPages)) {
@@ -39,7 +40,7 @@ public class MatchesPageService {
         return mapper.map(pageNumber, matches, totalPages, null);
     }
 
-    public MatchesPage getPlayerMatchesPage(String playerName, int pageNumber) {
+    public FinishedMatchesPage getPlayerMatchesPage(String playerName, int pageNumber) {
         Optional<Player> maybePlayer = playerService.find(playerName);
 
         if (maybePlayer.isEmpty()) {
@@ -59,6 +60,6 @@ public class MatchesPageService {
     }
 
     private boolean isInvalidPage(int pageNumber, int totalPages) {
-        return pageNumber < 1 || (totalPages > 0 && pageNumber > totalPages);
+        return pageNumber < MINIMAL_VALID_PAGE || (totalPages > 0 && pageNumber > totalPages);
     }
 }
