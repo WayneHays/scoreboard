@@ -1,6 +1,5 @@
 package scorecalculationservice_test;
 
-import com.scoreboard.model.GameState;
 import com.scoreboard.model.Player;
 import org.junit.jupiter.api.Test;
 
@@ -11,9 +10,9 @@ class TieBreakTest extends ScoreCalculationTestBase {
     @Test
     void shouldStartTiebreakIfGamesCount6_6() {
         setGamesCount(5, 6);
-        GameState gameState = winCurrentGame(player1);
+        winCurrentGame(player1);
 
-        assertTrue(gameState.isTieBreak());
+        assertTrue(ongoingMatch.isTieBreak());
     }
 
     @Test
@@ -21,7 +20,7 @@ class TieBreakTest extends ScoreCalculationTestBase {
         setGamesCount(5, 6);
         winCurrentGame(player1);
 
-        service.calculate(match, score, player1);
+        service.calculate(ongoingMatch, player1);
         assertEquals(0, score.getPoints(player1));
         assertEquals(0, score.getPoints(player2));
     }
@@ -31,7 +30,7 @@ class TieBreakTest extends ScoreCalculationTestBase {
         setGamesCount(5, 6);
         winCurrentGame(player1);
 
-        service.calculate(match, score, player1);
+        service.calculate(ongoingMatch, player1);
         assertEquals(1, score.getTieBreakPoints(player1));
     }
 
@@ -39,13 +38,25 @@ class TieBreakTest extends ScoreCalculationTestBase {
     void shouldWinTiebreakWithSevenPointsAndTwoPointLead() {
         setGamesCount(6, 6);
         setTieBreakPoints(20, 19);
+        ongoingMatch.setTieBreak(true);
 
-        GameState gameState = service.calculate(match, score, player1);
+        System.out.println("Before calculate:");
+        System.out.println("  TieBreakPoints: " + score.getTieBreakPoints(player1) + ":" + score.getTieBreakPoints(player2));
+        System.out.println("  Games: " + score.getGames(player1) + ":" + score.getGames(player2));
+        System.out.println("  Sets: " + score.getSets(player1) + ":" + score.getSets(player2));
+
+        service.calculate(ongoingMatch, player1);
+
+        System.out.println("After calculate:");
+        System.out.println("  TieBreakPoints: " + score.getTieBreakPoints(player1) + ":" + score.getTieBreakPoints(player2));
+        System.out.println("  Games: " + score.getGames(player1) + ":" + score.getGames(player2));
+        System.out.println("  Sets: " + score.getSets(player1) + ":" + score.getSets(player2));
+        System.out.println("  IsTieBreak: " + ongoingMatch.isTieBreak());
 
         assertEquals(0, score.getGames(player1));
         assertEquals(1, score.getSets(player1));
-        assertFalse(gameState.isTieBreak());
-        assertNull(gameState.advantagePlayer());
+        assertFalse(ongoingMatch.isTieBreak());
+        assertNull(ongoingMatch.getAdvantage());
     }
 
     @Test
@@ -53,34 +64,50 @@ class TieBreakTest extends ScoreCalculationTestBase {
         setSetsCount(1, 1);
         setGamesCount(6, 6);
         setTieBreakPoints(6, 5);
+        ongoingMatch.setTieBreak(true); // Устанавливаем тай-брейк вручную
 
-        GameState gameState = service.calculate(match, score, player1);
+        service.calculate(ongoingMatch, player1);
 
-        assertFalse(gameState.isTieBreak());
-        assertNull(gameState.advantagePlayer());
+        assertFalse(ongoingMatch.isTieBreak());
+        assertNull(ongoingMatch.getAdvantage());
         assertTrue(service.isMatchFinished(score, player1, player2));
     }
 
-    private GameState winCurrentGame(Player player) {
-        GameState gameState = null;
+    private void winCurrentGame(Player player) {
         for (int i = 0; i < 4; i++) {
-            gameState = service.calculate(match, score, player);
+            service.calculate(ongoingMatch, player);
         }
-        return gameState;
     }
 
     private void setGamesCount(int player1games, int player2games) {
-        score.setGames(player1, player1games);
-        score.setGames(player2, player2games);
+        // Сбрасываем текущие игры и устанавливаем новые через циклы
+        score.resetAllGames();
+
+        for (int i = 0; i < player1games; i++) {
+            score.awardGame(player1);
+        }
+        for (int i = 0; i < player2games; i++) {
+            score.awardGame(player2);
+        }
     }
 
     private void setSetsCount(int player1sets, int player2sets) {
-        score.setSets(player1, player1sets);
-        score.setSets(player2, player2sets);
+        // Устанавливаем сеты через циклы
+        for (int i = 0; i < player1sets; i++) {
+            score.awardSet(player1);
+        }
+        for (int i = 0; i < player2sets; i++) {
+            score.awardSet(player2);
+        }
     }
 
     private void setTieBreakPoints(int player1Points, int player2Points) {
-        score.setTieBreakPoints(player1, player1Points);
-        score.setTieBreakPoints(player2, player2Points);
+        // Устанавливаем тай-брейк очки через циклы
+        for (int i = 0; i < player1Points; i++) {
+            score.awardTieBreakPoint(player1);
+        }
+        for (int i = 0; i < player2Points; i++) {
+            score.awardTieBreakPoint(player2);
+        }
     }
 }

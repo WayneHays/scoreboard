@@ -1,6 +1,6 @@
 package com.scoreboard.service;
 
-import com.scoreboard.model.GameState;
+import com.scoreboard.dto.OngoingMatch;
 import com.scoreboard.model.Match;
 import com.scoreboard.model.Player;
 import com.scoreboard.model.Score;
@@ -21,190 +21,134 @@ public class ScoreCalculationService {
         return INSTANCE;
     }
 
-    public GameState calculate(Match match, Score score, Player pointWinner) {
-        Player firstPlayer = match.getFirstPlayer();
-        Player secondPlayer = match.getSecondPlayer();
+    public void calculate(OngoingMatch ongoingMatch, Player pointWinner) {
+        Score score = ongoingMatch.getScore();
+        Player firstPlayer = ongoingMatch.getMatch().getFirstPlayer();
+        Player secondPlayer = ongoingMatch.getMatch().getSecondPlayer();
 
         if (isMatchFinished(score, firstPlayer, secondPlayer)) {
-            return createGameState(score, firstPlayer, secondPlayer);
+            return;
         }
 
-        if (isTieBreak(score, firstPlayer, secondPlayer)) {
-            calculateTieBreak(pointWinner, score, firstPlayer, secondPlayer);
+        if (ongoingMatch.isTieBreak()) {
+            processTieBreakPoint(score, pointWinner, firstPlayer, secondPlayer);
         } else {
-            calculateNonTieBreak(pointWinner, score, firstPlayer, secondPlayer);
+            processRegularPoint(score, pointWinner, firstPlayer, secondPlayer);
         }
 
-        return createGameState(score, firstPlayer, secondPlayer);
+        updateMatchState(ongoingMatch, firstPlayer, secondPlayer);
+    }
+
+    private void updateMatchState(OngoingMatch ongoingMatch, Player firstPlayer, Player secondPlayer) {
+        Score score = ongoingMatch.getScore();
+
+        boolean shouldBeTieBreak = isTieBreak(score, firstPlayer, secondPlayer);
+        Optional<Player> advantagePlayer = getAdvantagePlayer(score, firstPlayer, secondPlayer);
+
+        ongoingMatch.setTieBreak(shouldBeTieBreak);
+        ongoingMatch.setAdvantage(shouldBeTieBreak ? null : advantagePlayer.orElse(null));
+    }
+
+    private void processTieBreakPoint(Score score, Player winner, Player firstPlayer, Player secondPlayer) {
+        score.awardTieBreakPoint(winner);
+
+        if (score.getTieBreakPoints(winner) >= MIN_TIEBREAK_POINTS_TO_WIN &&
+            Math.abs(score.getTieBreakPoints(firstPlayer) - score.getTieBreakPoints(secondPlayer)) >= MIN_ADVANTAGE_TO_WIN) {
+
+            score.awardGame(winner);
+            score.awardSet(winner);
+            score.resetAllGames();
+            score.resetAllTieBreakPoints();
+        }
+    }
+
+    private void processRegularPoint(Score score, Player winner, Player firstPlayer, Player secondPlayer) {
+        Optional<Player> advantagePlayerBefore = getAdvantagePlayer(score, firstPlayer, secondPlayer);
+        boolean wasDeuce = isDeuce(score, firstPlayer, secondPlayer);
+
+        score.awardTennisPoint(winner);
+
+        if (wasDeuce || advantagePlayerBefore.isPresent()) {
+            handleDeuceScenario(score, winner, advantagePlayerBefore, firstPlayer, secondPlayer);
+        } else if (score.getPoints(winner) > MAX_POINTS_PER_GAME) {
+            completeGame(score, winner, firstPlayer, secondPlayer);
+        }
+    }
+
+    private void handleDeuceScenario(Score score, Player winner, Optional<Player> advantagePlayerBefore,
+                                     Player firstPlayer, Player secondPlayer) {
+        if (advantagePlayerBefore.isPresent()) {
+            if (advantagePlayerBefore.get().equals(winner)) {
+                completeRegularGame(score, winner, firstPlayer, secondPlayer);
+            } else {
+                score.resetToDeuce();
+            }
+        }
+    }
+
+    private void completeGame(Score score, Player winner, Player firstPlayer, Player secondPlayer) {
+        score.awardGame(winner);
+        score.resetAllPoints();
+
+        if (isNotTieBreakSituation(score, firstPlayer, secondPlayer) &&
+            isSetWon(score, winner, firstPlayer, secondPlayer)) {
+
+            score.awardSet(winner);
+            score.resetAllGames();
+        }
+    }
+
+    private void completeRegularGame(Score score, Player winner, Player firstPlayer, Player secondPlayer) {
+        score.awardGame(winner);
+        score.resetAllPoints();
+
+        if (isSetWon(score, winner, firstPlayer, secondPlayer)) {
+            score.awardSet(winner);
+            score.resetAllGames();
+        }
     }
 
     public boolean isMatchFinished(Score score, Player first, Player second) {
-        return score.getSets(first) >= SETS_TO_WIN_MATCH
-               || score.getSets(second) >= SETS_TO_WIN_MATCH;
-    }
-
-    public GameState getCurrentGameState(Match match, Score score) {
-        return createGameState(score, match.getFirstPlayer(), match.getSecondPlayer());
+        return score.getSets(first) >= SETS_TO_WIN_MATCH ||
+               score.getSets(second) >= SETS_TO_WIN_MATCH;
     }
 
     public boolean isTieBreak(Score score, Player firstPlayer, Player secondPlayer) {
-        return score.getGames(firstPlayer) == GAMES_FOR_TIEBREAK
-               && score.getGames(secondPlayer) == GAMES_FOR_TIEBREAK;
+        return score.getGames(firstPlayer) == GAMES_FOR_TIEBREAK &&
+               score.getGames(secondPlayer) == GAMES_FOR_TIEBREAK;
     }
 
     public boolean isDeuce(Score score, Player firstPlayer, Player secondPlayer) {
-        return score.getPoints(firstPlayer) == MAX_POINTS_PER_GAME
-               && score.getPoints(secondPlayer) == MAX_POINTS_PER_GAME;
+        return score.getPoints(firstPlayer) >= MAX_POINTS_PER_GAME &&
+               score.getPoints(secondPlayer) >= MAX_POINTS_PER_GAME &&
+               score.getPoints(firstPlayer) == score.getPoints(secondPlayer);
     }
 
     public Optional<Player> getAdvantagePlayer(Score score, Player firstPlayer, Player secondPlayer) {
-        int firstPlayerPoints = score.getPoints(firstPlayer);
-        int secondPlayerPoints = score.getPoints(secondPlayer);
+        int firstPoints = score.getPoints(firstPlayer);
+        int secondPoints = score.getPoints(secondPlayer);
 
-        if (firstPlayerPoints < MAX_POINTS_PER_GAME || secondPlayerPoints < MAX_POINTS_PER_GAME) {
+        if (firstPoints < MAX_POINTS_PER_GAME || secondPoints < MAX_POINTS_PER_GAME ||
+            firstPoints == secondPoints) {
             return Optional.empty();
         }
 
-        if (firstPlayerPoints == secondPlayerPoints) {
-            return Optional.empty();
-        }
-
-        return firstPlayerPoints > secondPlayerPoints
-                ? Optional.of(firstPlayer) : Optional.of(secondPlayer);
+        return firstPoints > secondPoints ? Optional.of(firstPlayer) : Optional.of(secondPlayer);
     }
 
-    private void calculateTieBreak(Player pointWinner, Score score, Player firstPlayer, Player secondPlayer) {
-        int currentTieBreakPoints = score.getTieBreakPoints(pointWinner);
-        score.setTieBreakPoints(pointWinner, currentTieBreakPoints + 1);
+    public Player getMatchWinner(Match match, Score score) {
+        int firstPlayerSets = score.getSets(match.getFirstPlayer());
+        int secondPlayerSets = score.getSets(match.getSecondPlayer());
 
-        if (isTieBreakWon(pointWinner, score, firstPlayer, secondPlayer)) {
-            handleTieBreakWin(pointWinner, score, firstPlayer, secondPlayer);
-        }
+        return firstPlayerSets > secondPlayerSets ? match.getFirstPlayer() : match.getSecondPlayer();
     }
 
-    private void calculateNonTieBreak(Player pointWinner, Score score, Player firstPlayer, Player secondPlayer) {
-        boolean wasDeuceBefore = score.getPoints(firstPlayer) >= MAX_POINTS_PER_GAME
-                                 && score.getPoints(secondPlayer) >= MAX_POINTS_PER_GAME;
-
-        Optional<Player> advantagePlayerBefore = wasDeuceBefore
-                ? getAdvantagePlayer(score, firstPlayer, secondPlayer) : Optional.empty();
-
-        winPoint(pointWinner, score);
-
-        if (wasDeuceBefore) {
-            calculateDeuceLogic(pointWinner, score, firstPlayer, secondPlayer, advantagePlayerBefore);
-        } else {
-            calculateRegularGame(pointWinner, score, firstPlayer, secondPlayer);
-        }
+    private boolean isSetWon(Score score, Player winner, Player firstPlayer, Player secondPlayer) {
+        return score.getGames(winner) >= GAMES_TO_WIN_SET &&
+               Math.abs(score.getGames(firstPlayer) - score.getGames(secondPlayer)) >= MIN_ADVANTAGE_TO_WIN;
     }
 
-    private void calculateDeuceLogic(Player pointWinner,
-                                     Score score,
-                                     Player firstPlayer,
-                                     Player secondPlayer,
-                                     Optional<Player> advantagePlayerBefore) {
-        if (advantagePlayerBefore.isEmpty()) {
-            return;
-        }
-
-        if (advantagePlayerBefore.get().equals(pointWinner)) {
-            winGame(pointWinner, score);
-            score.resetPoints(firstPlayer, secondPlayer);
-
-            if (shouldCheckSetAndMatch(score, firstPlayer, secondPlayer)) {
-                checkIfSetAndMatchWon(pointWinner, score, firstPlayer, secondPlayer);
-            }
-            return;
-        }
-
-        score.resetPoints(firstPlayer, secondPlayer);
-        score.setPoints(firstPlayer, MAX_POINTS_PER_GAME);
-        score.setPoints(secondPlayer, MAX_POINTS_PER_GAME);
-    }
-
-    private void calculateRegularGame(Player pointWinner,
-                                      Score score,
-                                      Player firstPlayer,
-                                      Player secondPlayer) {
-        if (!isGameWon(pointWinner, score)) {
-            return;
-        }
-
-        winGame(pointWinner, score);
-        score.resetPoints(firstPlayer, secondPlayer);
-
-        if (shouldCheckSetAndMatch(score, firstPlayer, secondPlayer)) {
-            checkIfSetAndMatchWon(pointWinner, score, firstPlayer, secondPlayer);
-        }
-    }
-
-    private boolean isGameWon(Player pointWinner, Score score) {
-        return score.getPoints(pointWinner) > MAX_POINTS_PER_GAME;
-    }
-
-    private boolean isTieBreakWon(Player pointWinner,
-                                  Score score,
-                                  Player firstPlayer,
-                                  Player secondPlayer) {
-        return score.getTieBreakPoints(pointWinner) >= MIN_TIEBREAK_POINTS_TO_WIN
-               && Math.abs(score.getTieBreakPoints(firstPlayer) - score.getTieBreakPoints(secondPlayer))
-                  >= MIN_ADVANTAGE_TO_WIN;
-    }
-
-    private boolean isSetWon(Player pointWinner,
-                             Score score,
-                             Player firstPlayer,
-                             Player secondPlayer) {
-        return score.getGames(pointWinner) >= GAMES_TO_WIN_SET
-               && Math.abs(score.getGames(firstPlayer) - score.getGames(secondPlayer)) >= MIN_ADVANTAGE_TO_WIN;
-    }
-
-    private void handleTieBreakWin(Player pointWinner,
-                                   Score score,
-                                   Player firstPlayer,
-                                   Player secondPlayer) {
-        winGame(pointWinner, score);
-        winSet(pointWinner, score);
-        score.resetGames(firstPlayer, secondPlayer);
-        score.resetTieBreakPoints(firstPlayer, secondPlayer);
-    }
-
-    private boolean shouldCheckSetAndMatch(Score score, Player firstPlayer, Player secondPlayer) {
-        return score.getGames(firstPlayer) != GAMES_FOR_TIEBREAK
-               || score.getGames(secondPlayer) != GAMES_FOR_TIEBREAK;
-    }
-
-    private void checkIfSetAndMatchWon(Player pointWinner,
-                                       Score score,
-                                       Player firstPlayer,
-                                       Player secondPlayer) {
-        if (isSetWon(pointWinner, score, firstPlayer, secondPlayer)) {
-            winSet(pointWinner, score);
-            score.resetGames(firstPlayer, secondPlayer);
-        }
-    }
-
-    private void winPoint(Player player, Score score) {
-        int currentPlayerPoints = score.getPoints(player);
-        switch (currentPlayerPoints) {
-            case 0 -> score.setPoints(player, 15);
-            case 15 -> score.setPoints(player, 30);
-            case 30 -> score.setPoints(player, 40);
-            default -> score.setPoints(player, currentPlayerPoints + 1);
-        }
-    }
-
-    private void winGame(Player player, Score score) {
-        score.setGames(player, score.getGames(player) + 1);
-    }
-
-    private void winSet(Player player, Score score) {
-        score.setSets(player, score.getSets(player) + 1);
-    }
-
-    private GameState createGameState(Score score, Player firstPlayer, Player secondPlayer) {
-        boolean isTieBreak = isTieBreak(score, firstPlayer, secondPlayer);
-        Player advantagePlayer = getAdvantagePlayer(score, firstPlayer, secondPlayer).orElse(null);
-        return new GameState(score, isTieBreak, advantagePlayer);
+    private boolean isNotTieBreakSituation(Score score, Player firstPlayer, Player secondPlayer) {
+        return !isTieBreak(score, firstPlayer, secondPlayer);
     }
 }

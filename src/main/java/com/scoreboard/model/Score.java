@@ -54,30 +54,41 @@ public class Score {
         playersPoints.put(player, points);
     }
 
-    public void setGames(Player player, int games) {
-        playersGames.put(player, games);
+    public void awardTennisPoint(Player player) {
+        int currentPoints = playersPoints.get(player);
+        switch (currentPoints) {
+            case 0 -> playersPoints.put(player, 15);
+            case 15 -> playersPoints.put(player, 30);
+            case 30 -> playersPoints.put(player, 40);
+            default -> playersPoints.put(player, currentPoints + 1);
+        }
     }
 
-    public void setSets(Player player, int sets) {
-        playersSets.put(player, sets);
+    public void awardTieBreakPoint(Player player) {
+        playersTieBreakPoints.put(player, playersTieBreakPoints.get(player) + 1);
     }
 
-    public void setTieBreakPoints(Player player, int points) {
-        playersTieBreakPoints.put(player, points);
+    public void awardGame(Player player) {
+        playersGames.put(player, playersGames.get(player) + 1);
     }
 
-    public void resetPoints(Player firstPlayer, Player secondPlayer) {
-        playersPoints.put(firstPlayer, 0);
-        playersPoints.put(secondPlayer, 0);
+    public void awardSet(Player player) {
+        playersSets.put(player, playersSets.get(player) + 1);
     }
 
-    public void resetGames(Player firstPlayer, Player secondPlayer) {
-        playersGames.put(firstPlayer, 0);
-        playersGames.put(secondPlayer, 0);
+    public void resetToDeuce() {
+        playersPoints.replaceAll((player, points) -> 40);
     }
 
-    public void resetTieBreakPoints (Player firstPlayer, Player secondPlayer) {
-        playersTieBreakPoints.put(firstPlayer, 0);
-        playersTieBreakPoints.put(secondPlayer, 0);
+    public void resetAllPoints() {
+        playersPoints.replaceAll((player, points) -> 0);
+    }
+
+    public void resetAllGames() {
+        playersGames.replaceAll((player, games) -> 0);
+    }
+
+    public void resetAllTieBreakPoints() {
+        playersTieBreakPoints.replaceAll((player, points) -> 0);
     }
 }

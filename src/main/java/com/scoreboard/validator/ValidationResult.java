@@ -1,4 +1,4 @@
-package com.scoreboard.servlet;
+package com.scoreboard.validator;
 
 public record ValidationResult(boolean isValid, String value, String errorMessage) {
 

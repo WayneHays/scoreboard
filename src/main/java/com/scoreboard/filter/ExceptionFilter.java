@@ -1,6 +1,8 @@
 package com.scoreboard.filter;
 
+import com.scoreboard.exception.NotFoundException;
 import com.scoreboard.exception.ScoreboardServiceException;
+import com.scoreboard.exception.ValidationException;
 import com.scoreboard.util.ErrorHandler;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
@@ -19,6 +21,18 @@ public class ExceptionFilter implements Filter {
             throws IOException, ServletException {
         try {
             chain.doFilter(request, response);
+        } catch (NotFoundException e) {
+            ErrorHandler.handleHttpError(
+                    (HttpServletRequest) request,
+                    (HttpServletResponse) response,
+                    SC_NOT_FOUND,
+                    e.getMessage());
+        } catch (ValidationException e) {
+            ErrorHandler.handleHttpError(
+                    (HttpServletRequest) request,
+                    (HttpServletResponse) response,
+                    SC_BAD_REQUEST,
+                    e.getMessage());
         } catch (ScoreboardServiceException e) {
             ErrorHandler.handleHttpError(
                     (HttpServletRequest) request,
@@ -30,79 +44,19 @@ public class ExceptionFilter implements Filter {
                     (HttpServletRequest) request,
                     (HttpServletResponse) response,
                     SC_BAD_REQUEST,
-                    "Invalid number format: " + e.getMessage());
+                    "Invalid number format");
         } catch (IllegalArgumentException e) {
-            handleValidationError(
+            ErrorHandler.handleHttpError(
                     (HttpServletRequest) request,
                     (HttpServletResponse) response,
-                    e);
+                    SC_BAD_REQUEST,
+                    e.getMessage());
         } catch (Exception e) {
             ErrorHandler.handleHttpError(
                     (HttpServletRequest) request,
                     (HttpServletResponse) response,
                     SC_INTERNAL_SERVER_ERROR,
                     "Internal server error");
-        }
-    }
-
-    private void handleValidationError(HttpServletRequest request, HttpServletResponse response,
-                                       IllegalArgumentException e) throws ServletException, IOException {
-        String message = e.getMessage();
-
-        if (message == null) {
-            ErrorHandler.handleHttpError(
-                    request,
-                    response,
-                    SC_BAD_REQUEST,
-                    "Invalid request parameter");
-            return;
-        }
-
-        if (message.equals("Match not found") ||
-            message.equals("No matches found") ||
-            message.startsWith("Player not found:") ||
-            (message.contains("Page") && message.contains("not found"))) {
-            ErrorHandler.handleHttpError(
-                    request,
-                    response,
-                    SC_NOT_FOUND,
-                    message);
-        } else if (message.contains("UUID is required")) {
-            ErrorHandler.handleHttpError(
-                    request,
-                    response,
-                    SC_BAD_REQUEST,
-                    "Match ID is required");
-        } else if (message.contains("36 characters") || message.contains("UUID must be")) {
-            ErrorHandler.handleHttpError(
-                    request,
-                    response,
-                    SC_BAD_REQUEST,
-                    "Invalid UUID format");
-        } else if (message.contains("Player ID is required")) {
-            ErrorHandler.handleHttpError(
-                    request,
-                    response,
-                    SC_BAD_REQUEST,
-                    "Player ID is required");
-        } else if (message.contains("Player with ID") && message.contains("not found")) {
-            ErrorHandler.handleHttpError(
-                    request,
-                    response,
-                    SC_BAD_REQUEST,
-                    "Invalid player ID for this match");
-        } else if (message.toLowerCase().contains("uuid")) {
-            ErrorHandler.handleHttpError(
-                    request,
-                    response,
-                    SC_BAD_REQUEST,
-                    "Invalid UUID: " + message);
-        } else {
-            ErrorHandler.handleHttpError(
-                    request,
-                    response,
-                    SC_BAD_REQUEST,
-                    "Invalid parameter: " + message);
         }
     }
 }

@@ -13,10 +13,11 @@ public class PlayerService extends BaseTransactionalService {
         return INSTANCE;
     }
 
-    public Player findByNameOrCreate(String name) {
+
+    public Player create(String name) {
         return executeInTransaction(
-                () -> playersDao.find(name).orElseGet(() -> playersDao.save(new Player(name))),
-                "Failed to find by name or create player");
+                () -> playersDao.save(new Player(name)),
+                "Failed to create player with name: " + name);
     }
 
     public Optional<Player> find(String name) {

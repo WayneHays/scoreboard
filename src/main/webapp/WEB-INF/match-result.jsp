@@ -19,7 +19,7 @@
     <h1 class="title">Match Finished!</h1>
 
     <div class="winner-announcement">
-        <span class="winner-name">${ongoingMatch.winnerName}</span>
+        <span class="winner-name">${matchResult.winnerName}</span>
         wins!
     </div>
 
@@ -27,18 +27,18 @@
     <div class="final-scoreboard">
         <div class="score-title">Final Score</div>
 
-        <div class="final-score-row ${ongoingMatch.firstPlayerRowClass}">
+        <div class="final-score-row ${matchResult.firstPlayerRowClass}">
             <div class="player-info">
-                <div class="player-name">${ongoingMatch.firstPlayerName}</div>
+                <div class="player-name">${matchResult.firstPlayerName}</div>
             </div>
-            <div class="sets-score">${ongoingMatch.firstPlayerFinalSets}</div>
+            <div class="sets-score">${matchResult.firstPlayerFinalSets}</div>
         </div>
 
-        <div class="final-score-row ${ongoingMatch.secondPlayerRowClass}">
+        <div class="final-score-row ${matchResult.secondPlayerRowClass}">
             <div class="player-info">
-                <div class="player-name">${ongoingMatch.secondPlayerName}</div>
+                <div class="player-name">${matchResult.secondPlayerName}</div>
             </div>
-            <div class="sets-score">${ongoingMatch.secondPlayerFinalSets}</div>
+            <div class="sets-score">${matchResult.secondPlayerFinalSets}</div>
         </div>
     </div>
 

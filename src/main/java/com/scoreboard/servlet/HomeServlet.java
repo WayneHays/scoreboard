@@ -1,6 +1,6 @@
 package com.scoreboard.servlet;
 
-import com.scoreboard.util.JspPaths;
+import com.scoreboard.util.WebPaths;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -9,13 +9,13 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet ("/home")
+@WebServlet (WebPaths.HOME_URL)
 public class HomeServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        getServletContext().getRequestDispatcher(JspPaths.HOME_JSP).forward(req, resp);
+        getServletContext().getRequestDispatcher(WebPaths.HOME_JSP).forward(req, resp);
     }
 }
 

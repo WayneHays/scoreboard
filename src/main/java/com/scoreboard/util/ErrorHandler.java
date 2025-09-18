@@ -1,5 +1,6 @@
 package com.scoreboard.util;
 
+import com.scoreboard.dto.ErrorPageData;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,19 +15,13 @@ public final class ErrorHandler {
     }
 
     public static void handleHttpError(HttpServletRequest req, HttpServletResponse resp,
-                                       int statusCode, String message)
-            throws ServletException, IOException {
-        resp.setStatus(statusCode);
-        req.setAttribute("statusCode", statusCode);
-        req.setAttribute("errorMessage", message);
-        req.setAttribute("requestedUrl", buildUrl(req));
-        setErrorPageAttributes(req, statusCode);
-        req.getServletContext()
-                .getRequestDispatcher(JspPaths.ERROR_JSP)
-                .forward(req, resp);
+                                       int statusCode, String message) throws ServletException, IOException {
+        ErrorPageData errorData = createErrorPageData(statusCode, message, req);
+        renderErrorPage(req, resp, errorData);
     }
 
-    public static void setErrorPageAttributes(HttpServletRequest request, int statusCode) {
+    private static ErrorPageData createErrorPageData(int statusCode, String customMessage,
+                                                     HttpServletRequest req) {
         String errorIcon;
         String errorTitle;
         String defaultMessage;
@@ -45,8 +40,7 @@ public final class ErrorHandler {
             case HttpServletResponse.SC_INTERNAL_SERVER_ERROR:
                 errorIcon = "💥";
                 errorTitle = "Internal Server Error";
-                defaultMessage = "Something went wrong on our server. "
-                                 + "We're working to fix this issue.";
+                defaultMessage = "Something went wrong on our server. We're working to fix this issue.";
                 break;
             default:
                 errorIcon = "⚠️";
@@ -54,10 +48,35 @@ public final class ErrorHandler {
                 defaultMessage = "An unexpected error occurred.";
         }
 
-        request.setAttribute("errorIcon", errorIcon);
-        request.setAttribute("errorTitle", errorTitle);
-        request.setAttribute("defaultMessage", defaultMessage);
-        request.setAttribute("statusCode", statusCode);
+        String requestedUrl = buildUrl(req);
+
+        return new ErrorPageData(
+                statusCode,
+                errorIcon,
+                errorTitle,
+                defaultMessage,
+                customMessage,
+                requestedUrl
+        );
+    }
+
+    private static void renderErrorPage(HttpServletRequest req, HttpServletResponse resp,
+                                        ErrorPageData errorData) throws ServletException, IOException {
+        resp.setStatus(errorData.statusCode());
+        setRequestAttributes(req, errorData);
+
+        req.getServletContext()
+                .getRequestDispatcher(WebPaths.ERROR_JSP)
+                .forward(req, resp);
+    }
+
+    private static void setRequestAttributes(HttpServletRequest req, ErrorPageData data) {
+        req.setAttribute("statusCode", data.statusCode());
+        req.setAttribute("errorIcon", data.errorIcon());
+        req.setAttribute("errorTitle", data.errorTitle());
+        req.setAttribute("defaultMessage", data.defaultMessage());
+        req.setAttribute("errorMessage", data.errorMessage());
+        req.setAttribute("requestedUrl", data.requestedUrl());
     }
 
     private static String buildUrl(HttpServletRequest req) {

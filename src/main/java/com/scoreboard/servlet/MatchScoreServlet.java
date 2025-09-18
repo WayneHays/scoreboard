@@ -1,11 +1,15 @@
 package com.scoreboard.servlet;
 
+import com.scoreboard.dto.MatchProcessingView;
+import com.scoreboard.dto.MatchResult;
 import com.scoreboard.dto.OngoingMatch;
-import com.scoreboard.model.Player;
+import com.scoreboard.exception.ValidationException;
 import com.scoreboard.service.FinishedMatchService;
 import com.scoreboard.service.MatchGameplayService;
 import com.scoreboard.service.OngoingMatchesService;
-import com.scoreboard.util.JspPaths;
+import com.scoreboard.mapper.MatchProcessingViewMapper;
+import com.scoreboard.mapper.MatchResultMapper;
+import com.scoreboard.util.WebPaths;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -15,91 +19,77 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.UUID;
 
-@WebServlet("/match-score")
+@WebServlet(WebPaths.MATCH_SCORE_URL)
 public class MatchScoreServlet extends HttpServlet {
-    private static final int REQUIRED_UUID_LENGTH = 36;
-
     private final OngoingMatchesService ongoingMatchesService = OngoingMatchesService.getInstance();
     private final MatchGameplayService matchGameplayService = MatchGameplayService.getInstance();
     private final FinishedMatchService finishedMatchService = FinishedMatchService.getInstance();
+    private final MatchProcessingViewMapper processingViewMapper = new MatchProcessingViewMapper();
+    private final MatchResultMapper resultMapper = new MatchResultMapper();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         OngoingMatch ongoingMatch = findMatch(req);
-        req.setAttribute("ongoingMatch", ongoingMatch);
-        getServletContext().getRequestDispatcher(JspPaths.MATCH_SCORE_JSP).forward(req, resp);
+        MatchProcessingView matchView = processingViewMapper.map(ongoingMatch);
+        req.setAttribute("matchView", matchView);
+        getServletContext().getRequestDispatcher(WebPaths.MATCH_SCORE_JSP).forward(req, resp);
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
         OngoingMatch ongoingMatch = findMatch(req);
         String pointWinnerId = req.getParameter("pointWinnerId");
-
-        if (pointWinnerId == null || pointWinnerId.isBlank()) {
-            throw new IllegalArgumentException("Player ID is required");
-        }
-
         processPointWin(req, resp, ongoingMatch, pointWinnerId);
     }
 
     private OngoingMatch findMatch(HttpServletRequest req) {
         String uuidStr = req.getParameter("uuid");
         UUID uuid = parseUuid(uuidStr);
-        OngoingMatch ongoingMatch = ongoingMatchesService.get(uuid);
-
-        if (ongoingMatch == null) {
-            throw new IllegalArgumentException("Match not found");
-        }
-
-        return ongoingMatch;
+        return ongoingMatchesService.get(uuid);
     }
 
     private UUID parseUuid(String uuidStr) {
         if (uuidStr == null || uuidStr.isBlank()) {
-            throw new IllegalArgumentException("UUID is required");
+            throw new ValidationException("UUID is required");
         }
 
-        if (uuidStr.length() != REQUIRED_UUID_LENGTH) {
-            throw new IllegalArgumentException("UUID must be 36 characters long");
+        try {
+            return UUID.fromString(uuidStr);
+        } catch (IllegalArgumentException e) {
+            throw new ValidationException("Invalid UUID format");
         }
-
-        return UUID.fromString(uuidStr);
     }
 
     private void processPointWin(
             HttpServletRequest req,
             HttpServletResponse resp,
             OngoingMatch ongoingMatch,
-            String pointWinnerId) throws ServletException, IOException {
+            String pointWinnerId) throws IOException, ServletException {
 
         matchGameplayService.processPoint(ongoingMatch, pointWinnerId);
 
         if (matchGameplayService.isMatchFinished(ongoingMatch)) {
-            Player winner = matchGameplayService.getMatchWinner(ongoingMatch);
-            handleMatchCompletion(req, resp, ongoingMatch, winner);
+            matchGameplayService.setMatchWinner(ongoingMatch);
+
+            MatchResult result = resultMapper.map(ongoingMatch);
+            finishedMatchService.saveToDatabase(ongoingMatch.getMatch());
+            ongoingMatchesService.delete(ongoingMatch.getUuid());
+
+            showMatchResult(req, resp, result);
         } else {
-            continueMatch(resp, ongoingMatch);
+            continueMatch(req, resp, ongoingMatch);
         }
     }
 
-    private void handleMatchCompletion(
-            HttpServletRequest req,
-            HttpServletResponse resp,
-            OngoingMatch ongoingMatch,
-            Player winner) throws ServletException, IOException {
-
-        ongoingMatch.getMatch().setWinner(winner);
-        finishedMatchService.saveToDatabase(ongoingMatch.getMatch());
-        ongoingMatchesService.delete(ongoingMatch.getUuid());
-
-        req.setAttribute("ongoingMatch", ongoingMatch);
-        getServletContext().getRequestDispatcher(JspPaths.MATCH_RESULT_JSP).forward(req, resp);
+    private void showMatchResult(HttpServletRequest req, HttpServletResponse resp, MatchResult matchResult)
+            throws ServletException, IOException {
+        req.setAttribute("matchResult", matchResult);
+        getServletContext().getRequestDispatcher(WebPaths.MATCH_RESULT_JSP).forward(req, resp);
     }
 
-
-    private void continueMatch(HttpServletResponse resp,
+    private void continueMatch(HttpServletRequest req, HttpServletResponse resp,
                                OngoingMatch ongoingMatch)
             throws IOException {
-        resp.sendRedirect("/match-score?uuid=" + ongoingMatch.getUuid());
+        resp.sendRedirect(req.getContextPath() + "/match-score?uuid=" + ongoingMatch.getUuid());
     }
 }

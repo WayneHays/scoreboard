@@ -1,11 +1,8 @@
 package com.scoreboard.servlet;
 
 import com.scoreboard.dto.MatchesPage;
-import com.scoreboard.model.Match;
-import com.scoreboard.model.Player;
-import com.scoreboard.service.FindMatchesService;
-import com.scoreboard.service.PlayerService;
-import com.scoreboard.util.JspPaths;
+import com.scoreboard.service.MatchesPageService;
+import com.scoreboard.util.WebPaths;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -13,15 +10,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
 
-@WebServlet("/matches")
+@WebServlet(WebPaths.MATCHES_URL)
 public class MatchesServlet extends HttpServlet {
     private static final int DEFAULT_PAGE_NUMBER = 1;
 
-    private final FindMatchesService findMatchesService = FindMatchesService.getInstance();
-    private final PlayerService playerService = PlayerService.getInstance();
+    private final MatchesPageService pageService = MatchesPageService.getInstance();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -30,15 +24,11 @@ public class MatchesServlet extends HttpServlet {
         int pageNumber = parsePageNumber(pageNumberStr);
 
         MatchesPage matchesPage = (playerName == null || playerName.isBlank()) ?
-                buildAllMatchesPage(pageNumber) :
-                buildPlayerMatchesPage(playerName, pageNumber);
-
-        if (matchesPage.hasError() && shouldReturn404(matchesPage)) {
-            throw new IllegalArgumentException(matchesPage.errorMessage());
-        }
+                pageService.getAllMatchesPage(pageNumber) :
+                pageService.getPlayerMatchesPage(playerName, pageNumber);
 
         req.setAttribute("matchesPage", matchesPage);
-        getServletContext().getRequestDispatcher(JspPaths.MATCHES_JSP).forward(req, resp);
+        getServletContext().getRequestDispatcher(WebPaths.MATCHES_JSP).forward(req, resp);
     }
 
     private int parsePageNumber(String pageNumberStr) {
@@ -46,47 +36,5 @@ public class MatchesServlet extends HttpServlet {
             return DEFAULT_PAGE_NUMBER;
         }
         return Integer.parseInt(pageNumberStr);
-    }
-
-    private MatchesPage buildAllMatchesPage(int pageNumber) {
-        int totalPages = findMatchesService.getTotalCountOfPages();
-
-        if (isInvalidPage(pageNumber, totalPages)) {
-            String error = (totalPages == 0) ? "No matches found" :
-                    String.format("Page %d not found. Available pages: 1-%d", pageNumber, totalPages);
-            return new MatchesPage(pageNumber, List.of(), totalPages, null, error);
-        }
-
-        List<Match> matches = findMatchesService.findMatchesByPage(pageNumber);
-        return new MatchesPage(pageNumber, matches, totalPages);
-    }
-
-    private MatchesPage buildPlayerMatchesPage(String playerName, int pageNumber) {
-        Optional<Player> maybePlayer = playerService.find(playerName);
-
-        if (maybePlayer.isEmpty()) {
-            return new MatchesPage(DEFAULT_PAGE_NUMBER, List.of(), 0,
-                    playerName, "Player not found: " + playerName);
-        }
-
-        Player player = maybePlayer.get();
-        int totalPages = findMatchesService.getTotalCountOfPagesByPlayer(player);
-
-        if (isInvalidPage(pageNumber, totalPages)) {
-            String error = String.format("Page %d not found. Available pages: 1-%d",
-                    pageNumber, totalPages);
-            return new MatchesPage(pageNumber, List.of(), totalPages, playerName, error);
-        }
-
-        List<Match> matches = findMatchesService.findMatchesByPlayerByPage(player, pageNumber);
-        return new MatchesPage(pageNumber, matches, totalPages, playerName);
-    }
-
-    private boolean shouldReturn404(MatchesPage page) {
-        return page.errorMessage().contains("Page") && page.errorMessage().contains("not found");
-    }
-
-    private boolean isInvalidPage(int pageNumber, int totalPages) {
-        return pageNumber < 1 || (totalPages > 0 && pageNumber > totalPages);
     }
 }

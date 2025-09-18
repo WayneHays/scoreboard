@@ -1,6 +1,7 @@
 package com.scoreboard.service;
 
 import com.scoreboard.dto.OngoingMatch;
+import com.scoreboard.exception.NotFoundException;
 import com.scoreboard.model.Match;
 import com.scoreboard.model.Player;
 import com.scoreboard.model.Score;
@@ -32,7 +33,13 @@ public class OngoingMatchesService {
     }
 
     public OngoingMatch get(UUID uuid) {
-        return ongoingMatches.get(uuid);
+        OngoingMatch ongoingMatch = ongoingMatches.get(uuid);
+
+        if (ongoingMatch == null) {
+            throw new NotFoundException("Match not found");
+        }
+
+        return ongoingMatch;
     }
 
     public void delete(UUID uuid) {
