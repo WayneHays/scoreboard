@@ -4,13 +4,11 @@ import com.scoreboard.dto.OngoingMatch;
 import com.scoreboard.exception.ValidationException;
 import com.scoreboard.model.Match;
 import com.scoreboard.model.Player;
-import com.scoreboard.mapper.MatchResultMapper;
 
 public class MatchGameplayService {
     private static final MatchGameplayService INSTANCE = new MatchGameplayService();
 
     private final ScoreCalculationService scoreCalculationService = ScoreCalculationService.getInstance();
-    private final MatchResultMapper mapper = new MatchResultMapper();
 
     public static MatchGameplayService getInstance() {
         return INSTANCE;

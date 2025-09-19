@@ -27,7 +27,7 @@ public class MatchesServlet extends HttpServlet {
                 pageService.getAllMatchesPage(pageNumber) :
                 pageService.getPlayerMatchesPage(playerName, pageNumber);
 
-        req.setAttribute("matchesPage", finishedMatchesPage);
+        req.setAttribute("finishedMatchesPage", finishedMatchesPage);
         getServletContext().getRequestDispatcher(WebPaths.MATCHES_JSP).forward(req, resp);
     }
 

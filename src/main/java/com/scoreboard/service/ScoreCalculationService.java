@@ -39,22 +39,15 @@ public class ScoreCalculationService {
         updateMatchState(ongoingMatch, firstPlayer, secondPlayer);
     }
 
-    private void updateMatchState(OngoingMatch ongoingMatch, Player firstPlayer, Player secondPlayer) {
-        Score score = ongoingMatch.getScore();
-
-        boolean shouldBeTieBreak = isTieBreak(score, firstPlayer, secondPlayer);
-        Optional<Player> advantagePlayer = getAdvantagePlayer(score, firstPlayer, secondPlayer);
-
-        ongoingMatch.setTieBreak(shouldBeTieBreak);
-        ongoingMatch.setAdvantage(shouldBeTieBreak ? null : advantagePlayer.orElse(null));
+    public boolean isMatchFinished(Score score, Player first, Player second) {
+        return score.getSets(first) >= SETS_TO_WIN_MATCH ||
+               score.getSets(second) >= SETS_TO_WIN_MATCH;
     }
 
     private void processTieBreakPoint(Score score, Player winner, Player firstPlayer, Player secondPlayer) {
         score.awardTieBreakPoint(winner);
 
-        if (score.getTieBreakPoints(winner) >= MIN_TIEBREAK_POINTS_TO_WIN &&
-            Math.abs(score.getTieBreakPoints(firstPlayer) - score.getTieBreakPoints(secondPlayer)) >= MIN_ADVANTAGE_TO_WIN) {
-
+        if (isTieBreakOver(score, winner, firstPlayer, secondPlayer)) {
             score.awardGame(winner);
             score.awardSet(winner);
             score.resetAllGames();
@@ -69,14 +62,29 @@ public class ScoreCalculationService {
         score.awardTennisPoint(winner);
 
         if (wasDeuce || advantagePlayerBefore.isPresent()) {
-            handleDeuceScenario(score, winner, advantagePlayerBefore, firstPlayer, secondPlayer);
+            handleDeuceCase(score, winner, advantagePlayerBefore, firstPlayer, secondPlayer);
         } else if (score.getPoints(winner) > MAX_POINTS_PER_GAME) {
             completeGame(score, winner, firstPlayer, secondPlayer);
         }
     }
 
-    private void handleDeuceScenario(Score score, Player winner, Optional<Player> advantagePlayerBefore,
-                                     Player firstPlayer, Player secondPlayer) {
+    private void updateMatchState(OngoingMatch ongoingMatch, Player firstPlayer, Player secondPlayer) {
+        Score score = ongoingMatch.getScore();
+
+        boolean shouldBeTieBreak = isTieBreak(score, firstPlayer, secondPlayer);
+        Optional<Player> advantagePlayer = getAdvantagePlayer(score, firstPlayer, secondPlayer);
+
+        ongoingMatch.setTieBreak(shouldBeTieBreak);
+        ongoingMatch.setAdvantage(shouldBeTieBreak ? null : advantagePlayer.orElse(null));
+    }
+
+    private boolean isTieBreakOver(Score score, Player winner, Player firstPlayer, Player secondPlayer) {
+        return score.getTieBreakPoints(winner) >= MIN_TIEBREAK_POINTS_TO_WIN &&
+               Math.abs(score.getTieBreakPoints(firstPlayer) - score.getTieBreakPoints(secondPlayer)) >= MIN_ADVANTAGE_TO_WIN;
+    }
+
+    private void handleDeuceCase(Score score, Player winner, Optional<Player> advantagePlayerBefore,
+                                 Player firstPlayer, Player secondPlayer) {
         if (advantagePlayerBefore.isPresent()) {
             if (advantagePlayerBefore.get().equals(winner)) {
                 completeRegularGame(score, winner, firstPlayer, secondPlayer);
@@ -106,11 +114,6 @@ public class ScoreCalculationService {
             score.awardSet(winner);
             score.resetAllGames();
         }
-    }
-
-    public boolean isMatchFinished(Score score, Player first, Player second) {
-        return score.getSets(first) >= SETS_TO_WIN_MATCH ||
-               score.getSets(second) >= SETS_TO_WIN_MATCH;
     }
 
     public boolean isTieBreak(Score score, Player firstPlayer, Player secondPlayer) {

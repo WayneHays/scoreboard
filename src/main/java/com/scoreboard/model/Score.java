@@ -9,6 +9,11 @@ import java.util.Map;
 @AllArgsConstructor
 @Getter
 public class Score {
+    private static final int ZERO = 0;
+    private static final int FIFTEEN = 15;
+    private static final int THIRTY = 30;
+    private static final int FORTY = 40;
+
     private final Map<Player, Integer> playersPoints;
     private final Map<Player, Integer> playersGames;
     private final Map<Player, Integer> playersSets;
@@ -28,10 +33,10 @@ public class Score {
     }
 
     private void initializePlayerScore(Player player) {
-        playersPoints.put(player, 0);
-        playersGames.put(player, 0);
-        playersSets.put(player, 0);
-        playersTieBreakPoints.put(player, 0);
+        playersPoints.put(player, ZERO);
+        playersGames.put(player, ZERO);
+        playersSets.put(player, ZERO);
+        playersTieBreakPoints.put(player, ZERO);
     }
 
     public int getPoints(Player player) {
@@ -50,16 +55,12 @@ public class Score {
         return playersTieBreakPoints.get(player);
     }
 
-    public void setPoints(Player player, int points) {
-        playersPoints.put(player, points);
-    }
-
     public void awardTennisPoint(Player player) {
         int currentPoints = playersPoints.get(player);
         switch (currentPoints) {
-            case 0 -> playersPoints.put(player, 15);
-            case 15 -> playersPoints.put(player, 30);
-            case 30 -> playersPoints.put(player, 40);
+            case ZERO -> playersPoints.put(player, FIFTEEN);
+            case FIFTEEN -> playersPoints.put(player, THIRTY);
+            case THIRTY -> playersPoints.put(player, FORTY);
             default -> playersPoints.put(player, currentPoints + 1);
         }
     }
@@ -77,18 +78,18 @@ public class Score {
     }
 
     public void resetToDeuce() {
-        playersPoints.replaceAll((player, points) -> 40);
+        playersPoints.replaceAll((player, points) -> FORTY);
     }
 
     public void resetAllPoints() {
-        playersPoints.replaceAll((player, points) -> 0);
+        playersPoints.replaceAll((player, points) -> ZERO);
     }
 
     public void resetAllGames() {
-        playersGames.replaceAll((player, games) -> 0);
+        playersGames.replaceAll((player, games) -> ZERO);
     }
 
     public void resetAllTieBreakPoints() {
-        playersTieBreakPoints.replaceAll((player, points) -> 0);
+        playersTieBreakPoints.replaceAll((player, points) -> ZERO);
     }
 }

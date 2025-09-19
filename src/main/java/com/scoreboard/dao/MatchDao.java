@@ -1,5 +1,6 @@
 package com.scoreboard.dao;
 
+import com.scoreboard.config.AppConfig;
 import com.scoreboard.model.Match;
 import com.scoreboard.model.Player;
 import com.scoreboard.util.HibernateUtil;
@@ -9,11 +10,11 @@ import org.hibernate.query.Query;
 import java.util.List;
 
 public class MatchDao {
-    private static final int DEFAULT_PAGE_SIZE = 10;
-    private static final String FIND_ALL = "FROM Match";
-    private static final String FIND_BY_PLAYER = "FROM Match WHERE firstPlayer = :player OR secondPlayer = :player";
-    public static final String SELECT_COUNT = "SELECT COUNT(*) ";
-    private static final String PLAYER = "player";
+    private static final String FIND_ALL = "FROM Match ORDER BY id DESC";
+    private static final String FIND_BY_PLAYER = "FROM Match WHERE firstPlayer = :player OR secondPlayer = :player ORDER BY id DESC";
+    private static final String COUNT_ALL = "SELECT COUNT(id) FROM Match";
+    private static final String COUNT_BY_PLAYER = "SELECT COUNT(id) FROM Match WHERE firstPlayer = :player OR secondPlayer = :player";
+    private static final String PLAYER_PARAM = "player";
 
     private static final MatchDao INSTANCE = new MatchDao();
 
@@ -21,63 +22,48 @@ public class MatchDao {
         return INSTANCE;
     }
 
-    private MatchDao() {}
+    private MatchDao() {
+    }
 
     public void save(Match match) {
-        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-        session.persist(match);
+        getCurrentSession().persist(match);
     }
 
     public List<Match> find(int pageNumber) {
-        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-        Query<Match> query = session.createQuery(FIND_ALL, Match.class);
+        Query<Match> query = getCurrentSession().createQuery(FIND_ALL, Match.class);
         applyPagination(pageNumber, query);
         return query.getResultList();
     }
 
     public List<Match> find(Player player, int pageNumber) {
-        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-        Query<Match> query = session.createQuery(FIND_BY_PLAYER, Match.class);
-        query.setParameter(PLAYER, player);
+        Query<Match> query = getCurrentSession().createQuery(FIND_BY_PLAYER, Match.class);
+        query.setParameter(PLAYER_PARAM, player);
         applyPagination(pageNumber, query);
         return query.getResultList();
     }
 
-    public int getTotalCountOfPages() {
-        return calculateTotalPages(getTotalCountOfMatches());
+    public int getTotalCountOfMatches() {
+        return getCurrentSession().createQuery(COUNT_ALL, Long.class)
+                .getSingleResult()
+                .intValue();
     }
 
-    public int getTotalCountOfPagesByPlayer(Player player) {
-        return calculateTotalPages(getTotalCountOfMatchesByPlayer(player));
+    public int getTotalCountOfMatchesByPlayer(Player player) {
+        return getCurrentSession().createQuery(COUNT_BY_PLAYER, Long.class)
+                .setParameter(PLAYER_PARAM, player)
+                .getSingleResult()
+                .intValue();
+    }
+
+    private Session getCurrentSession() {
+        return HibernateUtil.getSessionFactory().getCurrentSession();
     }
 
     private void applyPagination(int pageNumber, Query<Match> query) {
-        query.setMaxResults(DEFAULT_PAGE_SIZE);
-        query.setFirstResult((pageNumber - 1) * DEFAULT_PAGE_SIZE);
-    }
-
-    private int calculateTotalPages(int totalRecords) {
-        if (totalRecords == 0) {
-            return 0;
+        if (pageNumber < 1) {
+            throw new IllegalArgumentException("Page number must be positive");
         }
-        if (totalRecords < DEFAULT_PAGE_SIZE) {
-            return 1;
-        }
-        return (int) Math.ceil((double) totalRecords / DEFAULT_PAGE_SIZE);
-    }
-
-    private int getTotalCountOfMatches() {
-        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-        return session.createQuery(SELECT_COUNT + FIND_ALL, Long.class)
-                       .getSingleResult()
-                       .intValue();
-    }
-
-    private int getTotalCountOfMatchesByPlayer(Player player) {
-        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-        return session.createQuery(SELECT_COUNT + FIND_BY_PLAYER, Long.class)
-                       .setParameter(PLAYER, player)
-                       .getSingleResult()
-                       .intValue();
+        query.setMaxResults(AppConfig.PAGE_SIZE);
+        query.setFirstResult((pageNumber - 1) * AppConfig.PAGE_SIZE);
     }
 }

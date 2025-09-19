@@ -18,7 +18,7 @@
 <h1>Welcome to Tennis Scoreboard!</h1>
 <h2>Manage your tennis matches, record results and track rankings!</h2>
 
-<img src="https://images.unsplash.com/photo-1554068865-24cecd4e34b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+<img src=${pageContext.request.contextPath}/images/tennis_player.jpg
      alt="tennis player">
 
 <div class="buttons-container">
