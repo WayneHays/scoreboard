@@ -1,5 +1,8 @@
 package com.scoreboard.dto;
 
+import lombok.Builder;
+
+@Builder
 public record ErrorPageData(
         int statusCode,
         String errorIcon,

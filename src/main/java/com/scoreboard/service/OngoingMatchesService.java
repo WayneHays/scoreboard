@@ -1,9 +1,9 @@
 package com.scoreboard.service;
 
-import com.scoreboard.dto.OngoingMatch;
+import com.scoreboard.model.OngoingMatch;
 import com.scoreboard.exception.NotFoundException;
-import com.scoreboard.model.Match;
-import com.scoreboard.model.Player;
+import com.scoreboard.model.entity.Match;
+import com.scoreboard.model.entity.Player;
 import com.scoreboard.model.Score;
 
 import java.util.Map;
@@ -11,15 +11,10 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class OngoingMatchesService {
-    private static final OngoingMatchesService INSTANCE = new OngoingMatchesService();
     private final Map<UUID, OngoingMatch> ongoingMatches;
 
     public OngoingMatchesService() {
         this.ongoingMatches = new ConcurrentHashMap<>();
-    }
-
-    public static OngoingMatchesService getInstance() {
-        return INSTANCE;
     }
 
     public UUID createMatch(Player first, Player second) {

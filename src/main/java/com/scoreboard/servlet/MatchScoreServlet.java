@@ -1,14 +1,15 @@
 package com.scoreboard.servlet;
 
+import com.scoreboard.config.ApplicationContext;
 import com.scoreboard.dto.MatchLiveView;
 import com.scoreboard.dto.MatchResult;
-import com.scoreboard.dto.OngoingMatch;
 import com.scoreboard.exception.ValidationException;
+import com.scoreboard.mapper.MatchLiveViewMapper;
+import com.scoreboard.mapper.MatchResultMapper;
+import com.scoreboard.model.OngoingMatch;
 import com.scoreboard.service.FinishedMatchService;
 import com.scoreboard.service.MatchGameplayService;
 import com.scoreboard.service.OngoingMatchesService;
-import com.scoreboard.mapper.MatchLiveViewMapper;
-import com.scoreboard.mapper.MatchResultMapper;
 import com.scoreboard.util.WebPaths;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -19,13 +20,21 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.UUID;
 
-@WebServlet(WebPaths.MATCH_SCORE_URL)
+@WebServlet( "/match-score")
 public class MatchScoreServlet extends HttpServlet {
-    private final OngoingMatchesService ongoingMatchesService = OngoingMatchesService.getInstance();
-    private final MatchGameplayService matchGameplayService = MatchGameplayService.getInstance();
-    private final FinishedMatchService finishedMatchService = FinishedMatchService.getInstance();
-    private final MatchLiveViewMapper liveViewMapper = new MatchLiveViewMapper();
-    private final MatchResultMapper resultMapper = new MatchResultMapper();
+    private final OngoingMatchesService ongoingMatchesService;
+    private final MatchGameplayService matchGameplayService;
+    private final FinishedMatchService finishedMatchService;
+    private final MatchLiveViewMapper liveViewMapper;
+    private final MatchResultMapper resultMapper;
+
+    public MatchScoreServlet() {
+        this.ongoingMatchesService = ApplicationContext.get(OngoingMatchesService.class);
+        this.matchGameplayService = ApplicationContext.get(MatchGameplayService.class);
+        this.finishedMatchService = ApplicationContext.get(FinishedMatchService.class);
+        this.liveViewMapper = ApplicationContext.get(MatchLiveViewMapper.class);
+        this.resultMapper = ApplicationContext.get(MatchResultMapper.class);
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -66,15 +75,12 @@ public class MatchScoreServlet extends HttpServlet {
             OngoingMatch ongoingMatch,
             String pointWinnerId) throws IOException, ServletException {
 
-        matchGameplayService.processPoint(ongoingMatch, pointWinnerId);
+        matchGameplayService.awardPointToPlayer(ongoingMatch, pointWinnerId);
 
-        if (matchGameplayService.isMatchFinished(ongoingMatch)) {
-            matchGameplayService.setMatchWinner(ongoingMatch);
-
+        if (ongoingMatch.getWinner() != null) {
             MatchResult result = resultMapper.map(ongoingMatch);
             finishedMatchService.saveToDatabase(ongoingMatch.getMatch());
             ongoingMatchesService.delete(ongoingMatch.getUuid());
-
             showMatchResult(req, resp, result);
         } else {
             continueMatch(req, resp, ongoingMatch);

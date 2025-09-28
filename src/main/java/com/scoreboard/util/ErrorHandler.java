@@ -4,20 +4,18 @@ import com.scoreboard.dto.ErrorPageData;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.io.IOException;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ErrorHandler {
-
-    private ErrorHandler() {
-        throw new UnsupportedOperationException(
-                "Utility class cannot be instantiated");
-    }
 
     public static void handleHttpError(HttpServletRequest req, HttpServletResponse resp,
                                        int statusCode, String message) throws ServletException, IOException {
-        ErrorPageData errorData = createErrorPageData(statusCode, message, req);
-        renderErrorPage(req, resp, errorData);
+        ErrorPageData errorPageData = createErrorPageData(statusCode, message, req);
+        renderErrorPage(req, resp, errorPageData);
     }
 
     private static ErrorPageData createErrorPageData(int statusCode, String customMessage,
@@ -50,34 +48,26 @@ public final class ErrorHandler {
 
         String requestedUrl = buildUrl(req);
 
-        return new ErrorPageData(
-                statusCode,
-                errorIcon,
-                errorTitle,
-                defaultMessage,
-                customMessage,
-                requestedUrl
-        );
+        return ErrorPageData.builder()
+                .statusCode(statusCode)
+                .errorIcon(errorIcon)
+                .errorTitle(errorTitle)
+                .defaultMessage(defaultMessage)
+                .errorMessage(customMessage)
+                .requestedUrl(requestedUrl)
+                .build();
     }
 
     private static void renderErrorPage(HttpServletRequest req, HttpServletResponse resp,
-                                        ErrorPageData errorData) throws ServletException, IOException {
-        resp.setStatus(errorData.statusCode());
-        setRequestAttributes(req, errorData);
+                                        ErrorPageData errorPageData) throws ServletException, IOException {
+        resp.setStatus(errorPageData.statusCode());
+        req.setAttribute("errorPageData", errorPageData);
 
         req.getServletContext()
                 .getRequestDispatcher(WebPaths.ERROR_JSP)
                 .forward(req, resp);
     }
 
-    private static void setRequestAttributes(HttpServletRequest req, ErrorPageData data) {
-        req.setAttribute("statusCode", data.statusCode());
-        req.setAttribute("errorIcon", data.errorIcon());
-        req.setAttribute("errorTitle", data.errorTitle());
-        req.setAttribute("defaultMessage", data.defaultMessage());
-        req.setAttribute("errorMessage", data.errorMessage());
-        req.setAttribute("requestedUrl", data.requestedUrl());
-    }
 
     private static String buildUrl(HttpServletRequest req) {
         return req.getRequestURI()

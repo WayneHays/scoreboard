@@ -8,57 +8,64 @@ import static org.junit.jupiter.api.Assertions.*;
 class GameplayTest extends ScoreCalculationTestBase {
 
     @Test
-    void shouldReturnIfMatchFinished() {
-        // Устанавливаем счет через циклы
-        score.awardSet(player1); // 1:0 сеты
-        score.awardSet(player2); // 1:1 сеты
+    void shouldFinishMatchWhenPlayerWins2Sets() {
+        ongoingMatch.awardSet(player1);
+        ongoingMatch.awardSet(player2);
 
-        // 5:0 игры
         for (int i = 0; i < 5; i++) {
-            score.awardGame(player1);
+            ongoingMatch.awardGame(player1);
         }
 
-        // 40:0 очки
-        score.setPoints(player1, 40);
-        score.setPoints(player2, 0);
+        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
+        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
+        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
+        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
 
-        service.calculate(ongoingMatch, player1);
-
-        assertTrue(service.isMatchFinished(score, player1, player2));
-        assertEquals(2, score.getSets(player1)); // Должно быть 2 сета для победы
-        assertEquals(1, score.getSets(player2));
+        assertTrue(service.isMatchFinished(ongoingMatch));
+        assertEquals(2, ongoingMatch.getSets(player1));
+        assertEquals(1, ongoingMatch.getSets(player2));
     }
 
     @Test
-    void shouldIncrementCountOfPoints() {
-        service.calculate(ongoingMatch, player1);
-        assertEquals(15, score.getPoints(player1));
-        assertEquals(0, score.getPoints(player2));
+    void shouldIncrementPointsCorrectly() {
+        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
+        assertEquals(15, ongoingMatch.getPoints(player1));
+        assertEquals(0, ongoingMatch.getPoints(player2));
 
-        service.calculate(ongoingMatch, player1);
-        assertEquals(30, score.getPoints(player1));
-        assertEquals(0, score.getPoints(player2));
+        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
+        assertEquals(30, ongoingMatch.getPoints(player1));
+        assertEquals(0, ongoingMatch.getPoints(player2));
 
-        service.calculate(ongoingMatch, player1);
-        assertEquals(40, score.getPoints(player1));
-        assertEquals(0, score.getPoints(player2));
+        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
+        assertEquals(40, ongoingMatch.getPoints(player1));
+        assertEquals(0, ongoingMatch.getPoints(player2));
 
-        service.calculate(ongoingMatch, player1);
-        assertEquals(0, score.getPoints(player1));
-        assertEquals(0, score.getPoints(player2));
-        assertEquals(1, score.getGames(player1)); // Должна быть засчитана игра
+        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
+        assertEquals(0, ongoingMatch.getPoints(player1));
+        assertEquals(0, ongoingMatch.getPoints(player2));
+        assertEquals(1, ongoingMatch.getGames(player1));
     }
 
     @Test
-    void shouldIncrementCountOfGames() {
-        service.calculate(ongoingMatch, player1);
-        service.calculate(ongoingMatch, player1);
-        service.calculate(ongoingMatch, player1);
-        service.calculate(ongoingMatch, player1);
+    void shouldIncrementGameCountAfterWinning4Points() {
+        // Выигрываем 4 очка подряд для победы в игре
+        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
+        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
+        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
+        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
 
-        assertEquals(0, score.getPoints(player1));
-        assertEquals(0, score.getPoints(player2));
-        assertEquals(1, score.getGames(player1));
-        assertEquals(0, score.getGames(player2));
+        assertEquals(0, ongoingMatch.getPoints(player1));
+        assertEquals(0, ongoingMatch.getPoints(player2));
+        assertEquals(1, ongoingMatch.getGames(player1));
+        assertEquals(0, ongoingMatch.getGames(player2));
+    }
+
+    @Test
+    void shouldNotFinishMatchIfNotEnoughSets() {
+        ongoingMatch.awardSet(player1);
+
+        assertFalse(service.isMatchFinished(ongoingMatch));
+        assertEquals(1, ongoingMatch.getSets(player1));
+        assertEquals(0, ongoingMatch.getSets(player2));
     }
 }

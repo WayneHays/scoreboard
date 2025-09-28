@@ -1,4 +1,4 @@
-package com.scoreboard.model;
+package com.scoreboard.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -6,13 +6,13 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 
 @Entity
 @Table(name = "Players")
 public class Player {
     @Id
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
@@ -22,6 +22,8 @@ public class Player {
             unique = true,
             columnDefinition = "VARCHAR"
     )
+
+    @EqualsAndHashCode.Include
     private String name;
 
     public Player(String name) {

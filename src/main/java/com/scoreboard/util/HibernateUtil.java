@@ -1,7 +1,10 @@
 package com.scoreboard.util;
 
-import com.scoreboard.model.Match;
-import com.scoreboard.model.Player;
+import com.scoreboard.config.ApplicationConfig;
+import com.scoreboard.model.entity.Match;
+import com.scoreboard.model.entity.Player;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
@@ -12,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HibernateUtil {
     private static final ServiceRegistry SERVICE_REGISTRY;
     private static final SessionFactory SESSION_FACTORY;
@@ -19,10 +23,6 @@ public final class HibernateUtil {
     static {
         SERVICE_REGISTRY = configureServiceRegistry();
         SESSION_FACTORY = buildSessionFactory();
-    }
-
-    private HibernateUtil() {
-        throw new UnsupportedOperationException("Utility class cannot be instantiated");
     }
 
     public static SessionFactory getSessionFactory() {
@@ -50,14 +50,14 @@ public final class HibernateUtil {
     private static Properties loadHibernateProperties() {
         Properties properties = new Properties();
         try (InputStream stream = HibernateUtil.class.getClassLoader()
-                .getResourceAsStream("hibernate.properties")) {
+                .getResourceAsStream(ApplicationConfig.HIBERNATE_PROPERTIES_FILE)) {
             if (stream == null) {
-                throw new RuntimeException("hibernate.properties file not found");
+                throw new RuntimeException(ApplicationConfig.HIBERNATE_PROPERTIES_FILE + " file not found");
             }
             properties.load(stream);
             return properties;
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load hibernate.properties", e);
+            throw new RuntimeException("Failed to load " + ApplicationConfig.HIBERNATE_PROPERTIES_FILE, e);
         }
     }
 

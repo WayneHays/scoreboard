@@ -6,6 +6,7 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,34 +17,36 @@
 </head>
 <body>
 <div class="container">
-    <h1 class="title">Match Finished!</h1>
+    <header>
+        <h1 class="title">Match Finished!</h1>
+    </header>
 
-    <div class="winner-announcement">
-        <span class="winner-name">${matchResult.winnerName}</span>
-        wins!
-    </div>
-
-    <!-- Final Score Display -->
-    <div class="final-scoreboard">
-        <div class="score-title">Final Score</div>
-
-        <div class="final-score-row ${matchResult.firstPlayerRowClass}">
-            <div class="player-info">
-                <div class="player-name">${matchResult.firstPlayerName}</div>
-            </div>
-            <div class="sets-score">${matchResult.firstPlayerFinalSets}</div>
+    <main>
+        <div class="winner-announcement">
+            <span class="winner-name"><c:out value="${matchResult.winnerName}"/></span>
+            wins!
         </div>
 
-        <div class="final-score-row ${matchResult.secondPlayerRowClass}">
-            <div class="player-info">
-                <div class="player-name">${matchResult.secondPlayerName}</div>
-            </div>
-            <div class="sets-score">${matchResult.secondPlayerFinalSets}</div>
-        </div>
-    </div>
+        <section class="final-scoreboard">
+            <div class="score-title">Final Score</div>
 
-    <!-- Navigation Links -->
-    <div class="navigation-links">
+            <div class="final-score-row ${matchResult.firstPlayerRowClass}">
+                <div class="player-info">
+                    <div class="player-name"><c:out value="${matchResult.firstPlayerName}"/></div>
+                </div>
+                <div class="sets-score">${matchResult.firstPlayerFinalSets}</div>
+            </div>
+
+            <div class="final-score-row ${matchResult.secondPlayerRowClass}">
+                <div class="player-info">
+                    <div class="player-name"><c:out value="${matchResult.secondPlayerName}"/></div>
+                </div>
+                <div class="sets-score">${matchResult.secondPlayerFinalSets}</div>
+            </div>
+        </section>
+    </main>
+
+    <nav class="navigation-links">
         <a href="${pageContext.request.contextPath}/home" class="nav-link">
             Home
         </a>
@@ -51,7 +54,7 @@
         <a href="${pageContext.request.contextPath}/matches" class="nav-link matches-link">
             Matches
         </a>
-    </div>
+    </nav>
 </div>
 </body>
 </html>

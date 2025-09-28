@@ -9,16 +9,16 @@ public class NewMatchFormMapper {
                             ValidationResult player1Result,
                             ValidationResult player2Result,
                             String generalError) {
-        return new NewMatchForm(
-                checkInput(player1Input),
-                checkInput(player2Input),
-                player1Result.errorMessage(),
-                player2Result.errorMessage(),
-                generalError
-        );
+        return NewMatchForm.builder()
+                .player1Value(normalizeInput(player1Input))
+                .player2Value(normalizeInput(player2Input))
+                .player1Error(player1Result.errorMessage())
+                .player2Error(player2Result.errorMessage())
+                .generalError(generalError)
+                .build();
     }
 
-    private String checkInput(String input) {
+    private String normalizeInput(String input) {
         return input != null ? input : "";
     }
 }

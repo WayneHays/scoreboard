@@ -1,14 +1,13 @@
 package com.scoreboard.service;
 
 import com.scoreboard.dao.MatchDao;
-import com.scoreboard.model.Match;
+import com.scoreboard.model.entity.Match;
 
 public class FinishedMatchService extends BaseTransactionalService{
-    private static final FinishedMatchService INSTANCE = new FinishedMatchService();
-    private final MatchDao matchDao = MatchDao.getInstance();
+    private final MatchDao matchDao;
 
-    public static FinishedMatchService getInstance() {
-        return INSTANCE;
+    public FinishedMatchService(MatchDao matchDao) {
+        this.matchDao = matchDao;
     }
 
     public void saveToDatabase(Match match) {

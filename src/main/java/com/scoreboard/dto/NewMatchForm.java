@@ -1,5 +1,8 @@
 package com.scoreboard.dto;
 
+import lombok.Builder;
+
+@Builder
 public record NewMatchForm(
         String player1Value,
         String player2Value,
