@@ -28,8 +28,8 @@ public class MatchesServlet extends HttpServlet {
         int pageNumber = parsePageNumber(pageNumberStr);
 
         FinishedMatchesPage finishedMatchesPage = (playerName == null || playerName.isBlank()) ?
-                matchesPageService.getAllMatchesPage(pageNumber) :
-                matchesPageService.getPlayerMatchesPage(playerName, pageNumber);
+                matchesPageService.getAllMatchesPage(pageNumber)
+                : matchesPageService.getPlayerMatchesPage(playerName, pageNumber);
 
         req.setAttribute("finishedMatchesPage", finishedMatchesPage);
         getServletContext().getRequestDispatcher(WebPaths.MATCHES_JSP).forward(req, resp);

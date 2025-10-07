@@ -60,7 +60,8 @@ public class NewMatchServlet extends HttpServlet {
         createMatchAndRedirect(req, resp, player1Result, player2Result);
     }
 
-    private void createMatchAndRedirect(HttpServletRequest req, HttpServletResponse resp, ValidationResult player1Result,
+    private void createMatchAndRedirect(HttpServletRequest req, HttpServletResponse resp,
+                                        ValidationResult player1Result,
                                         ValidationResult player2Result) throws IOException {
         Player player1 = findOrCreatePlayer(player1Result.value());
         Player player2 = findOrCreatePlayer(player2Result.value());
@@ -95,6 +96,13 @@ public class NewMatchServlet extends HttpServlet {
 
     private Player findOrCreatePlayer(String name) {
         return playerService.find(name)
-                .orElseGet(() -> playerService.create(name));
+                .orElseGet(() -> {
+                    try {
+                        return playerService.create(name);
+                    } catch (Exception e) {
+                        return playerService.find(name)
+                                .orElseThrow(() -> new RuntimeException("Failed to find or create player", e));
+                    }
+                });
     }
 }

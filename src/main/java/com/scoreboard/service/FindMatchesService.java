@@ -1,6 +1,5 @@
 package com.scoreboard.service;
 
-import com.scoreboard.config.ApplicationConfig;
 import com.scoreboard.dao.MatchDao;
 import com.scoreboard.model.entity.Match;
 import com.scoreboard.model.entity.Player;

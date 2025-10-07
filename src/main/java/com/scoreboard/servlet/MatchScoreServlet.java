@@ -20,7 +20,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.UUID;
 
-@WebServlet( "/match-score")
+@WebServlet("/match-score")
 public class MatchScoreServlet extends HttpServlet {
     private final OngoingMatchesService ongoingMatchesService;
     private final MatchGameplayService matchGameplayService;
@@ -78,24 +78,13 @@ public class MatchScoreServlet extends HttpServlet {
         matchGameplayService.awardPointToPlayer(ongoingMatch, pointWinnerId);
 
         if (ongoingMatch.getWinner() != null) {
-            MatchResult result = resultMapper.map(ongoingMatch);
+            MatchResult matchResult = resultMapper.map(ongoingMatch);
             finishedMatchService.saveToDatabase(ongoingMatch.getMatch());
             ongoingMatchesService.delete(ongoingMatch.getUuid());
-            showMatchResult(req, resp, result);
+            req.setAttribute("matchResult", matchResult);
+            getServletContext().getRequestDispatcher(WebPaths.MATCH_RESULT_JSP).forward(req, resp);
         } else {
-            continueMatch(req, resp, ongoingMatch);
+            resp.sendRedirect(req.getContextPath() + "/match-score?uuid=" + ongoingMatch.getUuid());
         }
-    }
-
-    private void showMatchResult(HttpServletRequest req, HttpServletResponse resp, MatchResult matchResult)
-            throws ServletException, IOException {
-        req.setAttribute("matchResult", matchResult);
-        getServletContext().getRequestDispatcher(WebPaths.MATCH_RESULT_JSP).forward(req, resp);
-    }
-
-    private void continueMatch(HttpServletRequest req, HttpServletResponse resp,
-                               OngoingMatch ongoingMatch)
-            throws IOException {
-        resp.sendRedirect(req.getContextPath() + "/match-score?uuid=" + ongoingMatch.getUuid());
     }
 }

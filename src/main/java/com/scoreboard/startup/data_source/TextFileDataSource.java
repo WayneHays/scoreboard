@@ -15,10 +15,6 @@ public class TextFileDataSource implements DataSource{
 
     @Override
     public List<String> getPlayers() {
-        return readFile(fileName);
-    }
-
-    private List<String> readFile(String fileName) {
         List<String> lines = new ArrayList<>();
         InputStream input = getClass().getResourceAsStream(fileName);
 
