@@ -13,6 +13,7 @@ public class OngoingMatch {
 
     @Getter
     private final UUID uuid;
+
     private final Score score;
 
     @Getter
@@ -31,6 +32,14 @@ public class OngoingMatch {
         this.advantage = null;
     }
 
+    public Player getPlayerById(Long playerId) {
+        if (match.getFirstPlayer().getId().equals(playerId)) {
+            return match.getFirstPlayer();
+        } else if (match.getSecondPlayer().getId().equals(playerId)) {
+            return match.getSecondPlayer();
+        }
+        throw new IllegalArgumentException("Player with id " + playerId + " not found in this match");
+    }
 
     public Player getFirstPlayer() {
         return match.getFirstPlayer();
@@ -90,9 +99,5 @@ public class OngoingMatch {
 
     public void awardTieBreakPoint(Player player) {
         score.awardTieBreakPoint(player);
-    }
-
-    public void resetToDeuce() {
-        score.resetToDeuce();
     }
 }
