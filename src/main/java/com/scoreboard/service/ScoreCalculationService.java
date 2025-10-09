@@ -61,14 +61,6 @@ public class ScoreCalculationService {
         updateMatchState(ongoingMatch);
     }
 
-    private void handleTieBreakPoint(OngoingMatch ongoingMatch, Player pointWinner) {
-        ongoingMatch.awardTieBreakPoint(pointWinner);
-
-        if (isTieBreakWon(ongoingMatch, pointWinner)) {
-            finishTieBreak(ongoingMatch, pointWinner);
-        }
-    }
-
     private void handleRegularPoint(OngoingMatch ongoingMatch, Player winner) {
         ongoingMatch.awardTennisPoint(winner);
 
@@ -76,45 +68,6 @@ public class ScoreCalculationService {
             finishGame(ongoingMatch, winner);
         } else {
             checkAndResetToDeuce(ongoingMatch);
-        }
-    }
-
-    private void checkAndResetToDeuce(OngoingMatch ongoingMatch) {
-        Player first = ongoingMatch.getFirstPlayer();
-        Player second = ongoingMatch.getSecondPlayer();
-
-        int firstPoints = ongoingMatch.getPoints(first);
-        int secondPoints = ongoingMatch.getPoints(second);
-
-        if (firstPoints == secondPoints && firstPoints >= MAX_POINTS_PER_GAME) {
-            ongoingMatch.resetToDeuce();
-        }
-    }
-
-    private boolean isTieBreakWon(OngoingMatch ongoingMatch, Player pointWinner) {
-        int winnerTieBreakPoints = ongoingMatch.getTieBreakPoints(pointWinner);
-        Player opponent = getOtherPlayer(ongoingMatch, pointWinner);
-        int opponentTieBreakPoints = ongoingMatch.getTieBreakPoints(opponent);
-
-        return winnerTieBreakPoints >= MIN_TIEBREAK_POINTS_TO_WIN &&
-               (winnerTieBreakPoints - opponentTieBreakPoints) >= MIN_ADVANTAGE_TO_WIN;
-    }
-
-    private void finishTieBreak(OngoingMatch ongoingMatch, Player pointWinner) {
-        ongoingMatch.awardGame(pointWinner);
-        ongoingMatch.awardSet(pointWinner);
-        ongoingMatch.resetAllGames();
-        ongoingMatch.resetAllTieBreakPoints();
-    }
-
-    private void finishGame(OngoingMatch ongoingMatch,
-                            Player pointWinner) {
-        ongoingMatch.awardGame(pointWinner);
-        ongoingMatch.resetAllPoints();
-
-        if (isSetWon(ongoingMatch, pointWinner)) {
-            ongoingMatch.awardSet(pointWinner);
-            ongoingMatch.resetAllGames();
         }
     }
 
@@ -134,10 +87,14 @@ public class ScoreCalculationService {
         return false;
     }
 
-    private Player getOtherPlayer(OngoingMatch ongoingMatch, Player player) {
-        Player first = ongoingMatch.getFirstPlayer();
-        Player second = ongoingMatch.getSecondPlayer();
-        return player.equals(first) ? second : first;
+    private void finishGame(OngoingMatch ongoingMatch, Player pointWinner) {
+        ongoingMatch.awardGame(pointWinner);
+        ongoingMatch.resetAllPoints();
+
+        if (isSetWon(ongoingMatch, pointWinner)) {
+            ongoingMatch.awardSet(pointWinner);
+            ongoingMatch.resetAllGames();
+        }
     }
 
     private boolean isSetWon(OngoingMatch ongoingMatch, Player pointWinner) {
@@ -145,6 +102,42 @@ public class ScoreCalculationService {
 
         return ongoingMatch.getGames(pointWinner) >= GAMES_TO_WIN_SET &&
                (ongoingMatch.getGames(pointWinner) - ongoingMatch.getGames(otherPlayer)) >= MIN_ADVANTAGE_TO_WIN;
+    }
+
+    private void checkAndResetToDeuce(OngoingMatch ongoingMatch) {
+        Player first = ongoingMatch.getFirstPlayer();
+        Player second = ongoingMatch.getSecondPlayer();
+
+        int firstPoints = ongoingMatch.getPoints(first);
+        int secondPoints = ongoingMatch.getPoints(second);
+
+        if (firstPoints == secondPoints && firstPoints >= MAX_POINTS_PER_GAME) {
+            ongoingMatch.resetToDeuce();
+        }
+    }
+
+    private void handleTieBreakPoint(OngoingMatch ongoingMatch, Player pointWinner) {
+        ongoingMatch.awardTieBreakPoint(pointWinner);
+
+        if (isTieBreakWon(ongoingMatch, pointWinner)) {
+            finishTieBreak(ongoingMatch, pointWinner);
+        }
+    }
+
+    private boolean isTieBreakWon(OngoingMatch ongoingMatch, Player pointWinner) {
+        int winnerTieBreakPoints = ongoingMatch.getTieBreakPoints(pointWinner);
+        Player opponent = getOtherPlayer(ongoingMatch, pointWinner);
+        int opponentTieBreakPoints = ongoingMatch.getTieBreakPoints(opponent);
+
+        return winnerTieBreakPoints >= MIN_TIEBREAK_POINTS_TO_WIN &&
+               (winnerTieBreakPoints - opponentTieBreakPoints) >= MIN_ADVANTAGE_TO_WIN;
+    }
+
+    private void finishTieBreak(OngoingMatch ongoingMatch, Player pointWinner) {
+        ongoingMatch.awardGame(pointWinner);
+        ongoingMatch.awardSet(pointWinner);
+        ongoingMatch.resetAllGames();
+        ongoingMatch.resetAllTieBreakPoints();
     }
 
     private void updateMatchState(OngoingMatch ongoingMatch) {
@@ -180,5 +173,11 @@ public class ScoreCalculationService {
         }
 
         return Optional.empty();
+    }
+
+    private Player getOtherPlayer(OngoingMatch ongoingMatch, Player player) {
+        Player first = ongoingMatch.getFirstPlayer();
+        Player second = ongoingMatch.getSecondPlayer();
+        return player.equals(first) ? second : first;
     }
 }

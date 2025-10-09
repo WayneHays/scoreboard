@@ -1,7 +1,7 @@
-package com.scoreboard.startup;
+package com.scoreboard.start_initialization;
 
 import com.scoreboard.config.ConfigLoader;
-import com.scoreboard.startup.data_source.TextFileDataSource;
+import com.scoreboard.start_initialization.data_source.TextFileDataSource;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;

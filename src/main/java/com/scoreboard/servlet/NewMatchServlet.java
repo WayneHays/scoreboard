@@ -34,12 +34,12 @@ public class NewMatchServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws IOException, ServletException {
-        String player1Input = req.getParameter("player1name");
-        String player2Input = req.getParameter("player2name");
+        String player1name = req.getParameter("player1name");
+        String player2name = req.getParameter("player2name");
 
         try {
-            String player1Name = PlayerNameValidator.validate(player1Input);
-            String player2Name = PlayerNameValidator.validate(player2Input);
+            String player1Name = PlayerNameValidator.validate(player1name);
+            String player2Name = PlayerNameValidator.validate(player2name);
 
             if (player1Name.equalsIgnoreCase(player2Name)) {
                 throw new ValidationException("Players cannot have the same name");
@@ -52,8 +52,8 @@ public class NewMatchServlet extends HttpServlet {
 
         } catch (ValidationException e) {
             req.setAttribute("error", e.getMessage());
-            req.setAttribute("player1Input", player1Input);
-            req.setAttribute("player2Input", player2Input);
+            req.setAttribute("player1Input", player1name);
+            req.setAttribute("player2Input", player2name);
             getServletContext().getRequestDispatcher(WebPaths.NEW_MATCH_JSP).forward(req, resp);
         }
     }

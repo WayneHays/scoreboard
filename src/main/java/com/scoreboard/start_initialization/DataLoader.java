@@ -1,17 +1,16 @@
-package com.scoreboard.startup;
+package com.scoreboard.start_initialization;
 
 import com.scoreboard.config.ApplicationContext;
-import com.scoreboard.startup.data_source.DataSource;
 import com.scoreboard.model.Match;
 import com.scoreboard.model.Player;
 import com.scoreboard.service.FinishedMatchesService;
 import com.scoreboard.service.PlayerService;
+import com.scoreboard.start_initialization.data_source.DataSource;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class DataLoader {
@@ -28,14 +27,7 @@ public final class DataLoader {
         List<Player> players = new ArrayList<>();
 
         for (String playerName : dataSource.getPlayers()) {
-            Optional<Player> existingPlayer = playerService.find(playerName);
-
-            if (existingPlayer.isEmpty()) {
-                Player player = playerService.create(playerName);
-                players.add(player);
-            } else {
-                players.add(existingPlayer.get());
-            }
+            players.add(playerService.create(playerName));
         }
         return players;
     }

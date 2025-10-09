@@ -1,4 +1,4 @@
-package com.scoreboard.startup.data_source;
+package com.scoreboard.start_initialization.data_source;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -24,6 +24,7 @@ public class TextFileDataSource implements DataSource{
 
         try (input; BufferedReader reader = new BufferedReader(new InputStreamReader(input))) {
             String line;
+
             while ((line = reader.readLine()) != null) {
                 String trimmed = line.trim();
 
@@ -32,7 +33,7 @@ public class TextFileDataSource implements DataSource{
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException("Error reading file: " + fileName);
+            throw new RuntimeException("Error while reading file: " + fileName);
         }
 
         return lines;
