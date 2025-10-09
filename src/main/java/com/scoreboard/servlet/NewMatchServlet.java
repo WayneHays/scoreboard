@@ -34,26 +34,26 @@ public class NewMatchServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws IOException, ServletException {
-        String player1name = req.getParameter("player1name");
-        String player2name = req.getParameter("player2name");
+        String firstPlayerInput = req.getParameter("firstPlayerInput");
+        String secondPlayerInput = req.getParameter("secondPlayerInput");
 
         try {
-            String player1Name = PlayerNameValidator.validate(player1name);
-            String player2Name = PlayerNameValidator.validate(player2name);
+            String firstPlayerName = PlayerNameValidator.validate(firstPlayerInput);
+            String secondPlayerName = PlayerNameValidator.validate(secondPlayerInput);
 
-            if (player1Name.equalsIgnoreCase(player2Name)) {
+            if (firstPlayerName.equalsIgnoreCase(secondPlayerName)) {
                 throw new ValidationException("Players cannot have the same name");
             }
 
-            Player player1 = findOrCreatePlayer(player1Name);
-            Player player2 = findOrCreatePlayer(player2Name);
-            UUID uuid = ongoingMatchesService.createMatch(player1, player2);
+            Player firstPlayer = findOrCreatePlayer(firstPlayerName);
+            Player secondPlayer = findOrCreatePlayer(secondPlayerName);
+            UUID uuid = ongoingMatchesService.createMatch(firstPlayer, secondPlayer);
             resp.sendRedirect(req.getContextPath() + "/match-score?uuid=" + uuid);
 
         } catch (ValidationException e) {
             req.setAttribute("error", e.getMessage());
-            req.setAttribute("player1Input", player1name);
-            req.setAttribute("player2Input", player2name);
+            req.setAttribute("firstPlayerInput", firstPlayerInput);
+            req.setAttribute("secondPlayerInput", secondPlayerInput);
             getServletContext().getRequestDispatcher(WebPaths.NEW_MATCH_JSP).forward(req, resp);
         }
     }
