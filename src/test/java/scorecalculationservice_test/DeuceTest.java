@@ -48,6 +48,7 @@ class DeuceTest extends ScoreCalculationTestBase {
     @Test
     void shouldReturnToDeuceIfOpponentWinsPointWhenPlayerHasAdvantage() {
         setPointsToDeuce();
+
         service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
         service.awardPointToPlayer(ongoingMatch, player2.getId().toString());
 

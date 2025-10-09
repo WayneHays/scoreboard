@@ -1,6 +1,6 @@
 package com.scoreboard.dao;
 
-import com.scoreboard.model.Match;
+import com.scoreboard.model.entity.Match;
 import com.scoreboard.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.query.Query;

@@ -1,5 +1,7 @@
 package com.scoreboard.model;
 
+import com.scoreboard.model.entity.Match;
+import com.scoreboard.model.entity.Player;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -52,10 +54,6 @@ public class OngoingMatch {
 
     public int getTieBreakPoints(Player player) {
         return score.getTieBreakPoints(player);
-    }
-
-    public boolean isWinner(Player player) {
-        return match.getWinner() != null && match.getWinner().equals(player);
     }
 
     public Player getWinner() {

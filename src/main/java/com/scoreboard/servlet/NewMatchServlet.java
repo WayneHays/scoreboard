@@ -2,9 +2,9 @@ package com.scoreboard.servlet;
 
 import com.scoreboard.config.ApplicationContext;
 import com.scoreboard.exception.ValidationException;
-import com.scoreboard.model.Player;
-import com.scoreboard.service.OngoingMatchesService;
 import com.scoreboard.service.PlayerService;
+import com.scoreboard.service.OngoingMatchesService;
+import com.scoreboard.model.entity.Player;
 import com.scoreboard.util.WebPaths;
 import com.scoreboard.validator.PlayerNameValidator;
 import jakarta.servlet.ServletException;

@@ -5,6 +5,9 @@ import com.scoreboard.dao.PlayerDao;
 import com.scoreboard.mapper.MatchesPageMapper;
 import com.scoreboard.mapper.MatchLiveViewMapper;
 import com.scoreboard.mapper.MatchResultMapper;
+import com.scoreboard.service.OngoingMatchesService;
+import com.scoreboard.service.ScoreCalculationService;
+import com.scoreboard.service.PlayerService;
 import com.scoreboard.service.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -30,10 +33,10 @@ public final class ApplicationContext {
             MatchResultMapper matchResultMapper = new MatchResultMapper();
 
             PlayerService playerService = new PlayerService(playerDao);
-            FinishedMatchesService finishedMatchesService = new FinishedMatchesService(matchDao);
+            FinishedMatchesService finishedMatchesService = new FinishedMatchesService(matchDao, pageMapper);
             OngoingMatchesService ongoingMatchesService = new OngoingMatchesService();
             ScoreCalculationService scoreCalculationService = new ScoreCalculationService();
-            MatchesPageService matchesPageService = new MatchesPageService(matchDao, pageMapper);
+            FinishedMatchesService matchesPageService = new FinishedMatchesService(matchDao, pageMapper);
 
             register(PlayerDao.class, playerDao);
             register(MatchDao.class, matchDao);
@@ -41,7 +44,7 @@ public final class ApplicationContext {
             register(FinishedMatchesService.class, finishedMatchesService);
             register(OngoingMatchesService.class, ongoingMatchesService);
             register(ScoreCalculationService.class, scoreCalculationService);
-            register(MatchesPageService.class, matchesPageService);
+            register(FinishedMatchesService.class, matchesPageService);
             register(MatchLiveViewMapper.class, matchLiveViewMapper);
             register(MatchResultMapper.class, matchResultMapper);
         } catch (Exception e) {

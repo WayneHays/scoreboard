@@ -1,7 +1,7 @@
 package com.scoreboard.mapper;
 
 import com.scoreboard.dto.MatchesPage;
-import com.scoreboard.model.Match;
+import com.scoreboard.model.entity.Match;
 
 import java.util.List;
 

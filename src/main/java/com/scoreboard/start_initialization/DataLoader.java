@@ -1,8 +1,8 @@
 package com.scoreboard.start_initialization;
 
 import com.scoreboard.config.ApplicationContext;
-import com.scoreboard.model.Match;
-import com.scoreboard.model.Player;
+import com.scoreboard.model.entity.Match;
+import com.scoreboard.model.entity.Player;
 import com.scoreboard.service.FinishedMatchesService;
 import com.scoreboard.service.PlayerService;
 import com.scoreboard.start_initialization.data_source.DataSource;

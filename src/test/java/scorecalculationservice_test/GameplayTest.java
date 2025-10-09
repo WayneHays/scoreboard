@@ -48,7 +48,6 @@ class GameplayTest extends ScoreCalculationTestBase {
 
     @Test
     void shouldIncrementGameCountAfterWinning4Points() {
-        // Выигрываем 4 очка подряд для победы в игре
         service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
         service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
         service.awardPointToPlayer(ongoingMatch, player1.getId().toString());

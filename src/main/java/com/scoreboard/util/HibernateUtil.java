@@ -1,8 +1,8 @@
 package com.scoreboard.util;
 
 import com.scoreboard.config.ConfigLoader;
-import com.scoreboard.model.Match;
-import com.scoreboard.model.Player;
+import com.scoreboard.model.entity.Match;
+import com.scoreboard.model.entity.Player;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.hibernate.SessionFactory;

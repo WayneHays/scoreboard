@@ -2,7 +2,7 @@ package com.scoreboard.mapper;
 
 import com.scoreboard.dto.MatchResult;
 import com.scoreboard.model.OngoingMatch;
-import com.scoreboard.model.Player;
+import com.scoreboard.model.entity.Player;
 
 public class MatchResultMapper {
 
@@ -17,8 +17,8 @@ public class MatchResultMapper {
                 .secondPlayerName(second.getName())
                 .firstPlayerFinalSets(ongoingMatch.getSets(first))
                 .secondPlayerFinalSets(ongoingMatch.getSets(second))
-                .firstPlayerRowClass(ongoingMatch.isWinner(first) ? "winner" : "")
-                .secondPlayerRowClass(ongoingMatch.isWinner(second) ? "winner" : "")
+                .firstPlayerRowClass(winner.equals(first) ? "winner" : "")
+                .secondPlayerRowClass(winner.equals(second) ? "winner" : "")
                 .build();
     }
 }

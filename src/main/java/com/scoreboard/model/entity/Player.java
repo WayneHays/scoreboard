@@ -1,4 +1,4 @@
-package com.scoreboard.model;
+package com.scoreboard.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

@@ -1,6 +1,6 @@
 package scorecalculationservice_test;
 
-import com.scoreboard.model.Player;
+import com.scoreboard.model.entity.Player;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -9,7 +9,8 @@ class TieBreakTest extends ScoreCalculationTestBase {
 
     @Test
     void shouldStartTiebreakIfGamesCount6_6() {
-        setGamesCount(5, 6);
+        setGamesScore(5, 6);
+
         winCurrentGame(player1);
 
         assertTrue(ongoingMatch.isTieBreak());
@@ -17,27 +18,29 @@ class TieBreakTest extends ScoreCalculationTestBase {
 
     @Test
     void shouldNotIncrementRegularPointsInTiebreak() {
-        setGamesCount(5, 6);
+        setGamesScore(5, 6);
         winCurrentGame(player1);
 
         service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
+
         assertEquals(0, ongoingMatch.getPoints(player1));
         assertEquals(0, ongoingMatch.getPoints(player2));
     }
 
     @Test
     void shouldIncrementTiebreakPoints() {
-        setGamesCount(5, 6);
+        setGamesScore(5, 6);
         winCurrentGame(player1);
 
         service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
+
         assertEquals(1, ongoingMatch.getTieBreakPoints(player1));
     }
 
     @Test
     void shouldWinTiebreakWithSevenPointsAndTwoPointLead() {
-        setGamesCount(6, 6);
-        setTieBreakPoints(6, 5);
+        setGamesScore(6, 6);
+        setTieBreakPointsBeforeMatchServe();
         ongoingMatch.setTieBreak(true);
 
         service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
@@ -50,9 +53,9 @@ class TieBreakTest extends ScoreCalculationTestBase {
 
     @Test
     void shouldFinishMatchIfTiebreakInThirdSet() {
-        setSetsCount(1, 1);
-        setGamesCount(6, 6);
-        setTieBreakPoints(6, 5);
+        setDrawBySets();
+        setGamesScore(6, 6);
+        setTieBreakPointsBeforeMatchServe();
         ongoingMatch.setTieBreak(true);
 
         service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
@@ -68,7 +71,7 @@ class TieBreakTest extends ScoreCalculationTestBase {
         }
     }
 
-    private void setGamesCount(int player1games, int player2games) {
+    private void setGamesScore(int player1games, int player2games) {
         ongoingMatch.resetAllGames();
 
         for (int i = 0; i < player1games; i++) {
@@ -79,20 +82,20 @@ class TieBreakTest extends ScoreCalculationTestBase {
         }
     }
 
-    private void setSetsCount(int player1sets, int player2sets) {
-        for (int i = 0; i < player1sets; i++) {
+    private void setDrawBySets() {
+        for (int i = 0; i < 1; i++) {
             ongoingMatch.awardSet(player1);
         }
-        for (int i = 0; i < player2sets; i++) {
+        for (int i = 0; i < 1; i++) {
             ongoingMatch.awardSet(player2);
         }
     }
 
-    private void setTieBreakPoints(int player1Points, int player2Points) {
-        for (int i = 0; i < player1Points; i++) {
+    private void setTieBreakPointsBeforeMatchServe() {
+        for (int i = 0; i < 6; i++) {
             ongoingMatch.awardTieBreakPoint(player1);
         }
-        for (int i = 0; i < player2Points; i++) {
+        for (int i = 0; i < 5; i++) {
             ongoingMatch.awardTieBreakPoint(player2);
         }
     }

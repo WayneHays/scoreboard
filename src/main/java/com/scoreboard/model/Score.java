@@ -1,5 +1,7 @@
 package com.scoreboard.model;
 
+import com.scoreboard.model.entity.Player;
+
 import java.util.Map;
 
 public class Score {

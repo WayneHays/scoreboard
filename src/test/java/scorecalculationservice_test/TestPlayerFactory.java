@@ -1,6 +1,6 @@
 package scorecalculationservice_test;
 
-import com.scoreboard.model.Player;
+import com.scoreboard.model.entity.Player;
 
 import java.lang.reflect.Field;
 

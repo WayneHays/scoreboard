@@ -1,9 +1,9 @@
 package com.scoreboard.service;
 
-import com.scoreboard.model.OngoingMatch;
 import com.scoreboard.exception.NotFoundException;
-import com.scoreboard.model.Match;
-import com.scoreboard.model.Player;
+import com.scoreboard.model.OngoingMatch;
+import com.scoreboard.model.entity.Match;
+import com.scoreboard.model.entity.Player;
 import com.scoreboard.model.Score;
 
 import java.util.Map;

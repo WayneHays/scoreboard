@@ -1,4 +1,4 @@
-package com.scoreboard.model;
+package com.scoreboard.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -13,17 +13,15 @@ public class Match {
     @Column(name = "id", columnDefinition = "BIGINT")
     private Long id;
 
-    @Setter(AccessLevel.PACKAGE)
     @ManyToOne
     @JoinColumn(name = "firstPlayer", referencedColumnName = "id")
     private Player firstPlayer;
 
-    @Setter(AccessLevel.PACKAGE)
     @ManyToOne
     @JoinColumn(name = "secondPlayer", referencedColumnName = "id")
     private Player secondPlayer;
 
-    @Setter(AccessLevel.PACKAGE)
+    @Setter
     @ManyToOne
     @JoinColumn(name = "winner", referencedColumnName = "id")
     private Player winner;

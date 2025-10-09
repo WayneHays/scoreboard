@@ -4,7 +4,7 @@ import com.scoreboard.config.ApplicationContext;
 import com.scoreboard.config.ConfigLoader;
 import com.scoreboard.dto.MatchesPage;
 import com.scoreboard.exception.ValidationException;
-import com.scoreboard.service.MatchesPageService;
+import com.scoreboard.service.FinishedMatchesService;
 import com.scoreboard.util.WebPaths;
 import com.scoreboard.validator.PlayerNameValidator;
 import jakarta.servlet.ServletException;
@@ -19,10 +19,10 @@ import java.io.IOException;
 public class MatchesServlet extends HttpServlet {
     private static final int DEFAULT_PAGE_NUMBER = 1;
     private static final int MATCHES_PER_PAGE = ConfigLoader.getInt("pagination.page.size");
-    private final MatchesPageService matchesPageService;
+    private final FinishedMatchesService finishedMatchesService;
 
     public MatchesServlet() {
-        this.matchesPageService = ApplicationContext.get(MatchesPageService.class);
+        this.finishedMatchesService = ApplicationContext.get(FinishedMatchesService.class);
     }
 
     @Override
@@ -35,14 +35,14 @@ public class MatchesServlet extends HttpServlet {
         MatchesPage page;
 
         if (playerName == null || playerName.isBlank()) {
-            page = matchesPageService.getMatchesPage(pageNumber, MATCHES_PER_PAGE);
+            page = finishedMatchesService.getMatchesPage(pageNumber, MATCHES_PER_PAGE);
         } else {
             try {
                 String validName = PlayerNameValidator.validate(playerName);
-                page = matchesPageService
+                page = finishedMatchesService
                         .getMatchesPageByPlayerName(validName, pageNumber, MATCHES_PER_PAGE);
             } catch (ValidationException e) {
-                page = matchesPageService
+                page = finishedMatchesService
                         .getMatchesPage(pageNumber, MATCHES_PER_PAGE)
                         .withValidationError(e.getMessage(), playerName);
             }
