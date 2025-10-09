@@ -1,183 +1,127 @@
 package com.scoreboard.service;
 
-import com.scoreboard.exception.ValidationException;
 import com.scoreboard.model.OngoingMatch;
 import com.scoreboard.model.entity.Player;
 
-import java.util.Optional;
-
 public class ScoreCalculationService {
-    public static final int MAX_POINTS_PER_GAME = 40;
-    public static final int SETS_TO_WIN_MATCH = 2;
-    public static final int MIN_TIEBREAK_POINTS_TO_WIN = 7;
-    public static final int MIN_ADVANTAGE_TO_WIN = 2;
-    public static final int GAMES_FOR_TIEBREAK = 6;
-    public static final int GAMES_TO_WIN_SET = 6;
+    private static final int GAMES_TO_WIN_SET = 6;
+    private static final int SETS_TO_WIN_MATCH = 2;
+    private static final int TIEBREAK_POINTS_TO_WIN = 7;
+    public static final int MAX_POSSIBLE_POINTS_PER_GAME = 40;
+    public static final int ADVANTAGE_TO_WIN_TIEBREAK = 2;
 
-    public void awardPointToPlayer(OngoingMatch ongoingMatch, String playerId) {
-        Player pointWinner = findPlayerById(ongoingMatch, playerId);
-        updateScore(ongoingMatch, pointWinner);
 
-        if (isMatchFinished(ongoingMatch)) {
-            ongoingMatch.setWinner(pointWinner);
-        }
-    }
-
-    public boolean isMatchFinished(OngoingMatch ongoingMatch) {
-        Player firstPlayer = ongoingMatch.getFirstPlayer();
-        Player secondPlayer = ongoingMatch.getSecondPlayer();
-        return ongoingMatch.getSets(firstPlayer) >= SETS_TO_WIN_MATCH ||
-               ongoingMatch.getSets(secondPlayer) >= SETS_TO_WIN_MATCH;
-    }
-
-    private Player findPlayerById(OngoingMatch ongoingMatch, String playerId) {
-        if (playerId == null || playerId.isBlank()) {
-            throw new ValidationException("Player ID is required");
-        }
-
-        Player firstPlayer = ongoingMatch.getFirstPlayer();
-        Player secondPlayer = ongoingMatch.getSecondPlayer();
-
-        if (playerId.equals(firstPlayer.getId().toString())) {
-            return firstPlayer;
-        }
-        if (playerId.equals(secondPlayer.getId().toString())) {
-            return secondPlayer;
-        }
-        throw new ValidationException("Player with ID " + playerId + " not found in this match");
-    }
-
-    private void updateScore(OngoingMatch ongoingMatch, Player pointWinner) {
-        if (isMatchFinished(ongoingMatch)) {
-            return;
+    public void winPoint(OngoingMatch ongoingMatch, Player player) {
+        if (ongoingMatch.getWinner() != null) {
+            throw new IllegalArgumentException("Match is already finished");
         }
 
         if (ongoingMatch.isTieBreak()) {
-            handleTieBreakPoint(ongoingMatch, pointWinner);
+            handleTieBreakPoint(ongoingMatch, player);
         } else {
-            handleRegularPoint(ongoingMatch, pointWinner);
-        }
-
-        updateMatchState(ongoingMatch);
-    }
-
-    private void handleRegularPoint(OngoingMatch ongoingMatch, Player winner) {
-        ongoingMatch.awardTennisPoint(winner);
-
-        if (isGameWon(ongoingMatch, winner)) {
-            finishGame(ongoingMatch, winner);
-        } else {
-            checkAndResetToDeuce(ongoingMatch);
+            handleRegularPoint(ongoingMatch, player);
         }
     }
 
-    private boolean isGameWon(OngoingMatch ongoingMatch, Player winner) {
-        int playerPoints = ongoingMatch.getPoints(winner);
-        Player opponent = getOtherPlayer(ongoingMatch, winner);
-        int opponentPoints = ongoingMatch.getPoints(opponent);
+    private void handleTieBreakPoint(OngoingMatch ongoingMatch, Player player) {
+        ongoingMatch.awardTieBreakPoint(player);
 
-        if (playerPoints > MAX_POINTS_PER_GAME && opponentPoints < MAX_POINTS_PER_GAME) {
-            return true;
-        }
-
-        if (playerPoints >= MAX_POINTS_PER_GAME && opponentPoints >= MAX_POINTS_PER_GAME) {
-            return (playerPoints - opponentPoints) >= MIN_ADVANTAGE_TO_WIN;
-        }
-
-        return false;
-    }
-
-    private void finishGame(OngoingMatch ongoingMatch, Player pointWinner) {
-        ongoingMatch.awardGame(pointWinner);
-        ongoingMatch.resetAllPoints();
-
-        if (isSetWon(ongoingMatch, pointWinner)) {
-            ongoingMatch.awardSet(pointWinner);
-            ongoingMatch.resetAllGames();
-        }
-    }
-
-    private boolean isSetWon(OngoingMatch ongoingMatch, Player pointWinner) {
-        Player otherPlayer = getOtherPlayer(ongoingMatch, pointWinner);
-
-        return ongoingMatch.getGames(pointWinner) >= GAMES_TO_WIN_SET &&
-               (ongoingMatch.getGames(pointWinner) - ongoingMatch.getGames(otherPlayer)) >= MIN_ADVANTAGE_TO_WIN;
-    }
-
-    private void checkAndResetToDeuce(OngoingMatch ongoingMatch) {
-        Player first = ongoingMatch.getFirstPlayer();
-        Player second = ongoingMatch.getSecondPlayer();
-
-        int firstPoints = ongoingMatch.getPoints(first);
-        int secondPoints = ongoingMatch.getPoints(second);
-
-        if (firstPoints == secondPoints && firstPoints >= MAX_POINTS_PER_GAME) {
-            ongoingMatch.resetToDeuce();
-        }
-    }
-
-    private void handleTieBreakPoint(OngoingMatch ongoingMatch, Player pointWinner) {
-        ongoingMatch.awardTieBreakPoint(pointWinner);
-
-        if (isTieBreakWon(ongoingMatch, pointWinner)) {
-            finishTieBreak(ongoingMatch, pointWinner);
-        }
-    }
-
-    private boolean isTieBreakWon(OngoingMatch ongoingMatch, Player pointWinner) {
-        int winnerTieBreakPoints = ongoingMatch.getTieBreakPoints(pointWinner);
-        Player opponent = getOtherPlayer(ongoingMatch, pointWinner);
+        Player opponent = getOpponent(ongoingMatch, player);
+        int playerTieBreakPoints = ongoingMatch.getTieBreakPoints(player);
         int opponentTieBreakPoints = ongoingMatch.getTieBreakPoints(opponent);
 
-        return winnerTieBreakPoints >= MIN_TIEBREAK_POINTS_TO_WIN &&
-               (winnerTieBreakPoints - opponentTieBreakPoints) >= MIN_ADVANTAGE_TO_WIN;
+        if (isTieBreakOver(playerTieBreakPoints, opponentTieBreakPoints)) {
+            playerWonTieBreak(ongoingMatch, player);
+        }
     }
 
-    private void finishTieBreak(OngoingMatch ongoingMatch, Player pointWinner) {
-        ongoingMatch.awardGame(pointWinner);
-        ongoingMatch.awardSet(pointWinner);
-        ongoingMatch.resetAllGames();
+    private Player getOpponent(OngoingMatch ongoingMatch, Player player) {
+        return player.equals(ongoingMatch.getFirstPlayer())
+                ? ongoingMatch.getSecondPlayer()
+                : ongoingMatch.getFirstPlayer();
+    }
+
+    private boolean isTieBreakOver(int playerTieBreakPoints, int opponentTieBreakPoints) {
+        return playerTieBreakPoints >= TIEBREAK_POINTS_TO_WIN
+               && playerTieBreakPoints - opponentTieBreakPoints >= ADVANTAGE_TO_WIN_TIEBREAK;
+    }
+
+    private void playerWonTieBreak(OngoingMatch ongoingMatch, Player player) {
+        ongoingMatch.setTieBreak(false);
         ongoingMatch.resetAllTieBreakPoints();
+        ongoingMatch.awardGame(player);
+
+        playerWonSet(ongoingMatch, player);
     }
 
-    private void updateMatchState(OngoingMatch ongoingMatch) {
-        Player first = ongoingMatch.getFirstPlayer();
-        Player second = ongoingMatch.getSecondPlayer();
+    private void playerWonSet(OngoingMatch ongoingMatch, Player player) {
+        ongoingMatch.resetAllGames();
+        ongoingMatch.resetAllPoints();
+        ongoingMatch.awardSet(player);
 
-        boolean shouldBeTieBreak = ongoingMatch.getGames(first) == GAMES_FOR_TIEBREAK &&
-                                   ongoingMatch.getGames(second) == GAMES_FOR_TIEBREAK;
-
-        ongoingMatch.setTieBreak(shouldBeTieBreak);
-
-        if (shouldBeTieBreak) {
-            ongoingMatch.setAdvantage(null);
-        } else {
-            Player advantagePlayer = getAdvantagePlayer(ongoingMatch).orElse(null);
-            ongoingMatch.setAdvantage(advantagePlayer);
+        if (ongoingMatch.getSets(player) == SETS_TO_WIN_MATCH) {
+            ongoingMatch.setWinner(player);
         }
     }
 
-    private Optional<Player> getAdvantagePlayer(OngoingMatch ongoingMatch) {
-        Player first = ongoingMatch.getFirstPlayer();
-        Player second = ongoingMatch.getSecondPlayer();
+    private void handleRegularPoint(OngoingMatch ongoingMatch, Player player) {
+        Player opponent = getOpponent(ongoingMatch, player);
+        int playerPoints = ongoingMatch.getPoints(player);
+        int opponentPoints = ongoingMatch.getPoints(opponent);
 
-        int firstPoints = ongoingMatch.getPoints(first);
-        int secondPoints = ongoingMatch.getPoints(second);
+        if (wasDeuce(playerPoints, opponentPoints)) {
+            ongoingMatch.setAdvantage(player);
+            return;
+        }
 
-        if (firstPoints >= MAX_POINTS_PER_GAME && secondPoints >= MAX_POINTS_PER_GAME) {
-            if (firstPoints - secondPoints == 1) {
-                return Optional.of(first);
-            } else if (secondPoints - firstPoints == 1) {
-                return Optional.of(second);
+        if (ongoingMatch.getAdvantage() != null) {
+            if (ongoingMatch.getAdvantage().equals(player)) {
+                playerWonGame(ongoingMatch, player);
+            } else {
+                ongoingMatch.setAdvantage(null);
             }
+            return;
         }
 
-        return Optional.empty();
+        ongoingMatch.awardTennisPoint(player);
+
+        if (ongoingMatch.getPoints(player) > MAX_POSSIBLE_POINTS_PER_GAME) {
+            playerWonGame(ongoingMatch, player);
+        }
     }
 
-    private Player getOtherPlayer(OngoingMatch ongoingMatch, Player player) {
-        Player first = ongoingMatch.getFirstPlayer();
-        Player second = ongoingMatch.getSecondPlayer();
-        return player.equals(first) ? second : first;
+    private boolean wasDeuce(int playerPoints, int opponentPoints) {
+        return playerPoints == MAX_POSSIBLE_POINTS_PER_GAME && opponentPoints == MAX_POSSIBLE_POINTS_PER_GAME;
+    }
+
+    private void playerWonGame(OngoingMatch ongoingMatch, Player player) {
+        ongoingMatch.resetAllPoints();
+        ongoingMatch.setAdvantage(null);
+        ongoingMatch.awardGame(player);
+
+        checkSetFinished(ongoingMatch, player);
+    }
+
+    private void checkSetFinished(OngoingMatch ongoingMatch, Player player) {
+        Player opponent = getOpponent(ongoingMatch, player);
+        int playerGames = ongoingMatch.getGames(player);
+        int opponentGames = ongoingMatch.getGames(opponent);
+
+        if (isTieBreak(playerGames, opponentGames)) {
+            ongoingMatch.setTieBreak(true);
+            return;
+        }
+
+        if (hasCurrentGameOver(playerGames, opponentGames)) {
+            playerWonSet(ongoingMatch, player);
+        }
+    }
+
+    private boolean hasCurrentGameOver(int playerGames, int opponentGames) {
+        return playerGames >= GAMES_TO_WIN_SET && playerGames - opponentGames >= 2;
+    }
+
+    private boolean isTieBreak(int playerGames, int opponentGames) {
+        return playerGames == GAMES_TO_WIN_SET && opponentGames == GAMES_TO_WIN_SET;
     }
 }
