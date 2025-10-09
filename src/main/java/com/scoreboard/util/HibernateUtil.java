@@ -1,6 +1,6 @@
 package com.scoreboard.util;
 
-import com.scoreboard.config.ApplicationConfig;
+import com.scoreboard.config.ConfigLoader;
 import com.scoreboard.model.entity.Match;
 import com.scoreboard.model.entity.Player;
 import lombok.AccessLevel;
@@ -48,16 +48,24 @@ public final class HibernateUtil {
     }
 
     private static Properties loadHibernateProperties() {
+        String configFile = ConfigLoader.get("hibernate.config");
+
+        if (configFile == null) {
+            throw new RuntimeException("hibernate.config not found in application.properties");
+        }
+
         Properties properties = new Properties();
         try (InputStream stream = HibernateUtil.class.getClassLoader()
-                .getResourceAsStream(ApplicationConfig.HIBERNATE_PROPERTIES_FILE)) {
+                .getResourceAsStream(configFile)) {
+
             if (stream == null) {
-                throw new RuntimeException(ApplicationConfig.HIBERNATE_PROPERTIES_FILE + " file not found");
+                throw new RuntimeException(configFile + " file not found");
             }
+
             properties.load(stream);
             return properties;
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load " + ApplicationConfig.HIBERNATE_PROPERTIES_FILE, e);
+            throw new RuntimeException("Failed to load " + configFile, e);
         }
     }
 

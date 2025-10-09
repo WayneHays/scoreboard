@@ -1,9 +1,12 @@
 package com.scoreboard.servlet;
 
 import com.scoreboard.config.ApplicationContext;
-import com.scoreboard.dto.FinishedMatchesPage;
+import com.scoreboard.config.ConfigLoader;
+import com.scoreboard.dto.MatchesPage;
+import com.scoreboard.exception.ValidationException;
 import com.scoreboard.service.MatchesPageService;
 import com.scoreboard.util.WebPaths;
+import com.scoreboard.validator.PlayerNameValidator;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -15,6 +18,7 @@ import java.io.IOException;
 @WebServlet("/matches")
 public class MatchesServlet extends HttpServlet {
     private static final int DEFAULT_PAGE_NUMBER = 1;
+    private static final int MATCHES_PER_PAGE = ConfigLoader.getInt("pagination.page.size");
     private final MatchesPageService matchesPageService;
 
     public MatchesServlet() {
@@ -22,16 +26,29 @@ public class MatchesServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
         String playerName = req.getParameter("filter_by_player_name");
-        String pageNumberStr = req.getParameter("page");
-        int pageNumber = parsePageNumber(pageNumberStr);
+        int pageNumber = parsePageNumber(req.getParameter("page"));
 
-        FinishedMatchesPage finishedMatchesPage = (playerName == null || playerName.isBlank()) ?
-                matchesPageService.getAllMatchesPage(pageNumber)
-                : matchesPageService.getPlayerMatchesPage(playerName, pageNumber);
+        MatchesPage page;
 
-        req.setAttribute("finishedMatchesPage", finishedMatchesPage);
+        if (playerName == null || playerName.isBlank()) {
+            page = matchesPageService.getMatchesPage(pageNumber, MATCHES_PER_PAGE);
+        } else {
+            try {
+                String validName = PlayerNameValidator.validate(playerName);
+                page = matchesPageService
+                        .getMatchesPageByPlayerName(validName, pageNumber, MATCHES_PER_PAGE);
+            } catch (ValidationException e) {
+                page = matchesPageService
+                        .getMatchesPage(pageNumber, MATCHES_PER_PAGE)
+                        .withValidationError(e.getMessage(), playerName);
+            }
+        }
+
+        req.setAttribute("page", page);
         getServletContext().getRequestDispatcher(WebPaths.MATCHES_JSP).forward(req, resp);
     }
 

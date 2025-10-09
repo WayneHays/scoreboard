@@ -1,8 +1,6 @@
 package com.scoreboard.dao;
 
-import com.scoreboard.config.ApplicationConfig;
 import com.scoreboard.model.entity.Match;
-import com.scoreboard.model.entity.Player;
 import com.scoreboard.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -11,56 +9,60 @@ import java.util.List;
 
 public class MatchDao {
     private static final String FIND_ALL = "FROM Match ORDER BY id DESC";
-    private static final String FIND_BY_PLAYER = "FROM Match WHERE firstPlayer = :player OR secondPlayer = :player ORDER BY id DESC";
-    private static final String COUNT_ALL = "SELECT COUNT(id) FROM Match";
-    private static final String COUNT_BY_PLAYER = "SELECT COUNT(id) FROM Match WHERE firstPlayer = :player OR secondPlayer = :player";
-    private static final String PLAYER_PARAM = "player";
+    private static final String FIND_BY_PLAYER_NAME =
+            "SELECT DISTINCT m FROM Match m " +
+            "WHERE LOWER(m.firstPlayer.name) LIKE LOWER(:namePattern) " +
+            "   OR LOWER(m.secondPlayer.name) LIKE LOWER(:namePattern) " +
+            "ORDER BY m.id DESC";
+
+    private static final String COUNT_ALL = "SELECT COUNT(m) FROM Match m";
+    private static final String COUNT_BY_PLAYER_NAME =
+            "SELECT COUNT(DISTINCT m) FROM Match m " +
+            "WHERE LOWER(m.firstPlayer.name) LIKE LOWER(:namePattern) " +
+            "   OR LOWER(m.secondPlayer.name) LIKE LOWER(:namePattern)";
+    private static final String NAME_PATTERN_PARAM = "namePattern";
 
     public void save(Match match) {
         getCurrentSession().persist(match);
     }
 
-    public List<Match> find(int pageNumber) {
-        return createPaginatedQuery(FIND_ALL, pageNumber).getResultList();
+    public List<Match> find(int pageNumber, int pageSize) {
+        return createPaginatedQuery(FIND_ALL, pageNumber, pageSize ).getResultList();
     }
 
-    public List<Match> find(Player player, int pageNumber) {
-        Query<Match> query = createPaginatedQuery(FIND_BY_PLAYER, pageNumber);
-        query.setParameter(PLAYER_PARAM, player);
-        return query.getResultList();
-    }
-
-    public List<Match> findAllByPlayer(Player player) {
-        return getCurrentSession().createQuery(FIND_BY_PLAYER, Match.class)
-                .setParameter(PLAYER_PARAM, player)
+    public List<Match> findByPlayerName(String name, int pageNumber, int pageSize) {
+        return createPaginatedQuery(FIND_BY_PLAYER_NAME, pageNumber, pageSize)
+                .setParameter(NAME_PATTERN_PARAM, "%" + name + "%")
                 .getResultList();
     }
 
     public int getTotalCountOfMatches() {
-        return getCurrentSession().createQuery(COUNT_ALL, Long.class)
+        return getCurrentSession()
+                .createQuery(COUNT_ALL, Long.class)
                 .getSingleResult()
                 .intValue();
     }
 
-    public int getTotalCountOfMatchesByPlayer(Player player) {
-        return getCurrentSession().createQuery(COUNT_BY_PLAYER, Long.class)
-                .setParameter(PLAYER_PARAM, player)
+    public int getTotalCountOfMatchesByPlayerName(String playerName) {
+        return getCurrentSession()
+                .createQuery(COUNT_BY_PLAYER_NAME, Long.class)
+                .setParameter(NAME_PATTERN_PARAM, "%" + playerName + "%")
                 .getSingleResult()
                 .intValue();
     }
 
-    private Session getCurrentSession() {
-        return HibernateUtil.getSessionFactory().getCurrentSession();
-    }
-
-    private Query<Match> createPaginatedQuery(String hql, int pageNumber) {
+    private Query<Match> createPaginatedQuery(String hql, int pageNumber, int pageSize) {
         if (pageNumber < 1) {
             throw new IllegalArgumentException("Page number must be positive");
         }
 
-        Query<Match> query = getCurrentSession().createQuery(hql, Match.class);
-        query.setMaxResults(ApplicationConfig.PAGE_SIZE);
-        query.setFirstResult((pageNumber - 1) * ApplicationConfig.PAGE_SIZE);
-        return query;
+        return getCurrentSession()
+                .createQuery(hql, Match.class)
+                .setMaxResults(pageSize)
+                .setFirstResult((pageNumber - 1) * pageSize);
+    }
+
+    private Session getCurrentSession() {
+        return HibernateUtil.getSessionFactory().getCurrentSession();
     }
 }

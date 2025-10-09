@@ -47,7 +47,7 @@ public class ErrorServlet extends HttpServlet {
             case HttpServletResponse.SC_NOT_FOUND -> "Page not found";
             case HttpServletResponse.SC_INTERNAL_SERVER_ERROR -> "Internal server error";
             case HttpServletResponse.SC_BAD_REQUEST -> "Bad request";
-            default -> "An error occurred";
+            default -> "Unexpected error occurred";
         };
     }
 }

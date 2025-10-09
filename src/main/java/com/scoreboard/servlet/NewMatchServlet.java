@@ -1,14 +1,12 @@
 package com.scoreboard.servlet;
 
 import com.scoreboard.config.ApplicationContext;
-import com.scoreboard.dto.NewMatchForm;
-import com.scoreboard.mapper.NewMatchFormMapper;
+import com.scoreboard.exception.ValidationException;
 import com.scoreboard.model.entity.Player;
 import com.scoreboard.service.OngoingMatchesService;
 import com.scoreboard.service.PlayerService;
 import com.scoreboard.util.WebPaths;
 import com.scoreboard.validator.PlayerNameValidator;
-import com.scoreboard.validator.ValidationResult;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -20,14 +18,10 @@ import java.util.UUID;
 
 @WebServlet("/new-match")
 public class NewMatchServlet extends HttpServlet {
-    private final PlayerNameValidator playerNameValidator;
-    private final NewMatchFormMapper newMatchFormMapper;
     private final OngoingMatchesService ongoingMatchesService;
     private final PlayerService playerService;
 
     public NewMatchServlet() {
-        this.playerNameValidator = ApplicationContext.get(PlayerNameValidator.class);
-        this.newMatchFormMapper = ApplicationContext.get(NewMatchFormMapper.class);
         this.ongoingMatchesService = ApplicationContext.get(OngoingMatchesService.class);
         this.playerService = ApplicationContext.get(PlayerService.class);
     }
@@ -43,55 +37,26 @@ public class NewMatchServlet extends HttpServlet {
         String player1Input = req.getParameter("player1name");
         String player2Input = req.getParameter("player2name");
 
-        ValidationResult player1Result = playerNameValidator.validate(player1Input);
-        ValidationResult player2Result = playerNameValidator.validate(player2Input);
+        try {
+            String player1Name = PlayerNameValidator.validate(player1Input);
+            String player2Name = PlayerNameValidator.validate(player2Input);
 
-        if (hasValidationErrors(player1Result, player2Result)) {
-            showFormWithErrors(req, resp, player1Result, player2Result, player1Input, player2Input, null);
-            return;
+            if (player1Name.equalsIgnoreCase(player2Name)) {
+                throw new ValidationException("Players cannot have the same name");
+            }
+
+            Player player1 = findOrCreatePlayer(player1Name);
+            Player player2 = findOrCreatePlayer(player2Name);
+            UUID uuid = ongoingMatchesService.createMatch(player1, player2);
+
+            resp.sendRedirect(req.getContextPath() + "/match-score?uuid=" + uuid);
+
+        } catch (ValidationException e) {
+            req.setAttribute("error", e.getMessage());
+            req.setAttribute("player1Input", player1Input);
+            req.setAttribute("player2Input", player2Input);
+            getServletContext().getRequestDispatcher(WebPaths.NEW_MATCH_JSP).forward(req, resp);
         }
-
-        if (hasDuplicateNames(player1Result, player2Result)) {
-            showFormWithErrors(req, resp, player1Result, player2Result, player1Input, player2Input,
-                    "Players cannot have the same name");
-            return;
-        }
-
-        createMatchAndRedirect(req, resp, player1Result, player2Result);
-    }
-
-    private void createMatchAndRedirect(HttpServletRequest req, HttpServletResponse resp,
-                                        ValidationResult player1Result,
-                                        ValidationResult player2Result) throws IOException {
-        Player player1 = findOrCreatePlayer(player1Result.value());
-        Player player2 = findOrCreatePlayer(player2Result.value());
-        UUID uuid = ongoingMatchesService.createMatch(player1, player2);
-        resp.sendRedirect(req.getContextPath() + "/match-score?uuid=" + uuid);
-    }
-
-    private void showFormWithErrors(HttpServletRequest req, HttpServletResponse resp,
-                                    ValidationResult player1Result, ValidationResult player2Result,
-                                    String player1Input, String player2Input, String generalError)
-            throws ServletException, IOException {
-        NewMatchForm form = newMatchFormMapper.map(
-                player1Input,
-                player2Input,
-                player1Result,
-                player2Result,
-                generalError
-        );
-
-        req.setAttribute("newMatchForm", form);
-        getServletContext().getRequestDispatcher(WebPaths.NEW_MATCH_JSP).forward(req, resp);
-    }
-
-    private boolean hasDuplicateNames(ValidationResult player1Result, ValidationResult player2Result) {
-        return player1Result.value() != null && player2Result.value() != null &&
-               player1Result.value().equalsIgnoreCase(player2Result.value());
-    }
-
-    private boolean hasValidationErrors(ValidationResult player1Result, ValidationResult player2Result) {
-        return !player1Result.isValid() || !player2Result.isValid();
     }
 
     private Player findOrCreatePlayer(String name) {

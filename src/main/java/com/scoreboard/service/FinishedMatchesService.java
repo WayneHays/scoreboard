@@ -3,10 +3,10 @@ package com.scoreboard.service;
 import com.scoreboard.dao.MatchDao;
 import com.scoreboard.model.entity.Match;
 
-public class FinishedMatchService extends BaseTransactionalService{
+public class FinishedMatchesService extends BaseTransactionalService{
     private final MatchDao matchDao;
 
-    public FinishedMatchService(MatchDao matchDao) {
+    public FinishedMatchesService(MatchDao matchDao) {
         this.matchDao = matchDao;
     }
 

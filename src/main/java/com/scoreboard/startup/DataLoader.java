@@ -4,7 +4,7 @@ import com.scoreboard.config.ApplicationContext;
 import com.scoreboard.startup.data_source.DataSource;
 import com.scoreboard.model.entity.Match;
 import com.scoreboard.model.entity.Player;
-import com.scoreboard.service.FinishedMatchService;
+import com.scoreboard.service.FinishedMatchesService;
 import com.scoreboard.service.PlayerService;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -18,10 +18,10 @@ public final class DataLoader {
 
     public static void loadData(DataSource dataSource) {
         PlayerService playerService = ApplicationContext.get(PlayerService.class);
-        FinishedMatchService finishedMatchService = ApplicationContext.get(FinishedMatchService.class);
+        FinishedMatchesService finishedMatchesService = ApplicationContext.get(FinishedMatchesService.class);
 
         List<Player> players = createPlayers(playerService, dataSource);
-        createMatches(finishedMatchService, players);
+        createMatches(finishedMatchesService, players);
     }
 
     private static List<Player> createPlayers(PlayerService playerService, DataSource dataSource) {
@@ -40,7 +40,7 @@ public final class DataLoader {
         return players;
     }
 
-    private static void createMatches(FinishedMatchService finishedMatchService, List<Player> players) {
+    private static void createMatches(FinishedMatchesService finishedMatchesService, List<Player> players) {
         for (int i = 0; i < players.size() - 1; i++) {
             Player player1 = players.get(i);
             Player player2 = players.get(i + 1);
@@ -48,7 +48,7 @@ public final class DataLoader {
             Match match = new Match(player1, player2);
             match.setWinner(winner);
 
-            finishedMatchService.saveToDatabase(match);
+            finishedMatchesService.saveToDatabase(match);
         }
     }
 }

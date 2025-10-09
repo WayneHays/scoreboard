@@ -1,73 +1,79 @@
 package com.scoreboard.service;
 
-import com.scoreboard.dto.FinishedMatchesPage;
-import com.scoreboard.mapper.FinishedMatchesPageMapper;
+import com.scoreboard.dao.MatchDao;
+import com.scoreboard.dto.MatchesPage;
+import com.scoreboard.exception.NotFoundException;
+import com.scoreboard.mapper.MatchesPageMapper;
 import com.scoreboard.model.entity.Match;
-import com.scoreboard.model.entity.Player;
-import com.scoreboard.util.PaginationHelper;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class MatchesPageService {
-    private final FindMatchesService findMatchesService;
-    private final PlayerService playerService;
-    private final FinishedMatchesPageMapper mapper;
+public class MatchesPageService extends BaseTransactionalService {
+    private final MatchDao matchDao;
+    private final MatchesPageMapper mapper;
 
-    public MatchesPageService(FindMatchesService findMatchesService,
-                              PlayerService playerService,
-                              FinishedMatchesPageMapper mapper) {
-        this.findMatchesService = findMatchesService;
-        this.playerService = playerService;
+    public MatchesPageService(MatchDao matchDao,
+                              MatchesPageMapper mapper) {
+        this.matchDao = matchDao;
         this.mapper = mapper;
     }
 
-    public FinishedMatchesPage getAllMatchesPage(int pageNumber) {
-        int totalPages = findMatchesService.getTotalCountOfPages();
-        PaginationHelper.validatePageNumber(pageNumber, totalPages);
+    public MatchesPage getMatchesPage(int pageNumber, int matchesPerPage) {
+        int totalMatches = executeInTransaction(
+                matchDao::getTotalCountOfMatches,
+                "Failed to get total count of matches"
+        );
 
-        List<Match> matches = findMatchesService.findMatchesByPage(pageNumber);
+        int totalPages = calculateTotalPages(totalMatches, matchesPerPage);
+
+        if (totalPages == 0) {
+            return mapper.map(pageNumber, Collections.emptyList(), 0, null);
+        }
+
+        validatePageNumber(pageNumber, totalPages);
+
+        List<Match> matches = executeInTransaction(
+                () -> matchDao.find(pageNumber, matchesPerPage),
+                "Failed to find matches by page " + pageNumber
+        );
+
         return mapper.map(pageNumber, matches, totalPages, null);
     }
 
-    public FinishedMatchesPage getPlayerMatchesPage(String playerName, int pageNumber) {
-        List<Player> matchingPlayers = playerService.findByNameContaining(playerName);
+    public MatchesPage getMatchesPageByPlayerName(String name, int pageNumber, int matchesPerPage) {
+        int totalMatches = executeInTransaction(
+                () -> matchDao.getTotalCountOfMatchesByPlayerName(name),
+                "Failed to get total count of matches by player name " + name
+        );
 
-        if (matchingPlayers.isEmpty()) {
-            return mapper.map(pageNumber, Collections.emptyList(), 0, playerName);
+        int totalPages = calculateTotalPages(totalMatches, matchesPerPage);
+
+        if (totalPages == 0) {
+            return mapper.map(pageNumber, Collections.emptyList(), 0, name);
         }
 
-        if (matchingPlayers.size() == 1) {
-            return getSinglePlayerMatches(matchingPlayers.get(0), pageNumber, playerName);
+        validatePageNumber(pageNumber, totalPages);
+
+        List<Match> matches = executeInTransaction(
+                () -> matchDao.findByPlayerName(name, pageNumber, matchesPerPage),
+                "Failed to find matches by player name " + name
+        );
+
+        return mapper.map(pageNumber, matches, totalPages, name);
+    }
+
+    private int calculateTotalPages(int totalMatches, int matchesPerPage) {
+        if (totalMatches < 1) return 0;
+        return (totalMatches - 1) / matchesPerPage + 1;
+    }
+
+    private void validatePageNumber(int pageNumber, int totalPages) {
+        if (pageNumber < 1 || (totalPages > 0 && pageNumber > totalPages)) {
+            String message = (totalPages == 0)
+                    ? "No matches found"
+                    : String.format("Page %d not found. Available pages: 1-%d", pageNumber, totalPages);
+            throw new NotFoundException(message);
         }
-
-        return getMultiplePlayersMatches(matchingPlayers, pageNumber, playerName);
-    }
-
-    private FinishedMatchesPage getSinglePlayerMatches(Player player, int pageNumber, String searchTerm) {
-        int totalPages = findMatchesService.getTotalCountOfPagesByPlayer(player);
-        PaginationHelper.validatePageNumber(pageNumber, totalPages);
-
-        List<Match> matches = findMatchesService.findMatchesByPlayerByPage(player, pageNumber);
-        return mapper.map(pageNumber, matches, totalPages, searchTerm);
-    }
-
-    private FinishedMatchesPage getMultiplePlayersMatches(List<Player> players, int pageNumber, String searchTerm) {
-        List<Match> allMatches = collectAllMatches(players);
-        int totalPages = PaginationHelper.calculateTotalPages(allMatches.size());
-
-        PaginationHelper.validatePageNumber(pageNumber, totalPages);
-
-        List<Match> paginatedMatches = PaginationHelper.paginateInMemory(allMatches, pageNumber);
-        return mapper.map(pageNumber, paginatedMatches, totalPages, searchTerm);
-    }
-
-    private List<Match> collectAllMatches(List<Player> players) {
-        List<Match> allMatches = new ArrayList<>();
-        for (Player player : players) {
-            allMatches.addAll(findMatchesService.findAllMatchesByPlayer(player));
-        }
-        return allMatches;
     }
 }

@@ -23,9 +23,9 @@
     </header>
 
     <main>
-        <c:if test="${newMatchForm.hasGeneralError()}">
+        <c:if test="${not empty error}">
             <div class="error-message general-error">
-                <c:out value="${newMatchForm.generalError}"/>
+                <c:out value="${error}"/>
             </div>
         </c:if>
 
@@ -36,16 +36,11 @@
                         type="text"
                         id="player1"
                         name="player1name"
-                        class="form-input ${newMatchForm.hasPlayer1Error() ? 'error' : ''}"
+                        class="form-input"
                         placeholder="First player's name"
-                        value="<c:out value='${newMatchForm.player1Value}'/>"
+                        value="<c:out value='${player1Input}'/>"
                         required
                 >
-                <c:if test="${newMatchForm.hasPlayer1Error()}">
-                    <div class="error-message field-error">
-                        <c:out value="${newMatchForm.player1Error}"/>
-                    </div>
-                </c:if>
             </div>
 
             <div class="vs-divider">
@@ -60,16 +55,11 @@
                         type="text"
                         id="player2"
                         name="player2name"
-                        class="form-input ${newMatchForm.hasPlayer2Error() ? 'error' : ''}"
+                        class="form-input"
                         placeholder="Second player's name"
-                        value="<c:out value='${newMatchForm.player2Value}'/>"
+                        value="<c:out value='${player2Input}'/>"
                         required
                 >
-                <c:if test="${newMatchForm.hasPlayer2Error()}">
-                    <div class="error-message field-error">
-                        <c:out value="${newMatchForm.player2Error}"/>
-                    </div>
-                </c:if>
             </div>
 
             <button type="submit" class="start-button">

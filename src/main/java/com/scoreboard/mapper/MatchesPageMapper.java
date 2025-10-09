@@ -1,14 +1,14 @@
 package com.scoreboard.mapper;
 
-import com.scoreboard.dto.FinishedMatchesPage;
+import com.scoreboard.dto.MatchesPage;
 import com.scoreboard.model.entity.Match;
 
 import java.util.List;
 
-public class FinishedMatchesPageMapper {
+public class MatchesPageMapper {
 
-    public FinishedMatchesPage map(int pageNumber, List<Match> matches,
-                                   int totalPages, String filterByPlayerName) {
+    public MatchesPage map(int pageNumber, List<Match> matches,
+                           int totalPages, String filterByPlayerName) {
         boolean hasFilter = filterByPlayerName != null && !filterByPlayerName.trim().isEmpty();
         boolean shouldShowPagination = totalPages > 1;
         boolean hasPrevious = pageNumber > 1;
@@ -16,7 +16,7 @@ public class FinishedMatchesPageMapper {
         int previousPage = hasPrevious ? pageNumber - 1 : 1;
         int nextPage = hasNext ? pageNumber + 1 : Math.max(1, totalPages);
 
-        return FinishedMatchesPage.builder()
+        return MatchesPage.builder()
                 .pageNumber(pageNumber)
                 .matches(matches)
                 .totalPages(totalPages)

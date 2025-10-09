@@ -1,6 +1,6 @@
 package com.scoreboard.startup;
 
-import com.scoreboard.config.ApplicationConfig;
+import com.scoreboard.config.ConfigLoader;
 import com.scoreboard.startup.data_source.TextFileDataSource;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
@@ -11,7 +11,8 @@ public class DatabaseInitializer implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        DataLoader.loadData(new TextFileDataSource(
-                ApplicationConfig.INITIAL_PLAYERS_FILE));
+        DataLoader.loadData(
+                new TextFileDataSource(
+                        ConfigLoader.get("files.initial.players")));
     }
 }

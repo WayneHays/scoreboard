@@ -7,7 +7,15 @@
     <groupId>com.scoreboard</groupId>
     <artifactId>scoreboard</artifactId>
     <version>1.0</version>
+    <name>scoreboard</name>
     <packaging>war</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.hibernate.orm</groupId>
@@ -23,6 +31,7 @@
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
             <version>6.1.0</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -47,10 +56,4 @@
             <version>3.0.1</version>
         </dependency>
     </dependencies>
-
-    <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 </project>

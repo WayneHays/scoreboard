@@ -6,7 +6,7 @@ import com.scoreboard.model.entity.Player;
 
 import java.util.Optional;
 
-public class MatchGameplayService {
+public class ScoreCalculationService {
     public static final int MAX_POINTS_PER_GAME = 40;
     public static final int SETS_TO_WIN_MATCH = 2;
     public static final int MIN_TIEBREAK_POINTS_TO_WIN = 7;
