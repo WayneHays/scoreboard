@@ -38,7 +38,7 @@
                         name="player1name"
                         class="form-input"
                         placeholder="First player's name"
-                        value="<c:out value='${player1Input}'/>"
+                        value="<c:out value='${firstPlayerInput}'/>"
                         required
                 >
             </div>
@@ -57,7 +57,7 @@
                         name="player2name"
                         class="form-input"
                         placeholder="Second player's name"
-                        value="<c:out value='${player2Input}'/>"
+                        value="<c:out value='${secondPlayerInput}'/>"
                         required
                 >
             </div>
