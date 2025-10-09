@@ -7,6 +7,7 @@ import com.scoreboard.exception.ValidationException;
 import com.scoreboard.mapper.MatchLiveViewMapper;
 import com.scoreboard.mapper.MatchResultMapper;
 import com.scoreboard.model.OngoingMatch;
+import com.scoreboard.model.entity.Player;
 import com.scoreboard.service.ScoreCalculationService;
 import com.scoreboard.service.FinishedMatchesService;
 import com.scoreboard.service.OngoingMatchesService;
@@ -40,6 +41,7 @@ public class MatchScoreServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         OngoingMatch ongoingMatch = findMatch(req);
         MatchLiveView matchView = liveViewMapper.map(ongoingMatch);
+
         req.setAttribute("matchView", matchView);
         getServletContext().getRequestDispatcher(WebPaths.MATCH_SCORE_JSP).forward(req, resp);
     }
@@ -47,9 +49,11 @@ public class MatchScoreServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
         OngoingMatch ongoingMatch = findMatch(req);
-        String pointWinnerId = req.getParameter("pointWinnerId");
 
-        scoreCalculationService.awardPointToPlayer(ongoingMatch, pointWinnerId);
+        Long pointWinnerId = Long.parseLong(req.getParameter("pointWinnerId"));
+        Player pointWinner = ongoingMatch.getPlayerById(pointWinnerId);;
+
+        scoreCalculationService.winPoint(ongoingMatch, pointWinner);
 
         if (ongoingMatch.getWinner() == null) {
             resp.sendRedirect(req.getContextPath() + "/match-score?uuid=" + ongoingMatch.getUuid());
@@ -76,7 +80,7 @@ public class MatchScoreServlet extends HttpServlet {
         try {
             return UUID.fromString(uuidStr);
         } catch (IllegalArgumentException e) {
-            throw new ValidationException("Invalid UUID format");
+            throw new IllegalArgumentException("Invalid UUID format", e);
         }
     }
 }
