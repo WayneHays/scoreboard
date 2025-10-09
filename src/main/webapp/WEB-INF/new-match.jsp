@@ -13,7 +13,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>New Match</title>
-    <link href="${pageContext.request.contextPath}/css/new_match.css" rel="stylesheet">
+    <link href="${pageContext.request.contextPath}/css/new-match.css" rel="stylesheet">
 </head>
 <body>
 <div class="container">

@@ -2,8 +2,8 @@ package com.scoreboard.startup;
 
 import com.scoreboard.config.ApplicationContext;
 import com.scoreboard.startup.data_source.DataSource;
-import com.scoreboard.model.entity.Match;
-import com.scoreboard.model.entity.Player;
+import com.scoreboard.model.Match;
+import com.scoreboard.model.Player;
 import com.scoreboard.service.FinishedMatchesService;
 import com.scoreboard.service.PlayerService;
 import lombok.AccessLevel;
@@ -45,8 +45,7 @@ public final class DataLoader {
             Player player1 = players.get(i);
             Player player2 = players.get(i + 1);
             Player winner = (i % 2 == 0) ? player1 : player2;
-            Match match = new Match(player1, player2);
-            match.setWinner(winner);
+            Match match = new Match(player1, player2, winner);
 
             finishedMatchesService.saveToDatabase(match);
         }

@@ -1,64 +1,136 @@
 package com.scoreboard.model;
 
-import com.scoreboard.model.entity.Player;
-
 import java.util.Map;
 
 public class Score {
-    private final Map<Player, PlayerScore> playersScores;
+    private final Map<Player, PlayerScore> scores;
 
     public Score(Player player1, Player player2) {
-        this.playersScores = Map.of(
+        this.scores = Map.of(
                 player1, new PlayerScore(),
                 player2, new PlayerScore()
         );
     }
 
     public int getPoints(Player player) {
-        return playersScores.get(player).getPoints();
+        return getScore(player).getPoints();
     }
 
     public int getGames(Player player) {
-        return playersScores.get(player).getGames();
+        return getScore(player).getGames();
     }
 
     public int getSets(Player player) {
-        return playersScores.get(player).getSets();
+        return getScore(player).getSets();
     }
 
     public int getTieBreakPoints(Player player) {
-        return playersScores.get(player).getTieBreakPoints();
+        return getScore(player).getTieBreakPoints();
     }
 
     public void awardTennisPoint(Player player) {
-        playersScores.get(player).awardPoint();
+        getScore(player).awardPoint();
     }
 
     public void awardTieBreakPoint(Player player) {
-        playersScores.get(player).awardTieBreakPoint();
+        getScore(player).awardTieBreakPoint();
     }
 
     public void awardGame(Player player) {
-        playersScores.get(player).awardGame();
+        getScore(player).awardGame();
     }
 
     public void awardSet(Player player) {
-        playersScores.get(player).awardSet();
+        getScore(player).awardSet();
     }
 
     public void resetToDeuce() {
-        playersScores.values().forEach(PlayerScore::resetToDeuce);
+        scores.values().forEach(PlayerScore::resetToDeuce);
     }
 
     public void resetAllPoints() {
-        playersScores.values().forEach(PlayerScore::resetPoints);
+        scores.values().forEach(PlayerScore::resetPoints);
     }
 
     public void resetAllGames() {
-        playersScores.values().forEach(PlayerScore::resetGames);
+        scores.values().forEach(PlayerScore::resetGames);
     }
 
     public void resetAllTieBreakPoints() {
-        playersScores.values().forEach(PlayerScore::resetTieBreakPoints);
+        scores.values().forEach(PlayerScore::resetTieBreakPoints);
+    }
+
+    private PlayerScore getScore(Player player) {
+        PlayerScore score = scores.get(player);
+
+        if (score == null) {
+            throw new IllegalArgumentException("Player not found: " + player);
+        }
+        return score;
+    }
+
+    private static class PlayerScore {
+        private static final int ZERO = 0;
+        private static final int FIFTEEN = 15;
+        private static final int THIRTY = 30;
+        private static final int FORTY = 40;
+
+        private int points = ZERO;
+        private int games = ZERO;
+        private int sets = ZERO;
+        private int tieBreakPoints = ZERO;
+
+        int getPoints() {
+            return points;
+        }
+
+        int getGames() {
+            return games;
+        }
+
+        int getSets() {
+            return sets;
+        }
+
+        int getTieBreakPoints() {
+            return tieBreakPoints;
+        }
+
+        void awardPoint() {
+            points = switch (points) {
+                case ZERO -> FIFTEEN;
+                case FIFTEEN -> THIRTY;
+                case THIRTY -> FORTY;
+                default -> points + 1;
+            };
+        }
+
+        void awardGame() {
+            games++;
+        }
+
+        void awardSet() {
+            sets++;
+        }
+
+        void awardTieBreakPoint() {
+            tieBreakPoints++;
+        }
+
+        void resetPoints() {
+            points = ZERO;
+        }
+
+        void resetGames() {
+            games = ZERO;
+        }
+
+        void resetTieBreakPoints() {
+            tieBreakPoints = ZERO;
+        }
+
+        void resetToDeuce() {
+            points = FORTY;
+        }
     }
 }

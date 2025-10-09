@@ -1,7 +1,7 @@
 package com.scoreboard.service;
 
 import com.scoreboard.dao.PlayerDao;
-import com.scoreboard.model.entity.Player;
+import com.scoreboard.model.Player;
 
 import java.util.Optional;
 

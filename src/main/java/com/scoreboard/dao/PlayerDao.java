@@ -1,6 +1,6 @@
 package com.scoreboard.dao;
 
-import com.scoreboard.model.entity.Player;
+import com.scoreboard.model.Player;
 import com.scoreboard.util.HibernateUtil;
 import org.hibernate.Session;
 

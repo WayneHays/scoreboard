@@ -1,7 +1,5 @@
 package com.scoreboard.model;
 
-import com.scoreboard.model.entity.Match;
-import com.scoreboard.model.entity.Player;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -31,9 +29,6 @@ public class OngoingMatch {
         this.advantage = null;
     }
 
-    public static OngoingMatch createNew(Match match, Score score, UUID uuid) {
-        return new OngoingMatch(match, score, uuid);
-    }
 
     public Player getFirstPlayer() {
         return match.getFirstPlayer();

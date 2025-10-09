@@ -2,8 +2,8 @@ package com.scoreboard.service;
 
 import com.scoreboard.model.OngoingMatch;
 import com.scoreboard.exception.NotFoundException;
-import com.scoreboard.model.entity.Match;
-import com.scoreboard.model.entity.Player;
+import com.scoreboard.model.Match;
+import com.scoreboard.model.Player;
 import com.scoreboard.model.Score;
 
 import java.util.Map;
@@ -22,7 +22,7 @@ public class OngoingMatchesService {
         Score score = new Score(first, second);
         UUID uuid = UUID.randomUUID();
 
-        OngoingMatch ongoingMatch = OngoingMatch.createNew(match, score, uuid);
+        OngoingMatch ongoingMatch = new OngoingMatch(match, score, uuid);
         ongoingMatches.put(uuid, ongoingMatch);
         return uuid;
     }

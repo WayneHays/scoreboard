@@ -1,13 +1,11 @@
-package com.scoreboard.model.entity;
+package com.scoreboard.model;
 
 import jakarta.persistence.*;
 import lombok.*;
 
 @NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-
 @Entity
 @Table(name = "Players")
 public class Player {

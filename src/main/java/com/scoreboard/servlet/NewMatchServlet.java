@@ -2,7 +2,7 @@ package com.scoreboard.servlet;
 
 import com.scoreboard.config.ApplicationContext;
 import com.scoreboard.exception.ValidationException;
-import com.scoreboard.model.entity.Player;
+import com.scoreboard.model.Player;
 import com.scoreboard.service.OngoingMatchesService;
 import com.scoreboard.service.PlayerService;
 import com.scoreboard.util.WebPaths;
@@ -48,7 +48,6 @@ public class NewMatchServlet extends HttpServlet {
             Player player1 = findOrCreatePlayer(player1Name);
             Player player2 = findOrCreatePlayer(player2Name);
             UUID uuid = ongoingMatchesService.createMatch(player1, player2);
-
             resp.sendRedirect(req.getContextPath() + "/match-score?uuid=" + uuid);
 
         } catch (ValidationException e) {

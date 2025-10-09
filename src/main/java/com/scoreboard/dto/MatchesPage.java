@@ -1,6 +1,6 @@
 package com.scoreboard.dto;
 
-import com.scoreboard.model.entity.Match;
+import com.scoreboard.model.Match;
 import lombok.Builder;
 
 import java.util.List;

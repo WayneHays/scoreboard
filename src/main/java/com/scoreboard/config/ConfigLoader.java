@@ -1,9 +1,13 @@
 package com.scoreboard.config;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ConfigLoader {
     private static final Properties PROPERTIES = new Properties();
 
@@ -13,7 +17,7 @@ public final class ConfigLoader {
                 .getResourceAsStream("application.properties")) {
 
             if (input == null) {
-                throw new RuntimeException("application.PROPERTIES not found");
+                throw new RuntimeException("Properties file not found");
             }
 
             PROPERTIES.load(input);
@@ -21,10 +25,6 @@ public final class ConfigLoader {
         } catch (IOException e) {
             throw new RuntimeException("Failed to load configuration", e);
         }
-    }
-
-    private ConfigLoader() {
-        throw new UnsupportedOperationException("Utility class cannot be instantiated");
     }
 
     public static String get(String key) {

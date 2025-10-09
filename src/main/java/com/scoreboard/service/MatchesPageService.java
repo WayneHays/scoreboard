@@ -4,7 +4,7 @@ import com.scoreboard.dao.MatchDao;
 import com.scoreboard.dto.MatchesPage;
 import com.scoreboard.exception.NotFoundException;
 import com.scoreboard.mapper.MatchesPageMapper;
-import com.scoreboard.model.entity.Match;
+import com.scoreboard.model.Match;
 
 import java.util.Collections;
 import java.util.List;

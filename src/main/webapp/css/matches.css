@@ -21,7 +21,6 @@ body {
     margin: 0 auto;
 }
 
-/* Header */
 header {
     margin-bottom: 30px;
 }
@@ -33,14 +32,12 @@ header {
     text-align: center;
 }
 
-/* Main content */
 main {
     display: flex;
     flex-direction: column;
     gap: 30px;
 }
 
-/* Navigation Buttons */
 .nav-buttons {
     display: flex;
     gap: 15px;
@@ -70,7 +67,29 @@ main {
     background: #38a169;
 }
 
-/* Search Form */
+.error-message {
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.general-error {
+    background-color: #fee2e2;
+    border: 1px solid #fca5a5;
+    color: #dc2626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.general-error::before {
+    content: "⚠️";
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
 .search-form {
     background: #f8f9fa;
     padding: 30px;
@@ -133,19 +152,16 @@ main {
     background: #5a6169;
 }
 
-/* Search Info */
 .search-info {
     color: #6c757d;
     text-align: center;
     font-style: italic;
 }
 
-/* Results Section */
 .results-section {
-    /* Inherits spacing from main flex gap */
+
 }
 
-/* Table Styles */
 .matches-table {
     width: 100%;
     border-collapse: collapse;
@@ -186,7 +202,6 @@ main {
     font-weight: 600;
 }
 
-/* No Results */
 .no-results {
     text-align: center;
     padding: 40px;
@@ -197,7 +212,6 @@ main {
     border: 2px dashed #dee2e6;
 }
 
-/* Pagination */
 .pagination {
     display: flex;
     justify-content: center;
@@ -236,7 +250,6 @@ main {
     cursor: not-allowed;
 }
 
-/* Page Info */
 .page-info {
     text-align: center;
     color: #6c757d;
@@ -246,7 +259,6 @@ main {
     border-radius: 5px;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
     .search-form {
         padding: 20px;
@@ -266,6 +278,11 @@ main {
     .search-button {
         width: 100%;
         max-width: 200px;
+    }
+
+    .error-message {
+        font-size: 0.9rem;
+        padding: 0.875rem 1rem;
     }
 }
 
@@ -295,6 +312,15 @@ main {
 
     .no-results {
         padding: 20px;
+        font-size: 1rem;
+    }
+
+    .error-message {
+        font-size: 0.85rem;
+        padding: 0.75rem;
+    }
+
+    .general-error::before {
         font-size: 1rem;
     }
 }

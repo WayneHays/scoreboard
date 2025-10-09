@@ -2,7 +2,7 @@ package com.scoreboard.service;
 
 import com.scoreboard.model.OngoingMatch;
 import com.scoreboard.exception.ValidationException;
-import com.scoreboard.model.entity.Player;
+import com.scoreboard.model.Player;
 
 import java.util.Optional;
 

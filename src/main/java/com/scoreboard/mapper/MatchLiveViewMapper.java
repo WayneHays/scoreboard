@@ -2,7 +2,7 @@ package com.scoreboard.mapper;
 
 import com.scoreboard.dto.MatchLiveView;
 import com.scoreboard.model.OngoingMatch;
-import com.scoreboard.model.entity.Player;
+import com.scoreboard.model.Player;
 
 public class MatchLiveViewMapper {
     private static final String ADVANTAGE_VIEW = "AD";

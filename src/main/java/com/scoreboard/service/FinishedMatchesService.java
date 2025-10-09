@@ -1,7 +1,7 @@
 package com.scoreboard.service;
 
 import com.scoreboard.dao.MatchDao;
-import com.scoreboard.model.entity.Match;
+import com.scoreboard.model.Match;
 
 public class FinishedMatchesService extends BaseTransactionalService{
     private final MatchDao matchDao;

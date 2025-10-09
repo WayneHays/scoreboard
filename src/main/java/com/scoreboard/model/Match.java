@@ -1,11 +1,10 @@
-package com.scoreboard.model.entity;
+package com.scoreboard.model;
 
 import jakarta.persistence.*;
 import lombok.*;
 
 @NoArgsConstructor
 @Getter
-
 @Entity
 @Table(name = "Matches")
 public class Match {
@@ -14,15 +13,17 @@ public class Match {
     @Column(name = "id", columnDefinition = "BIGINT")
     private Long id;
 
+    @Setter(AccessLevel.PACKAGE)
     @ManyToOne
     @JoinColumn(name = "firstPlayer", referencedColumnName = "id")
     private Player firstPlayer;
 
+    @Setter(AccessLevel.PACKAGE)
     @ManyToOne
     @JoinColumn(name = "secondPlayer", referencedColumnName = "id")
     private Player secondPlayer;
 
-    @Setter
+    @Setter(AccessLevel.PACKAGE)
     @ManyToOne
     @JoinColumn(name = "winner", referencedColumnName = "id")
     private Player winner;
@@ -30,5 +31,11 @@ public class Match {
     public Match(Player firstPlayer, Player secondPlayer) {
         this.firstPlayer = firstPlayer;
         this.secondPlayer = secondPlayer;
+    }
+
+    public Match(Player firstPlayer, Player secondPlayer, Player winner) {
+        this.firstPlayer = firstPlayer;
+        this.secondPlayer = secondPlayer;
+        this.winner = winner;
     }
 }
