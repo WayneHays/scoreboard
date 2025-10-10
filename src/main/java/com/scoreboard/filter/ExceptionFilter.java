@@ -45,7 +45,7 @@ public class ExceptionFilter extends HttpFilter {
                     res,
                     SC_BAD_REQUEST,
                     "Invalid number format");
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             ErrorHandler.handleHttpError(
                     req,
                     res,
