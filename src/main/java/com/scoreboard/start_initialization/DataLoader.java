@@ -1,10 +1,11 @@
 package com.scoreboard.start_initialization;
 
 import com.scoreboard.config.ApplicationContext;
+import com.scoreboard.model.OngoingMatch;
+import com.scoreboard.model.Score;
 import com.scoreboard.model.entity.Match;
 import com.scoreboard.model.entity.Player;
-import com.scoreboard.service.FinishedMatchesService;
-import com.scoreboard.service.PlayerService;
+import com.scoreboard.service.FinishedMatchPersistenceService;
 import com.scoreboard.start_initialization.data_source.DataSource;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -16,30 +17,31 @@ import java.util.List;
 public final class DataLoader {
 
     public static void loadData(DataSource dataSource) {
-        PlayerService playerService = ApplicationContext.get(PlayerService.class);
-        FinishedMatchesService finishedMatchesService = ApplicationContext.get(FinishedMatchesService.class);
+        FinishedMatchPersistenceService finishedMatchPersistenceService = ApplicationContext.get(FinishedMatchPersistenceService.class);
 
-        List<Player> players = createPlayers(playerService, dataSource);
-        createMatches(finishedMatchesService, players);
+        List<Player> players = createPlayers(dataSource);
+        createMatches(finishedMatchPersistenceService, players);
     }
 
-    private static List<Player> createPlayers(PlayerService playerService, DataSource dataSource) {
+    private static List<Player> createPlayers(DataSource dataSource) {
         List<Player> players = new ArrayList<>();
 
-        for (String playerName : dataSource.getPlayers()) {
-            players.add(playerService.create(playerName));
+        for (String playerName : dataSource.getPlayerNames()) {
+            players.add(new Player(playerName));
         }
         return players;
     }
 
-    private static void createMatches(FinishedMatchesService finishedMatchesService, List<Player> players) {
+    private static void createMatches(FinishedMatchPersistenceService finishedMatchPersistenceService, List<Player> players) {
         for (int i = 0; i < players.size() - 1; i++) {
             Player player1 = players.get(i);
             Player player2 = players.get(i + 1);
             Player winner = (i % 2 == 0) ? player1 : player2;
-            Match match = new Match(player1, player2, winner);
+            OngoingMatch ongoingMatch = new OngoingMatch(
+                    new Match(player1, player2, winner),
+                    new Score(player1, player2));
 
-            finishedMatchesService.saveToDatabase(match);
+            finishedMatchPersistenceService.saveFinishedMatch(ongoingMatch);
         }
     }
 }
