@@ -2,7 +2,6 @@ package com.scoreboard.servlet;
 
 import com.scoreboard.config.ApplicationContext;
 import com.scoreboard.exception.ValidationException;
-import com.scoreboard.service.PlayerService;
 import com.scoreboard.service.OngoingMatchesService;
 import com.scoreboard.model.entity.Player;
 import com.scoreboard.util.WebPaths;
@@ -19,11 +18,9 @@ import java.util.UUID;
 @WebServlet("/new-match")
 public class NewMatchServlet extends HttpServlet {
     private final OngoingMatchesService ongoingMatchesService;
-    private final PlayerService playerService;
 
     public NewMatchServlet() {
         this.ongoingMatchesService = ApplicationContext.get(OngoingMatchesService.class);
-        this.playerService = ApplicationContext.get(PlayerService.class);
     }
 
     @Override
@@ -34,39 +31,28 @@ public class NewMatchServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws IOException, ServletException {
-        String firstPlayerInput = req.getParameter("firstPlayerInput");
-        String secondPlayerInput = req.getParameter("secondPlayerInput");
+        String player1name = req.getParameter("player1name");
+        String player2name = req.getParameter("player2name");
 
         try {
-            String firstPlayerName = PlayerNameValidator.validate(firstPlayerInput);
-            String secondPlayerName = PlayerNameValidator.validate(secondPlayerInput);
+            String player1ValidName = PlayerNameValidator.validate(player1name);
+            String player2ValidName = PlayerNameValidator.validate(player2name);
 
-            if (firstPlayerName.equalsIgnoreCase(secondPlayerName)) {
+            if (player1ValidName.equalsIgnoreCase(player2ValidName)) {
                 throw new ValidationException("Players cannot have the same name");
             }
 
-            Player firstPlayer = findOrCreatePlayer(firstPlayerName);
-            Player secondPlayer = findOrCreatePlayer(secondPlayerName);
+            Player firstPlayer = new Player(player1ValidName);
+            Player secondPlayer = new Player(player2ValidName);
+
             UUID uuid = ongoingMatchesService.createMatch(firstPlayer, secondPlayer);
             resp.sendRedirect(req.getContextPath() + "/match-score?uuid=" + uuid);
 
         } catch (ValidationException e) {
             req.setAttribute("error", e.getMessage());
-            req.setAttribute("firstPlayerInput", firstPlayerInput);
-            req.setAttribute("secondPlayerInput", secondPlayerInput);
+            req.setAttribute("firstPlayerInput", player1name);
+            req.setAttribute("secondPlayerInput", player2name);
             getServletContext().getRequestDispatcher(WebPaths.NEW_MATCH_JSP).forward(req, resp);
         }
-    }
-
-    private Player findOrCreatePlayer(String name) {
-        return playerService.find(name)
-                .orElseGet(() -> {
-                    try {
-                        return playerService.create(name);
-                    } catch (Exception e) {
-                        return playerService.find(name)
-                                .orElseThrow(() -> new RuntimeException("Failed to find or create player", e));
-                    }
-                });
     }
 }
