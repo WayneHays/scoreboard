@@ -15,7 +15,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><c:out value="${errorTitle}"/> - ${statusCode}</title>
-  <link href="${pageContext.request.contextPath}/css/error/error.css" rel="stylesheet">
+  <link href="${pageContext.request.contextPath}/css/error.css" rel="stylesheet">
 </head>
 <body>
 <div class="container error-${statusCode}">
