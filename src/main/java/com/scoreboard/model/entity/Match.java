@@ -36,4 +36,9 @@ public class Match {
         this.secondPlayer = secondPlayer;
         this.winner = winner;
     }
+
+    public void setPlayers(Player firstPlayer, Player secondPlayer) {
+        this.firstPlayer = firstPlayer;
+        this.secondPlayer = secondPlayer;
+    }
 }
