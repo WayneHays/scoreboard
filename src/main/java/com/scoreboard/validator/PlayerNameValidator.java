@@ -1,17 +1,16 @@
 package com.scoreboard.validator;
 
 import com.scoreboard.exception.ValidationException;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.regex.Pattern;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PlayerNameValidator {
     private static final int MIN_NAME_LENGTH = 2;
     private static final int MAX_NAME_LENGTH = 30;
     private static final Pattern VALID_NAME_PATTERN = Pattern.compile("^[a-zA-Zа-яёА-ЯЁ\\s-']+$");
-
-    private PlayerNameValidator() {
-        throw new UnsupportedOperationException("Utility class cannot be instantiated");
-    }
 
     public static String validate(String name) {
         if (name == null || name.trim().isEmpty()) {
