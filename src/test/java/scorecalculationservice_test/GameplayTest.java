@@ -16,31 +16,31 @@ class GameplayTest extends ScoreCalculationTestBase {
             ongoingMatch.awardGame(player1);
         }
 
-        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
-        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
-        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
-        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
+        scoreCalculationService.winPoint(ongoingMatch, player1);
+        scoreCalculationService.winPoint(ongoingMatch, player1);
+        scoreCalculationService.winPoint(ongoingMatch, player1);
+        scoreCalculationService.winPoint(ongoingMatch, player1);
 
-        assertTrue(service.isMatchFinished(ongoingMatch));
+        assertEquals(player1, ongoingMatch.getWinner());
         assertEquals(2, ongoingMatch.getSets(player1));
         assertEquals(1, ongoingMatch.getSets(player2));
     }
 
     @Test
     void shouldIncrementPointsCorrectly() {
-        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
+        scoreCalculationService.winPoint(ongoingMatch, player1);
         assertEquals(15, ongoingMatch.getPoints(player1));
         assertEquals(0, ongoingMatch.getPoints(player2));
 
-        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
+        scoreCalculationService.winPoint(ongoingMatch, player1);
         assertEquals(30, ongoingMatch.getPoints(player1));
         assertEquals(0, ongoingMatch.getPoints(player2));
 
-        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
+        scoreCalculationService.winPoint(ongoingMatch, player1);
         assertEquals(40, ongoingMatch.getPoints(player1));
         assertEquals(0, ongoingMatch.getPoints(player2));
 
-        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
+        scoreCalculationService.winPoint(ongoingMatch, player1);
         assertEquals(0, ongoingMatch.getPoints(player1));
         assertEquals(0, ongoingMatch.getPoints(player2));
         assertEquals(1, ongoingMatch.getGames(player1));
@@ -48,10 +48,10 @@ class GameplayTest extends ScoreCalculationTestBase {
 
     @Test
     void shouldIncrementGameCountAfterWinning4Points() {
-        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
-        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
-        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
-        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
+        scoreCalculationService.winPoint(ongoingMatch, player1);
+        scoreCalculationService.winPoint(ongoingMatch, player1);
+        scoreCalculationService.winPoint(ongoingMatch, player1);
+        scoreCalculationService.winPoint(ongoingMatch, player1);
 
         assertEquals(0, ongoingMatch.getPoints(player1));
         assertEquals(0, ongoingMatch.getPoints(player2));
@@ -63,7 +63,7 @@ class GameplayTest extends ScoreCalculationTestBase {
     void shouldNotFinishMatchIfNotEnoughSets() {
         ongoingMatch.awardSet(player1);
 
-        assertFalse(service.isMatchFinished(ongoingMatch));
+        assertNull(ongoingMatch.getWinner());
         assertEquals(1, ongoingMatch.getSets(player1));
         assertEquals(0, ongoingMatch.getSets(player2));
     }
