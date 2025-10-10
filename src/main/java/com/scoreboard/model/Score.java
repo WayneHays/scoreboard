@@ -1,64 +1,73 @@
 package com.scoreboard.model;
 
 import com.scoreboard.model.entity.Player;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Map;
 
 public class Score {
     private final Map<Player, PlayerScore> scores;
 
+    @Getter
+    @Setter
+    private boolean isTieBreak;
+
+    @Getter
+    @Setter
+    private Player advantage;
+
     public Score(Player player1, Player player2) {
         this.scores = Map.of(
                 player1, new PlayerScore(),
                 player2, new PlayerScore()
         );
+        this.isTieBreak = false;
+        this.advantage = null;
     }
 
-    public int getPoints(Player player) {
+    int getPoints(Player player) {
         return getScore(player).getPoints();
     }
 
-    public int getGames(Player player) {
+    int getGames(Player player) {
         return getScore(player).getGames();
     }
 
-    public int getSets(Player player) {
+    int getSets(Player player) {
         return getScore(player).getSets();
     }
 
-    public int getTieBreakPoints(Player player) {
+    int getTieBreakPoints(Player player) {
         return getScore(player).getTieBreakPoints();
     }
 
-    public void awardTennisPoint(Player player) {
+    void awardTennisPoint(Player player) {
         getScore(player).awardPoint();
     }
 
-    public void awardTieBreakPoint(Player player) {
+    void awardTieBreakPoint(Player player) {
         getScore(player).awardTieBreakPoint();
     }
 
-    public void awardGame(Player player) {
+    void awardGame(Player player) {
         getScore(player).awardGame();
     }
 
-    public void awardSet(Player player) {
+    void awardSet(Player player) {
         getScore(player).awardSet();
     }
 
-    public void resetToDeuce() {
-        scores.values().forEach(PlayerScore::resetToDeuce);
-    }
 
-    public void resetAllPoints() {
+    void resetAllPoints() {
         scores.values().forEach(PlayerScore::resetPoints);
     }
 
-    public void resetAllGames() {
+    void resetAllGames() {
         scores.values().forEach(PlayerScore::resetGames);
     }
 
-    public void resetAllTieBreakPoints() {
+    void resetAllTieBreakPoints() {
         scores.values().forEach(PlayerScore::resetTieBreakPoints);
     }
 
@@ -129,10 +138,6 @@ public class Score {
 
         void resetTieBreakPoints() {
             tieBreakPoints = ZERO;
-        }
-
-        void resetToDeuce() {
-            points = FORTY;
         }
     }
 }
