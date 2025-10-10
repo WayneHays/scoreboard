@@ -1,20 +1,19 @@
 package com.scoreboard.start_initialization.data_source;
 
+import lombok.AllArgsConstructor;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+@AllArgsConstructor
 public class TextFileDataSource implements DataSource{
     private final String fileName;
 
-    public TextFileDataSource(String fileName) {
-        this.fileName = fileName;
-    }
-
     @Override
-    public List<String> getPlayers() {
+    public List<String> getPlayerNames() {
         List<String> lines = new ArrayList<>();
         InputStream input = getClass().getResourceAsStream(fileName);
 

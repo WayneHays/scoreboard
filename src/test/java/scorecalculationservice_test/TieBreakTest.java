@@ -21,7 +21,7 @@ class TieBreakTest extends ScoreCalculationTestBase {
         setGamesScore(5, 6);
         winCurrentGame(player1);
 
-        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
+        scoreCalculationService.winPoint(ongoingMatch, player1);
 
         assertEquals(0, ongoingMatch.getPoints(player1));
         assertEquals(0, ongoingMatch.getPoints(player2));
@@ -32,7 +32,7 @@ class TieBreakTest extends ScoreCalculationTestBase {
         setGamesScore(5, 6);
         winCurrentGame(player1);
 
-        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
+        scoreCalculationService.winPoint(ongoingMatch, player1);
 
         assertEquals(1, ongoingMatch.getTieBreakPoints(player1));
     }
@@ -43,12 +43,12 @@ class TieBreakTest extends ScoreCalculationTestBase {
         setTieBreakPointsBeforeMatchServe();
         ongoingMatch.setTieBreak(true);
 
-        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
+        scoreCalculationService.winPoint(ongoingMatch, player1);
 
         assertEquals(0, ongoingMatch.getGames(player1));
         assertEquals(1, ongoingMatch.getSets(player1));
         assertFalse(ongoingMatch.isTieBreak());
-        assertNull(ongoingMatch.getAdvantage());
+        assertNull(ongoingMatch.getAdvantageStatus());
     }
 
     @Test
@@ -58,16 +58,16 @@ class TieBreakTest extends ScoreCalculationTestBase {
         setTieBreakPointsBeforeMatchServe();
         ongoingMatch.setTieBreak(true);
 
-        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
+        scoreCalculationService.winPoint(ongoingMatch, player1);
 
         assertFalse(ongoingMatch.isTieBreak());
-        assertNull(ongoingMatch.getAdvantage());
-        assertTrue(service.isMatchFinished(ongoingMatch));
+        assertNull(ongoingMatch.getAdvantageStatus());
+        assertEquals(player1, ongoingMatch.getWinner());
     }
 
     private void winCurrentGame(Player player) {
         for (int i = 0; i < 4; i++) {
-            service.awardPointToPlayer(ongoingMatch, player.getId().toString());
+            scoreCalculationService.winPoint(ongoingMatch, player);
         }
     }
 
