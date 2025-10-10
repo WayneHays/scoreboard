@@ -1,16 +1,14 @@
 package com.scoreboard.servlet;
 
 import com.scoreboard.config.ApplicationContext;
-import com.scoreboard.dto.MatchLiveView;
-import com.scoreboard.dto.MatchResult;
 import com.scoreboard.exception.ValidationException;
 import com.scoreboard.mapper.MatchLiveViewMapper;
 import com.scoreboard.mapper.MatchResultMapper;
 import com.scoreboard.model.OngoingMatch;
 import com.scoreboard.model.entity.Player;
-import com.scoreboard.service.ScoreCalculationService;
-import com.scoreboard.service.FinishedMatchesService;
+import com.scoreboard.service.FinishedMatchPersistenceService;
 import com.scoreboard.service.OngoingMatchesService;
+import com.scoreboard.service.ScoreCalculationService;
 import com.scoreboard.util.WebPaths;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -25,51 +23,48 @@ import java.util.UUID;
 public class MatchScoreServlet extends HttpServlet {
     private final OngoingMatchesService ongoingMatchesService;
     private final ScoreCalculationService scoreCalculationService;
-    private final FinishedMatchesService finishedMatchesService;
+    private final FinishedMatchPersistenceService finishedMatchPersistenceService;
     private final MatchLiveViewMapper liveViewMapper;
     private final MatchResultMapper resultMapper;
 
     public MatchScoreServlet() {
         this.ongoingMatchesService = ApplicationContext.get(OngoingMatchesService.class);
         this.scoreCalculationService = ApplicationContext.get(ScoreCalculationService.class);
-        this.finishedMatchesService = ApplicationContext.get(FinishedMatchesService.class);
+        this.finishedMatchPersistenceService = ApplicationContext.get(FinishedMatchPersistenceService.class);
         this.liveViewMapper = ApplicationContext.get(MatchLiveViewMapper.class);
         this.resultMapper = ApplicationContext.get(MatchResultMapper.class);
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        OngoingMatch ongoingMatch = findMatch(req);
-        MatchLiveView matchView = liveViewMapper.map(ongoingMatch);
+        String uuidStr = req.getParameter("uuid");
+        UUID uuid = parseUuid(uuidStr);
+        OngoingMatch ongoingMatch = ongoingMatchesService.get(uuid);
 
-        req.setAttribute("matchView", matchView);
+        req.setAttribute("matchView", liveViewMapper.map(ongoingMatch));
         getServletContext().getRequestDispatcher(WebPaths.MATCH_SCORE_JSP).forward(req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
-        OngoingMatch ongoingMatch = findMatch(req);
+        String uuidStr = req.getParameter("uuid");
+        UUID uuid = parseUuid(uuidStr);
+        OngoingMatch ongoingMatch = ongoingMatchesService.get(uuid);
 
-        Long pointWinnerId = Long.parseLong(req.getParameter("pointWinnerId"));
-        Player pointWinner = ongoingMatch.getPlayerById(pointWinnerId);;
+        String playerName = req.getParameter("playerName");
+        Player pointWinner = ongoingMatch.getPlayer(playerName);
 
         scoreCalculationService.winPoint(ongoingMatch, pointWinner);
 
-        if (ongoingMatch.getWinner() == null) {
-            resp.sendRedirect(req.getContextPath() + "/match-score?uuid=" + ongoingMatch.getUuid());
-        } else {
-            MatchResult matchResult = resultMapper.map(ongoingMatch);
-            finishedMatchesService.saveToDatabase(ongoingMatch.getMatch());
-            ongoingMatchesService.delete(ongoingMatch.getUuid());
-            req.setAttribute("matchResult", matchResult);
-            getServletContext().getRequestDispatcher(WebPaths.MATCH_RESULT_JSP).forward(req, resp);
-        }
-    }
+        if (isWinnerDetermined(ongoingMatch)) {
+            finishedMatchPersistenceService.saveFinishedMatch(ongoingMatch);
+            ongoingMatchesService.delete(uuid);
 
-    private OngoingMatch findMatch(HttpServletRequest req) {
-        String uuidStr = req.getParameter("uuid");
-        UUID uuid = parseUuid(uuidStr);
-        return ongoingMatchesService.get(uuid);
+            req.setAttribute("matchResult", resultMapper.map(ongoingMatch));
+            getServletContext().getRequestDispatcher(WebPaths.MATCH_RESULT_JSP).forward(req, resp);
+        } else {
+            resp.sendRedirect(req.getContextPath() + "/match-score?uuid=" + uuid);
+        }
     }
 
     private UUID parseUuid(String uuidStr) {
@@ -82,5 +77,9 @@ public class MatchScoreServlet extends HttpServlet {
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid UUID format", e);
         }
+    }
+
+    private boolean isWinnerDetermined(OngoingMatch ongoingMatch) {
+        return ongoingMatch.getWinner() != null;
     }
 }
