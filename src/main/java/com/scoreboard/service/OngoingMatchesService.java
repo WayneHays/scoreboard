@@ -21,9 +21,7 @@ public class OngoingMatchesService {
         Match match = new Match(first, second);
         Score score = new Score(first, second);
         UUID uuid = UUID.randomUUID();
-
-        OngoingMatch ongoingMatch = new OngoingMatch(match, score, uuid);
-        ongoingMatches.put(uuid, ongoingMatch);
+        ongoingMatches.put(uuid, new OngoingMatch(match, score));
         return uuid;
     }
 
