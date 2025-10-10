@@ -8,17 +8,17 @@ public class MatchResultMapper {
 
     public MatchResult map(OngoingMatch ongoingMatch) {
         Player winner = ongoingMatch.getWinner();
-        Player first = ongoingMatch.getFirstPlayer();
-        Player second = ongoingMatch.getSecondPlayer();
+        Player player1 = ongoingMatch.getFirstPlayer();
+        Player player2 = ongoingMatch.getSecondPlayer();
 
         return MatchResult.builder()
                 .winnerName(winner.getName())
-                .firstPlayerName(first.getName())
-                .secondPlayerName(second.getName())
-                .firstPlayerFinalSets(ongoingMatch.getSets(first))
-                .secondPlayerFinalSets(ongoingMatch.getSets(second))
-                .firstPlayerRowClass(winner.equals(first) ? "winner" : "")
-                .secondPlayerRowClass(winner.equals(second) ? "winner" : "")
+                .firstPlayerName(player1.getName())
+                .secondPlayerName(player2.getName())
+                .firstPlayerFinalSets(ongoingMatch.getSets(player1))
+                .secondPlayerFinalSets(ongoingMatch.getSets(player2))
+                .firstPlayerRowClass(winner.equals(player1) ? "winner" : "")
+                .secondPlayerRowClass(winner.equals(player2) ? "winner" : "")
                 .build();
     }
 }

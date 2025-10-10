@@ -8,25 +8,24 @@ public class MatchLiveViewMapper {
     private static final String ADVANTAGE_VIEW = "AD";
 
     public MatchLiveView map(OngoingMatch ongoingMatch) {
-        Player first = ongoingMatch.getFirstPlayer();
-        Player second = ongoingMatch.getSecondPlayer();
+        Player player1 = ongoingMatch.getFirstPlayer();
+        Player player2 = ongoingMatch.getSecondPlayer();
         return MatchLiveView.builder()
-                .firstPlayerName(first.getName())
-                .secondPlayerName(second.getName())
-                .firstPlayerId(String.valueOf(first.getId()))
-                .secondPlayerId(String.valueOf(second.getId()))
-                .firstPlayerSets(ongoingMatch.getSets(first))
-                .secondPlayerSets(ongoingMatch.getSets(second))
-                .firstPlayerGames(ongoingMatch.getGames(first))
-                .secondPlayerGames(ongoingMatch.getGames(second))
-                .firstPlayerPoints(formatPlayerPoints(ongoingMatch, first))
-                .secondPlayerPoints(formatPlayerPoints(ongoingMatch,second))
+                .firstPlayerName(player1.getName())
+                .secondPlayerName(player2.getName())
+                .firstPlayerId(String.valueOf(player1.getId()))
+                .secondPlayerId(String.valueOf(player2.getId()))
+                .firstPlayerSets(ongoingMatch.getSets(player1))
+                .secondPlayerSets(ongoingMatch.getSets(player2))
+                .firstPlayerGames(ongoingMatch.getGames(player1))
+                .secondPlayerGames(ongoingMatch.getGames(player2))
+                .firstPlayerPoints(formatPlayerPoints(ongoingMatch, player1))
+                .secondPlayerPoints(formatPlayerPoints(ongoingMatch, player2))
                 .build();
     }
 
     private String formatPlayerPoints(OngoingMatch ongoingMatch, Player player) {
-        if (ongoingMatch.getAdvantage() != null &&
-            ongoingMatch.getAdvantage().equals(player)) {
+        if (playerHasAdvantage(ongoingMatch, player)) {
             return ADVANTAGE_VIEW;
         }
 
@@ -35,5 +34,9 @@ public class MatchLiveViewMapper {
         }
 
         return String.valueOf(ongoingMatch.getPoints(player));
+    }
+
+    private boolean playerHasAdvantage(OngoingMatch ongoingMatch, Player player) {
+        return ongoingMatch.getAdvantageStatus() != null && ongoingMatch.getAdvantageStatus().equals(player);
     }
 }
