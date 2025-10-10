@@ -8,14 +8,14 @@ class DeuceTest extends ScoreCalculationTestBase {
 
     @Test
     void shouldNotHaveAdvantageInitially() {
-        assertNull(ongoingMatch.getAdvantage());
+        assertNull(ongoingMatch.getAdvantageStatus());
     }
 
     @Test
     void shouldNotHaveAdvantageAtDeuce() {
         setPointsToDeuce();
 
-        assertNull(ongoingMatch.getAdvantage());
+        assertNull(ongoingMatch.getAdvantageStatus());
         assertEquals(40, ongoingMatch.getPoints(player1));
         assertEquals(40, ongoingMatch.getPoints(player2));
     }
@@ -24,10 +24,10 @@ class DeuceTest extends ScoreCalculationTestBase {
     void shouldSetAdvantageIfPlayerWinsPointAfterDeuce() {
         setPointsToDeuce();
 
-        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
+        scoreCalculationService.winPoint(ongoingMatch, player1);
 
-        assertEquals(player1, ongoingMatch.getAdvantage());
-        assertEquals(41, ongoingMatch.getPoints(player1));
+        assertEquals(player1, ongoingMatch.getAdvantageStatus());
+        assertEquals(40, ongoingMatch.getPoints(player1));
         assertEquals(40, ongoingMatch.getPoints(player2));
     }
 
@@ -35,24 +35,24 @@ class DeuceTest extends ScoreCalculationTestBase {
     void shouldWinGameIfPlayerHasAdvantageAndWinsAnotherPoint() {
         setPointsToDeuce();
 
-        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
-        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
+        scoreCalculationService.winPoint(ongoingMatch, player1);
+        scoreCalculationService.winPoint(ongoingMatch, player1);
 
         assertEquals(0, ongoingMatch.getPoints(player1));
         assertEquals(0, ongoingMatch.getPoints(player2));
         assertEquals(1, ongoingMatch.getGames(player1));
         assertEquals(0, ongoingMatch.getGames(player2));
-        assertNull(ongoingMatch.getAdvantage());
+        assertNull(ongoingMatch.getAdvantageStatus());
     }
 
     @Test
     void shouldReturnToDeuceIfOpponentWinsPointWhenPlayerHasAdvantage() {
         setPointsToDeuce();
 
-        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
-        service.awardPointToPlayer(ongoingMatch, player2.getId().toString());
+        scoreCalculationService.winPoint(ongoingMatch, player1);
+        scoreCalculationService.winPoint(ongoingMatch, player2);
 
-        assertNull(ongoingMatch.getAdvantage());
+        assertNull(ongoingMatch.getAdvantageStatus());
         assertEquals(40, ongoingMatch.getPoints(player1));
         assertEquals(40, ongoingMatch.getPoints(player2));
     }
@@ -61,14 +61,14 @@ class DeuceTest extends ScoreCalculationTestBase {
     void shouldSwitchAdvantageBackAndForth() {
         setPointsToDeuce();
 
-        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
-        assertEquals(player1, ongoingMatch.getAdvantage());
+        scoreCalculationService.winPoint(ongoingMatch, player1);
+        assertEquals(player1, ongoingMatch.getAdvantageStatus());
 
-        service.awardPointToPlayer(ongoingMatch, player2.getId().toString());
-        assertNull(ongoingMatch.getAdvantage());
+        scoreCalculationService.winPoint(ongoingMatch, player2);
+        assertNull(ongoingMatch.getAdvantageStatus());
 
-        service.awardPointToPlayer(ongoingMatch, player2.getId().toString());
-        assertEquals(player2, ongoingMatch.getAdvantage());
+        scoreCalculationService.winPoint(ongoingMatch, player2);
+        assertEquals(player2, ongoingMatch.getAdvantageStatus());
     }
 
     @Test
@@ -76,21 +76,21 @@ class DeuceTest extends ScoreCalculationTestBase {
         setGamesCount(5, 6);
         setPointsToDeuce();
 
-        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
-        service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
+        scoreCalculationService.winPoint(ongoingMatch, player1);
+        scoreCalculationService.winPoint(ongoingMatch, player1);
 
         assertEquals(6, ongoingMatch.getGames(player1));
         assertEquals(6, ongoingMatch.getGames(player2));
         assertTrue(ongoingMatch.isTieBreak());
         assertEquals(0, ongoingMatch.getPoints(player1));
         assertEquals(0, ongoingMatch.getPoints(player2));
-        assertNull(ongoingMatch.getAdvantage());
+        assertNull(ongoingMatch.getAdvantageStatus());
     }
 
     private void setPointsToDeuce() {
         for (int i = 0; i < 3; i++) {
-            service.awardPointToPlayer(ongoingMatch, player1.getId().toString());
-            service.awardPointToPlayer(ongoingMatch, player2.getId().toString());
+            scoreCalculationService.winPoint(ongoingMatch, player1);
+            scoreCalculationService.winPoint(ongoingMatch, player2);
         }
     }
 
