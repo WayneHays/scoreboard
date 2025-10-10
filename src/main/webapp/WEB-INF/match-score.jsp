@@ -48,7 +48,7 @@
         <section class="actions-container">
             <form action="${pageContext.request.contextPath}/match-score" method="POST" class="point-form">
                 <input type="hidden" name="uuid" value="${param.uuid}">
-                <input type="hidden" name="pointWinnerId" value="${matchView.firstPlayerId}">
+                <input type="hidden" name="playerName" value="${matchView.firstPlayerName}">
                 <button type="submit" class="action-button">
                     <c:out value="${matchView.firstPlayerName}"/> Wins Point
                 </button>
@@ -56,7 +56,7 @@
 
             <form action="${pageContext.request.contextPath}/match-score" method="POST" class="point-form">
                 <input type="hidden" name="uuid" value="${param.uuid}">
-                <input type="hidden" name="pointWinnerId" value="${matchView.secondPlayerId}">
+                <input type="hidden" name="playerName" value="${matchView.secondPlayerName}">
                 <button type="submit" class="action-button player2-button">
                     <c:out value="${matchView.secondPlayerName}"/> Wins Point
                 </button>
