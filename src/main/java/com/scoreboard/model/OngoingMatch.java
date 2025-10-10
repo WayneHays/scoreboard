@@ -2,43 +2,85 @@ package com.scoreboard.model;
 
 import com.scoreboard.model.entity.Match;
 import com.scoreboard.model.entity.Player;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
 
-import java.util.UUID;
+import java.util.function.Consumer;
 
+@AllArgsConstructor
 public class OngoingMatch {
-    @Getter
     private final Match match;
-
-    @Getter
-    private final UUID uuid;
-
     private final Score score;
 
-    @Getter
-    @Setter
-    private boolean isTieBreak;
-
-    @Getter
-    @Setter
-    private Player advantage;
-
-    public OngoingMatch(Match match, Score score, UUID uuid) {
-        this.match = match;
-        this.uuid = uuid;
-        this.score = score;
-        this.isTieBreak = false;
-        this.advantage = null;
+    public void withMatch(Consumer<Match> operation) {
+        operation.accept(match);
     }
 
-    public Player getPlayerById(Long playerId) {
-        if (match.getFirstPlayer().getId().equals(playerId)) {
+    public Player getPlayer(String name) {
+        if (match.getFirstPlayer().getName().equals(name)) {
             return match.getFirstPlayer();
-        } else if (match.getSecondPlayer().getId().equals(playerId)) {
+        }
+
+        if (match.getSecondPlayer().getName().equals(name)) {
             return match.getSecondPlayer();
         }
-        throw new IllegalArgumentException("Player with id " + playerId + " not found in this match");
+
+        throw new IllegalArgumentException(
+                "Player with name " + name + " is not part of this match"
+        );
+    }
+
+    public Player getOpponent(Player player) {
+        if (player.equals(getFirstPlayer())) {
+            return getSecondPlayer();
+        }
+
+        if (player.equals(getSecondPlayer())) {
+            return getFirstPlayer();
+        }
+
+        throw new IllegalArgumentException("Player is not part of this match");
+    }
+
+    public void winGame(Player player) {
+        resetAllPoints();
+        resetAdvantage();
+        awardGame(player);
+    }
+
+    public void winTieBreak(Player player) {
+        setTieBreak(false);
+        resetAllTieBreakPoints();
+        awardGame(player);
+    }
+
+    public void winSet(Player player) {
+        resetAllGames();
+        resetAllPoints();
+        resetAdvantage();
+        awardSet(player);
+    }
+
+    public int getSets(Player player) {
+        return score.getSets(player);
+    }
+
+    public int getGames(Player player) {
+        return score.getGames(player);
+    }
+    public int getPoints(Player player) {
+        return score.getPoints(player);
+    }
+
+    public Player getAdvantageStatus() {
+        return score.getAdvantage();
+    }
+
+    public int getTieBreakPoints(Player player) {
+        return score.getTieBreakPoints(player);
+    }
+
+    public boolean isTieBreak() {
+        return score.isTieBreak();
     }
 
     public Player getFirstPlayer() {
@@ -49,22 +91,6 @@ public class OngoingMatch {
         return match.getSecondPlayer();
     }
 
-    public int getSets(Player player) {
-        return score.getSets(player);
-    }
-
-    public int getGames(Player player) {
-        return score.getGames(player);
-    }
-
-    public int getPoints(Player player) {
-        return score.getPoints(player);
-    }
-
-    public int getTieBreakPoints(Player player) {
-        return score.getTieBreakPoints(player);
-    }
-
     public Player getWinner() {
         return match.getWinner();
     }
@@ -73,8 +99,20 @@ public class OngoingMatch {
         match.setWinner(player);
     }
 
+    public void setTieBreak(boolean isTieBreak) {
+        score.setTieBreak(isTieBreak);
+    }
+
+    public void setAdvantage(Player player) {
+        score.setAdvantage(player);
+    }
+
     public void awardTennisPoint(Player player) {
         score.awardTennisPoint(player);
+    }
+
+    public void awardTieBreakPoint(Player player) {
+        score.awardTieBreakPoint(player);
     }
 
     public void awardGame(Player player) {
@@ -85,19 +123,19 @@ public class OngoingMatch {
         score.awardSet(player);
     }
 
-    public void resetAllPoints() {
-        score.resetAllPoints();
-    }
-
     public void resetAllGames() {
         score.resetAllGames();
     }
 
-    public void resetAllTieBreakPoints() {
+    private void resetAllPoints() {
+        score.resetAllPoints();
+    }
+
+    private void resetAllTieBreakPoints() {
         score.resetAllTieBreakPoints();
     }
 
-    public void awardTieBreakPoint(Player player) {
-        score.awardTieBreakPoint(player);
+    private void resetAdvantage() {
+        score.setAdvantage(null);
     }
 }
