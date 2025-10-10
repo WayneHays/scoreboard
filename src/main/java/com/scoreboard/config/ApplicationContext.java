@@ -5,9 +5,6 @@ import com.scoreboard.dao.PlayerDao;
 import com.scoreboard.mapper.MatchesPageMapper;
 import com.scoreboard.mapper.MatchLiveViewMapper;
 import com.scoreboard.mapper.MatchResultMapper;
-import com.scoreboard.service.OngoingMatchesService;
-import com.scoreboard.service.ScoreCalculationService;
-import com.scoreboard.service.PlayerService;
 import com.scoreboard.service.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -28,25 +25,27 @@ public final class ApplicationContext {
             PlayerDao playerDao = new PlayerDao();
             MatchDao matchDao = new MatchDao();
 
-            MatchesPageMapper pageMapper = new MatchesPageMapper();
+            MatchesPageMapper matchesPageMapper = new MatchesPageMapper();
             MatchLiveViewMapper matchLiveViewMapper = new MatchLiveViewMapper();
             MatchResultMapper matchResultMapper = new MatchResultMapper();
 
-            PlayerService playerService = new PlayerService(playerDao);
-            FinishedMatchesService finishedMatchesService = new FinishedMatchesService(matchDao, pageMapper);
+            PaginationService paginationService = new PaginationService(matchesPageMapper);
+            FinishedMatchPersistenceService finishedMatchPersistenceService =
+                    new FinishedMatchPersistenceService(matchDao, playerDao);
+            MatchQueryService matchQueryService = new MatchQueryService(matchDao, paginationService);
             OngoingMatchesService ongoingMatchesService = new OngoingMatchesService();
             ScoreCalculationService scoreCalculationService = new ScoreCalculationService();
-            FinishedMatchesService matchesPageService = new FinishedMatchesService(matchDao, pageMapper);
 
             register(PlayerDao.class, playerDao);
             register(MatchDao.class, matchDao);
-            register(PlayerService.class, playerService);
-            register(FinishedMatchesService.class, finishedMatchesService);
-            register(OngoingMatchesService.class, ongoingMatchesService);
-            register(ScoreCalculationService.class, scoreCalculationService);
-            register(FinishedMatchesService.class, matchesPageService);
+            register(MatchesPageMapper.class, matchesPageMapper);
             register(MatchLiveViewMapper.class, matchLiveViewMapper);
             register(MatchResultMapper.class, matchResultMapper);
+            register(PaginationService.class, paginationService);
+            register(FinishedMatchPersistenceService.class, finishedMatchPersistenceService);
+            register(MatchQueryService.class, matchQueryService);
+            register(OngoingMatchesService.class, ongoingMatchesService);
+            register(ScoreCalculationService.class, scoreCalculationService);
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize services", e);
         }
