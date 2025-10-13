@@ -36,19 +36,17 @@ public class MatchDao {
                 .getResultList();
     }
 
-    public int getTotalCountOfMatches() {
+    public long getTotalCountOfMatches() {
         return getCurrentSession()
                 .createQuery(COUNT_ALL, Long.class)
-                .getSingleResult()
-                .intValue();
+                .getSingleResult();
     }
 
-    public int getTotalCountOfMatchesByPlayerName(String playerName) {
+    public long getTotalCountOfMatchesByPlayerName(String playerName) {
         return getCurrentSession()
                 .createQuery(COUNT_BY_PLAYER_NAME, Long.class)
                 .setParameter(NAME_PATTERN_PARAM, "%" + playerName + "%")
-                .getSingleResult()
-                .intValue();
+                .getSingleResult();
     }
 
     private Query<Match> createPaginatedQuery(String hql, int pageNumber, int pageSize) {
