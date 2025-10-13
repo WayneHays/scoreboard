@@ -4,8 +4,7 @@ import com.scoreboard.config.ApplicationContext;
 import com.scoreboard.config.ConfigLoader;
 import com.scoreboard.dto.MatchesPage;
 import com.scoreboard.exception.ValidationException;
-import com.scoreboard.service.FinishedMatchPersistenceService;
-import com.scoreboard.service.MatchQueryService;
+import com.scoreboard.service.MatchesPageService;
 import com.scoreboard.util.WebPaths;
 import com.scoreboard.validator.PlayerNameValidator;
 import jakarta.servlet.ServletException;
@@ -20,10 +19,10 @@ import java.io.IOException;
 public class MatchesServlet extends HttpServlet {
     private static final int DEFAULT_PAGE_NUMBER = 1;
     private static final int MATCHES_PER_PAGE = ConfigLoader.getInt("pagination.page.size");
-    private final MatchQueryService matchQueryService;
+    private final MatchesPageService matchesPageServices;
 
     public MatchesServlet() {
-        this.matchQueryService = ApplicationContext.get(MatchQueryService.class);
+        this.matchesPageServices = ApplicationContext.get(MatchesPageService.class);
     }
 
     @Override
@@ -40,14 +39,14 @@ public class MatchesServlet extends HttpServlet {
     private MatchesPage getMatchesPage(String playerName, int pageNumber) {
         MatchesPage page;
         if (playerName == null || playerName.isBlank()) {
-            page = matchQueryService.getMatchesPage(pageNumber, MATCHES_PER_PAGE);
+            page = matchesPageServices.getMatchesPage(pageNumber, MATCHES_PER_PAGE);
         } else {
             try {
                 String validName = PlayerNameValidator.validate(playerName);
-                page = matchQueryService
+                page = matchesPageServices
                         .getMatchesPageByPlayerName(validName, pageNumber, MATCHES_PER_PAGE);
             } catch (ValidationException e) {
-                page = matchQueryService
+                page = matchesPageServices
                         .getMatchesPage(pageNumber, MATCHES_PER_PAGE)
                         .withValidationError(e.getMessage(), playerName);
             }
