@@ -1,15 +1,10 @@
 package com.scoreboard.config;
 
-import com.scoreboard.dao.MatchDao;
-import com.scoreboard.dao.PlayerDao;
-import com.scoreboard.mapper.MatchesPageMapper;
-import com.scoreboard.mapper.MatchLiveViewMapper;
-import com.scoreboard.mapper.MatchResultMapper;
-import com.scoreboard.service.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -22,39 +17,29 @@ public final class ApplicationContext {
 
     private static void initialize() {
         try {
-            PlayerDao playerDao = new PlayerDao();
-            MatchDao matchDao = new MatchDao();
+            ServiceLoader<ServiceProvider> loader = ServiceLoader.load(ServiceProvider.class);
 
-            MatchesPageMapper matchesPageMapper = new MatchesPageMapper();
-            MatchLiveViewMapper matchLiveViewMapper = new MatchLiveViewMapper();
-            MatchResultMapper matchResultMapper = new MatchResultMapper();
-
-            PaginationService paginationService = new PaginationService(matchesPageMapper);
-            FinishedMatchPersistenceService finishedMatchPersistenceService =
-                    new FinishedMatchPersistenceService(matchDao, playerDao);
-            MatchQueryService matchQueryService = new MatchQueryService(matchDao, paginationService);
-            OngoingMatchesService ongoingMatchesService = new OngoingMatchesService();
-            ScoreCalculationService scoreCalculationService = new ScoreCalculationService();
-
-            register(PlayerDao.class, playerDao);
-            register(MatchDao.class, matchDao);
-            register(MatchesPageMapper.class, matchesPageMapper);
-            register(MatchLiveViewMapper.class, matchLiveViewMapper);
-            register(MatchResultMapper.class, matchResultMapper);
-            register(PaginationService.class, paginationService);
-            register(FinishedMatchPersistenceService.class, finishedMatchPersistenceService);
-            register(MatchQueryService.class, matchQueryService);
-            register(OngoingMatchesService.class, ongoingMatchesService);
-            register(ScoreCalculationService.class, scoreCalculationService);
+            for (ServiceProvider provider : loader) {
+                Class<?> clazz = provider.getServiceClass();
+                register(clazz, provider);
+            }
         } catch (Exception e) {
-            throw new RuntimeException("Failed to initialize services", e);
+            throw new RuntimeException("Failed to initialize ApplicationContext", e);
         }
     }
 
-    private static <T> void register(Class<T> clazz, T instance) {
+    private static void register(Class<?> clazz, Object instance) {
         if (SERVICES.containsKey(clazz)) {
             throw new RuntimeException("Service already registered: " + clazz.getName());
         }
+
+        if (!clazz.isInstance(instance)) {
+            throw new RuntimeException(
+                    "Instance of %s is not compatible with %s"
+                            .formatted(instance.getClass().getName(), clazz.getName())
+            );
+        }
+
         SERVICES.put(clazz, instance);
     }
 
@@ -63,7 +48,8 @@ public final class ApplicationContext {
         T service = (T) SERVICES.get(type);
 
         if (service == null) {
-            throw new RuntimeException("Service not found: " + type.getName());
+            throw new RuntimeException("Service not found: %s. Have you registered it in META-INF/services/?"
+                                               .formatted(type.getName()));
         }
         return service;
     }

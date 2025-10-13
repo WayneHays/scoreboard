@@ -1,15 +1,19 @@
 package com.scoreboard.service;
 
+import com.scoreboard.config.ApplicationContext;
 import com.scoreboard.dao.MatchDao;
 import com.scoreboard.dao.PlayerDao;
 import com.scoreboard.model.OngoingMatch;
 import com.scoreboard.model.entity.Player;
-import lombok.AllArgsConstructor;
 
-@AllArgsConstructor
 public class FinishedMatchPersistenceService extends BaseTransactionalService {
     private final MatchDao matchDao;
     private final PlayerDao playerDao;
+
+    public FinishedMatchPersistenceService() {
+        this.matchDao = ApplicationContext.get(MatchDao.class);
+        this.playerDao = ApplicationContext.get(PlayerDao.class);
+    }
 
     public void saveFinishedMatch(OngoingMatch ongoingMatch) {
         executeInTransaction(() -> ongoingMatch.withMatch(match -> {

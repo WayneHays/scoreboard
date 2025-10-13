@@ -1,5 +1,6 @@
 package com.scoreboard.dao;
 
+import com.scoreboard.config.ServiceProvider;
 import com.scoreboard.model.entity.Match;
 import com.scoreboard.util.HibernateUtil;
 import org.hibernate.Session;
@@ -7,7 +8,7 @@ import org.hibernate.query.Query;
 
 import java.util.List;
 
-public class MatchDao {
+public class MatchDao implements ServiceProvider {
     private static final String FIND_ALL = "FROM Match ORDER BY id DESC";
     private static final String FIND_BY_PLAYER_NAME =
             "SELECT DISTINCT m FROM Match m " +

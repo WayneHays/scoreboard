@@ -1,10 +1,11 @@
 package com.scoreboard.mapper;
 
+import com.scoreboard.config.ServiceProvider;
 import com.scoreboard.dto.MatchLiveView;
 import com.scoreboard.model.OngoingMatch;
 import com.scoreboard.model.entity.Player;
 
-public class MatchLiveViewMapper {
+public class MatchLiveViewMapper implements ServiceProvider {
     private static final String ADVANTAGE_VIEW = "AD";
 
     public MatchLiveView map(OngoingMatch ongoingMatch) {

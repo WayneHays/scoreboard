@@ -1,11 +1,12 @@
 package com.scoreboard.mapper;
 
+import com.scoreboard.config.ServiceProvider;
 import com.scoreboard.dto.MatchesPage;
 import com.scoreboard.model.entity.Match;
 
 import java.util.List;
 
-public class MatchesPageMapper {
+public class MatchesPageMapper implements ServiceProvider {
 
     public MatchesPage map(long pageNumber, List<Match> matches,
                            long totalPages, String filterByPlayerName) {

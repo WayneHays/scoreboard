@@ -1,20 +1,24 @@
 package com.scoreboard.service;
 
+import com.scoreboard.config.ApplicationContext;
 import com.scoreboard.dao.MatchDao;
 import com.scoreboard.dto.MatchesPage;
 import com.scoreboard.exception.NotFoundException;
 import com.scoreboard.mapper.MatchesPageMapper;
 import com.scoreboard.model.entity.Match;
-import lombok.AllArgsConstructor;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
-@AllArgsConstructor
 public class MatchesPageService extends BaseTransactionalService {
     private final MatchDao matchDao;
     private final MatchesPageMapper mapper;
+
+    public MatchesPageService() {
+        this.matchDao = ApplicationContext.get(MatchDao.class);
+        this.mapper = ApplicationContext.get(MatchesPageMapper.class);
+    }
 
     public MatchesPage getMatchesPage(int pageNumber, int matchesPerPage) {
         return buildMatchesPage(

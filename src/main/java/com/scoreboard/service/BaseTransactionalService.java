@@ -1,5 +1,6 @@
 package com.scoreboard.service;
 
+import com.scoreboard.config.ServiceProvider;
 import com.scoreboard.exception.ScoreboardServiceException;
 import com.scoreboard.util.HibernateUtil;
 import org.hibernate.Session;
@@ -7,7 +8,7 @@ import org.hibernate.Transaction;
 
 import java.util.function.Supplier;
 
-public abstract class BaseTransactionalService {
+public abstract class BaseTransactionalService implements ServiceProvider {
     protected <T> T executeInTransaction(Supplier<T> operation, String errorMessage) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
         Transaction transaction = session.beginTransaction();

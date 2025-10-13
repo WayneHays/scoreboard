@@ -1,9 +1,10 @@
 package com.scoreboard.service;
 
+import com.scoreboard.config.ServiceProvider;
 import com.scoreboard.model.OngoingMatch;
 import com.scoreboard.model.entity.Player;
 
-public class ScoreCalculationService {
+public class ScoreCalculationService implements ServiceProvider {
     private static final int GAMES_TO_WIN_SET = 6;
     private static final int GAMES_DIFFERENCE_TO_WIN_SET = 2;
     private static final int TIEBREAK_POINTS_TO_WIN = 7;

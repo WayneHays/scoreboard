@@ -1,5 +1,6 @@
 package com.scoreboard.service;
 
+import com.scoreboard.config.ServiceProvider;
 import com.scoreboard.exception.NotFoundException;
 import com.scoreboard.model.OngoingMatch;
 import com.scoreboard.model.entity.Match;
@@ -10,7 +11,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class OngoingMatchesService {
+public class OngoingMatchesService implements ServiceProvider {
     private final Map<UUID, OngoingMatch> ongoingMatches;
 
     public OngoingMatchesService() {
