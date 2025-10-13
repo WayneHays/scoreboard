@@ -7,16 +7,16 @@ import java.util.List;
 
 @Builder
 public record MatchesPage(
-        int pageNumber,
+        long pageNumber,
         List<Match> matches,
-        int totalPages,
+        long totalPages,
         String filterByPlayerName,
         boolean hasFilter,
         boolean shouldShowPagination,
         boolean hasPrevious,
         boolean hasNext,
-        int previousPage,
-        int nextPage,
+        long previousPage,
+        long nextPage,
         String validationError,
         String invalidPlayerName) {
 
