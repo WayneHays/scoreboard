@@ -5,11 +5,11 @@ import com.scoreboard.model.entity.Player;
 
 public class ScoreCalculationService {
     private static final int GAMES_TO_WIN_SET = 6;
-    public static final int GAMES_DIFFERENCE_TO_WIN_SET = 2;
+    private static final int GAMES_DIFFERENCE_TO_WIN_SET = 2;
     private static final int TIEBREAK_POINTS_TO_WIN = 7;
-    public static final int TIEBREAK_POINTS_DIFFERENCE_TO_WIN = 2;
+    private static final int TIEBREAK_POINTS_DIFFERENCE_TO_WIN = 2;
     private static final int SETS_TO_WIN_MATCH = 2;
-    public static final int MAX_POSSIBLE_POINTS_PER_GAME = 40;
+    private static final int MAX_POSSIBLE_POINTS_PER_GAME = 40;
 
     public void winPoint(OngoingMatch ongoingMatch, Player player) {
         if (ongoingMatch.getWinner() != null) {
@@ -69,7 +69,7 @@ public class ScoreCalculationService {
             if (currentAdvantage.equals(player)) {
                 playerWonGame(ongoingMatch, player, opponent);
             } else {
-                ongoingMatch.setAdvantage(null);
+                ongoingMatch.resetAdvantage();
             }
             return;
         }
