@@ -15,8 +15,6 @@ public class MatchResultMapper {
                 .winnerName(winner.getName())
                 .firstPlayerName(player1.getName())
                 .secondPlayerName(player2.getName())
-                .firstPlayerFinalSets(ongoingMatch.getSets(player1))
-                .secondPlayerFinalSets(ongoingMatch.getSets(player2))
                 .firstPlayerRowClass(winner.equals(player1) ? "winner" : "")
                 .secondPlayerRowClass(winner.equals(player2) ? "winner" : "")
                 .build();
