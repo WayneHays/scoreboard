@@ -1,0 +1,14 @@
+# DAO
+com.scoreboard.dao.PlayerDao
+com.scoreboard.dao.MatchDao
+
+# Mappers
+com.scoreboard.mapper.MatchesPageMapper
+com.scoreboard.mapper.MatchLiveViewMapper
+com.scoreboard.mapper.MatchResultMapper
+
+# Services
+com.scoreboard.service.OngoingMatchesService
+com.scoreboard.service.ScoreCalculationService
+com.scoreboard.service.FinishedMatchPersistenceService
+com.scoreboard.service.MatchesPageService
