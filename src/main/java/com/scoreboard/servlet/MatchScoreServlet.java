@@ -59,7 +59,6 @@ public class MatchScoreServlet extends HttpServlet {
         if (isWinnerDetermined(ongoingMatch)) {
             finishedMatchPersistenceService.saveFinishedMatch(ongoingMatch);
             ongoingMatchesService.delete(uuid);
-
             req.setAttribute("matchResult", resultMapper.map(ongoingMatch));
             getServletContext().getRequestDispatcher(WebPaths.MATCH_RESULT_JSP).forward(req, resp);
         } else {
