@@ -123,6 +123,10 @@ public class OngoingMatch {
         score.awardSet(player);
     }
 
+    public void resetAdvantage() {
+        score.setAdvantage(null);
+    }
+
     public void resetAllGames() {
         score.resetAllGames();
     }
@@ -133,9 +137,5 @@ public class OngoingMatch {
 
     private void resetAllTieBreakPoints() {
         score.resetAllTieBreakPoints();
-    }
-
-    private void resetAdvantage() {
-        score.setAdvantage(null);
     }
 }
