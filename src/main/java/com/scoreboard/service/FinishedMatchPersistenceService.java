@@ -10,9 +10,17 @@ public class FinishedMatchPersistenceService extends BaseTransactionalService {
     private final MatchDao matchDao;
     private final PlayerDao playerDao;
 
-    public FinishedMatchPersistenceService() {
-        this.matchDao = ApplicationContext.get(MatchDao.class);
-        this.playerDao = ApplicationContext.get(PlayerDao.class);
+    public FinishedMatchPersistenceService(MatchDao matchDao, PlayerDao playerDao) {
+        this.matchDao = matchDao;
+        this.playerDao = playerDao;
+    }
+
+    @Override
+    public Object createService(ApplicationContext context) {
+        return new FinishedMatchPersistenceService(
+                context.get(MatchDao.class),
+                context.get(PlayerDao.class)
+        );
     }
 
     public void saveFinishedMatch(OngoingMatch ongoingMatch) {

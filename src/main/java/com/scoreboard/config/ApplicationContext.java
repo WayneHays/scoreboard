@@ -1,26 +1,48 @@
 package com.scoreboard.config;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ApplicationContext {
-    private static final Map<Class<?>, Object> SERVICES;
+    private final Map<Class<?>, Object> services;
 
-    static {
-        SERVICES = ServiceDiscovery.discoverServices();
+    public ApplicationContext() {
+        this.services = new ConcurrentHashMap<>();
+        ServiceDiscovery.discoverAndRegister(this);
+    }
+
+    public <T> void register(Class<T> type, T instance) {
+        if (services.containsKey(type)) {
+            throw new IllegalStateException("Service already registered: " + type.getName());
+        }
+
+        if (!type.isInstance(instance)) {
+            throw new IllegalArgumentException(
+                    String.format("Type mismatch: %s is not compatible with %s",
+                            instance.getClass().getName(), type.getName())
+            );
+        }
+
+        services.put(type, instance);
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T get(Class<T> type) {
-        T service = (T) SERVICES.get(type);
+    public <T> T get(Class<T> type) {
+        T service = (T) services.get(type);
 
         if (service == null) {
-            throw new RuntimeException("Service not found: %s. Have you registered it in META-INF/services/?"
-                    .formatted(type.getName()));
+            throw new IllegalStateException(
+                    String.format(
+                            "Service not found: %s. Make sure it's registered or available via ServiceLoader",
+                            type.getName()
+                    )
+            );
         }
+
         return service;
+    }
+
+    public int getServiceCount() {
+        return services.size();
     }
 }

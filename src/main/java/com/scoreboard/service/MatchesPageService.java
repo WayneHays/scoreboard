@@ -15,9 +15,17 @@ public class MatchesPageService extends BaseTransactionalService {
     private final MatchDao matchDao;
     private final MatchesPageMapper mapper;
 
-    public MatchesPageService() {
-        this.matchDao = ApplicationContext.get(MatchDao.class);
-        this.mapper = ApplicationContext.get(MatchesPageMapper.class);
+    public MatchesPageService(MatchDao matchDao, MatchesPageMapper mapper) {
+        this.matchDao = matchDao;
+        this.mapper = mapper;
+    }
+
+    @Override
+    public Object createService(ApplicationContext context) {
+        return new MatchesPageService(
+                context.get(MatchDao.class),
+                context.get(MatchesPageMapper.class)
+        );
     }
 
     public MatchesPage getMatchesPage(int pageNumber, int matchesPerPage) {

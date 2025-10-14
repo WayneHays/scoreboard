@@ -1,6 +1,6 @@
 package com.scoreboard.servlet;
 
-import com.scoreboard.config.ApplicationContext;
+import com.scoreboard.config.Config;
 import com.scoreboard.dto.MatchesPage;
 import com.scoreboard.exception.ValidationException;
 import com.scoreboard.service.MatchesPageService;
@@ -8,20 +8,27 @@ import com.scoreboard.util.WebPaths;
 import com.scoreboard.validator.PlayerNameValidator;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 @WebServlet("/matches")
-public class MatchesServlet extends HttpServlet {
+public class MatchesServlet extends BaseServlet {
+    private static final Logger logger = LoggerFactory.getLogger(MatchesServlet.class);
     private static final int DEFAULT_PAGE_NUMBER = 1;
-    private static final int MATCHES_PER_PAGE = ConfigLoader.getInt("pagination.page.size");
-    private final MatchesPageService matchesPageServices;
+    private MatchesPageService matchesPageServices;
+    private int matchesPerPage;
 
-    public MatchesServlet() {
-        this.matchesPageServices = ApplicationContext.get(MatchesPageService.class);
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        this.matchesPageServices = getService(MatchesPageService.class);
+        Config config = getService(Config.class);
+        this.matchesPerPage = config.getInt("matches.per.page");
+        logger.debug("MatchesServlet initialized with {} matches per page", matchesPerPage);
     }
 
     @Override
@@ -29,6 +36,7 @@ public class MatchesServlet extends HttpServlet {
             throws ServletException, IOException {
         String playerName = req.getParameter("filter_by_player_name");
         int pageNumber = parsePageNumber(req.getParameter("page"));
+
         MatchesPage page = getMatchesPage(playerName, pageNumber);
 
         req.setAttribute("page", page);
@@ -38,15 +46,18 @@ public class MatchesServlet extends HttpServlet {
     private MatchesPage getMatchesPage(String playerName, int pageNumber) {
         MatchesPage page;
         if (playerName == null || playerName.isBlank()) {
-            page = matchesPageServices.getMatchesPage(pageNumber, MATCHES_PER_PAGE);
+            logger.debug("Loading all matches page {}", pageNumber);
+            page = matchesPageServices.getMatchesPage(pageNumber, matchesPerPage);
         } else {
             try {
                 String validName = PlayerNameValidator.validate(playerName);
+                logger.debug("Loading matches filtered by player: '{}', page: {}", validName, pageNumber);
                 page = matchesPageServices
-                        .getMatchesPageByPlayerName(validName, pageNumber, MATCHES_PER_PAGE);
+                        .getMatchesPageByPlayerName(validName, pageNumber, matchesPerPage);
             } catch (ValidationException e) {
+                logger.warn("Player name validation failed: '{}' - {}", playerName, e.getMessage());
                 page = matchesPageServices
-                        .getMatchesPage(pageNumber, MATCHES_PER_PAGE)
+                        .getMatchesPage(pageNumber, matchesPerPage)
                         .withValidationError(e.getMessage(), playerName);
             }
         }

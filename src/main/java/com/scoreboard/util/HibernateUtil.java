@@ -1,5 +1,6 @@
 package com.scoreboard.util;
 
+import com.scoreboard.config.Config;
 import com.scoreboard.model.entity.Match;
 import com.scoreboard.model.entity.Player;
 import lombok.AccessLevel;
@@ -16,49 +17,62 @@ import java.util.Properties;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HibernateUtil {
-    private static final ServiceRegistry SERVICE_REGISTRY;
-    private static final SessionFactory SESSION_FACTORY;
+    private static volatile SessionFactory sessionFactory;
+    private static volatile ServiceRegistry serviceRegistry;
 
-    static {
-        SERVICE_REGISTRY = configureServiceRegistry();
-        SESSION_FACTORY = buildSessionFactory();
+    public static synchronized void initialize(Config config) {
+        if (sessionFactory != null) {
+            throw new IllegalStateException("HibernateUtil already initialized");
+        }
+
+        try {
+            serviceRegistry = configureServiceRegistry(config);
+            sessionFactory = buildSessionFactory();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize Hibernate", e);
+        }
     }
 
     public static SessionFactory getSessionFactory() {
-        return SESSION_FACTORY;
+        if (sessionFactory == null) {
+            throw new IllegalStateException(
+                    "HibernateUtil not initialized. Call initialize(Config) first."
+            );
+        }
+        return sessionFactory;
     }
 
-    public static void shutdown() {
-        if (SESSION_FACTORY != null) {
-            SESSION_FACTORY.close();
+    public static synchronized void shutdown() {
+        if (sessionFactory != null) {
+            sessionFactory.close();
+            sessionFactory = null;
         }
-        if (SERVICE_REGISTRY != null) {
-            StandardServiceRegistryBuilder.destroy(SERVICE_REGISTRY);
+        if (serviceRegistry != null) {
+            StandardServiceRegistryBuilder.destroy(serviceRegistry);
+            serviceRegistry = null;
         }
     }
 
-    private static ServiceRegistry configureServiceRegistry() {
+    private static ServiceRegistry configureServiceRegistry(Config config) {
         try {
-            Properties properties = loadHibernateProperties();
-            return new StandardServiceRegistryBuilder().applySettings(properties).build();
+            Properties properties = loadHibernateProperties(config);
+            return new StandardServiceRegistryBuilder()
+                    .applySettings(properties)
+                    .build();
         } catch (Exception e) {
             throw new RuntimeException("Failed to configure ServiceRegistry", e);
         }
     }
 
-    private static Properties loadHibernateProperties() {
-        String configFile = ConfigLoader.get("hibernate.config");
-
-        if (configFile == null) {
-            throw new RuntimeException("hibernate.config not found in application.properties");
-        }
+    private static Properties loadHibernateProperties(Config config) {
+        String configFile = config.get("hibernate.config");
 
         Properties properties = new Properties();
         try (InputStream stream = HibernateUtil.class.getClassLoader()
                 .getResourceAsStream(configFile)) {
 
             if (stream == null) {
-                throw new RuntimeException(configFile + " file not found");
+                throw new IllegalStateException(configFile + " file not found");
             }
 
             properties.load(stream);
@@ -70,14 +84,13 @@ public final class HibernateUtil {
 
     private static SessionFactory buildSessionFactory() {
         try {
-            MetadataSources sources = new MetadataSources(SERVICE_REGISTRY);
+            MetadataSources sources = new MetadataSources(serviceRegistry);
             sources.addAnnotatedClass(Player.class);
             sources.addAnnotatedClass(Match.class);
             Metadata metadata = sources.getMetadataBuilder().build();
             return metadata.getSessionFactoryBuilder().build();
         } catch (RuntimeException e) {
-            throw new RuntimeException("Initializing Session Factory failed", e);
+            throw new RuntimeException("Failed to build SessionFactory", e);
         }
     }
 }
-
