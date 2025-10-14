@@ -1,6 +1,5 @@
 package com.scoreboard.util;
 
-import com.scoreboard.config.ConfigLoader;
 import com.scoreboard.model.entity.Match;
 import com.scoreboard.model.entity.Player;
 import lombok.AccessLevel;

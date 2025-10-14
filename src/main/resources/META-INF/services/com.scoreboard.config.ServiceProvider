@@ -1,3 +1,8 @@
+
+com.scoreboard.config.PropertiesConfig
+com.scoreboard.start_initialization.StartupDatabaseInitializer
+com.scoreboard.start_initialization.TextFileDataSourceFactory
+
 # DAO
 com.scoreboard.dao.PlayerDao
 com.scoreboard.dao.MatchDao

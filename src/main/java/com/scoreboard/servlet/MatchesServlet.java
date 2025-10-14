@@ -1,7 +1,6 @@
 package com.scoreboard.servlet;
 
 import com.scoreboard.config.ApplicationContext;
-import com.scoreboard.config.ConfigLoader;
 import com.scoreboard.dto.MatchesPage;
 import com.scoreboard.exception.ValidationException;
 import com.scoreboard.service.MatchesPageService;
