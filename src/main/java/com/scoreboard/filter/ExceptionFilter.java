@@ -1,5 +1,6 @@
 package com.scoreboard.filter;
 
+import com.scoreboard.exception.ApplicationStartupException;
 import com.scoreboard.exception.NotFoundException;
 import com.scoreboard.exception.ScoreboardServiceException;
 import com.scoreboard.exception.ValidationException;
@@ -33,6 +34,12 @@ public class ExceptionFilter extends HttpFilter {
                     res,
                     SC_BAD_REQUEST,
                     e.getMessage());
+        } catch (ApplicationStartupException e) {
+            ErrorHandler.handleHttpError(
+                    req,
+                    res,
+                    SC_INTERNAL_SERVER_ERROR,
+                    "Application initialization error: " + e.getMessage());
         } catch (ScoreboardServiceException e) {
             ErrorHandler.handleHttpError(
                     req,

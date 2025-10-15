@@ -1,6 +1,5 @@
 package scorecalculationservice_test;
 
-import com.scoreboard.config.ApplicationContext;
 import com.scoreboard.model.OngoingMatch;
 import com.scoreboard.model.entity.Player;
 import com.scoreboard.service.OngoingMatchesService;
@@ -20,8 +19,10 @@ public abstract class ScoreCalculationTestBase {
     void setUp() {
         player1 = new Player("Ivan");
         player2 = new Player("Petr");
-        ongoingMatchesService = ApplicationContext.get(OngoingMatchesService.class);
-        scoreCalculationService = ApplicationContext.get(ScoreCalculationService.class);
+
+        ongoingMatchesService = new OngoingMatchesService();
+        scoreCalculationService = new ScoreCalculationService();
+
         UUID uuid = ongoingMatchesService.createMatch(player1, player2);
         ongoingMatch = ongoingMatchesService.get(uuid);
     }

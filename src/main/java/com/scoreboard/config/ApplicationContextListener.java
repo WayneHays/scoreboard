@@ -1,5 +1,7 @@
 package com.scoreboard.config;
 
+import ch.qos.logback.classic.LoggerContext;
+import com.scoreboard.exception.ApplicationStartupException;
 import com.scoreboard.start_initialization.StartupDatabaseInitializer;
 import com.scoreboard.util.HibernateUtil;
 import jakarta.servlet.ServletContext;
@@ -22,10 +24,6 @@ public class ApplicationContextListener implements ServletContextListener {
             ApplicationContext context = new ApplicationContext();
             log.info("ApplicationContext created with {} services", context.getServiceCount());
 
-            Config config = context.get(Config.class);
-            HibernateUtil.initialize(config);
-            log.info("Hibernate initialized");
-
             StartupDatabaseInitializer initializer = context.get(StartupDatabaseInitializer.class);
             initializer.initialize();
             log.info("Database initialized with startup data");
@@ -36,7 +34,7 @@ public class ApplicationContextListener implements ServletContextListener {
             log.info("=== Application startup completed successfully ===");
         } catch (Exception e) {
             log.error("Application startup failed", e);
-            throw new RuntimeException("Application startup failed", e);
+            throw new ApplicationStartupException("Application startup failed", e);
         }
     }
 
@@ -53,18 +51,8 @@ public class ApplicationContextListener implements ServletContextListener {
 
             log.info("=== Application shutdown completed successfully ===");
         } catch (Exception e) {
-            log.error("Error during application shutdown", e);
+            String errorMessage = "Error during application shutdown";
+            log.error(errorMessage, e);
         }
-    }
-
-    public static ApplicationContext getContext(ServletContext servletContext) {
-        ApplicationContext context = (ApplicationContext)
-                servletContext.getAttribute(CONTEXT_ATTRIBUTE);
-
-        if (context == null) {
-            throw new IllegalStateException("ApplicationContext not initialized");
-        }
-
-        return context;
     }
 }

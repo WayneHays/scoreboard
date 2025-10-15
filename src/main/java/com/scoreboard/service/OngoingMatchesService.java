@@ -3,9 +3,9 @@ package com.scoreboard.service;
 import com.scoreboard.config.ServiceProvider;
 import com.scoreboard.exception.NotFoundException;
 import com.scoreboard.model.OngoingMatch;
+import com.scoreboard.model.Score;
 import com.scoreboard.model.entity.Match;
 import com.scoreboard.model.entity.Player;
-import com.scoreboard.model.Score;
 
 import java.util.Map;
 import java.util.UUID;

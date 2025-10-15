@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @WebServlet("/match-score")
 public class MatchScoreServlet extends BaseServlet {
@@ -27,6 +28,8 @@ public class MatchScoreServlet extends BaseServlet {
     private FinishedMatchPersistenceService finishedMatchPersistenceService;
     private MatchLiveViewMapper liveViewMapper;
     private MatchResultMapper resultMapper;
+
+    private final ConcurrentHashMap<UUID, Object> matchLocks = new ConcurrentHashMap<>();
 
     @Override
     public void init() throws ServletException {
@@ -48,6 +51,7 @@ public class MatchScoreServlet extends BaseServlet {
 
         req.setAttribute("matchView", liveViewMapper.map(ongoingMatch));
         getServletContext().getRequestDispatcher(WebPaths.MATCH_SCORE_JSP).forward(req, resp);
+
         logger.debug("Match score page rendered - Players: {} vs {}",
                 ongoingMatch.getFirstPlayer().getName(), ongoingMatch.getSecondPlayer().getName());
     }
@@ -56,22 +60,29 @@ public class MatchScoreServlet extends BaseServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
         String uuidStr = req.getParameter("uuid");
         UUID uuid = parseUuid(uuidStr);
-        OngoingMatch ongoingMatch = ongoingMatchesService.get(uuid);
 
-        String playerName = req.getParameter("playerName");
-        Player pointWinner = ongoingMatch.getPlayer(playerName);
+        Object matchLock = matchLocks.computeIfAbsent(uuid, k -> new Object());
 
-        scoreCalculationService.winPoint(ongoingMatch, pointWinner);
-        logger.debug("Point awarded to player: {}", playerName);
+        synchronized (matchLock) {
+            OngoingMatch ongoingMatch = ongoingMatchesService.get(uuid);
+            String playerName = req.getParameter("playerName");
+            Player pointWinner = ongoingMatch.getPlayer(playerName);
 
-        if (isWinnerDetermined(ongoingMatch)) {
-            logger.info("Match completed - UUID: {}, Winner: {}", uuid, ongoingMatch.getWinner().getName());
-            finishedMatchPersistenceService.saveFinishedMatch(ongoingMatch);
-            ongoingMatchesService.delete(uuid);
-            req.setAttribute("matchResult", resultMapper.map(ongoingMatch));
-            getServletContext().getRequestDispatcher(WebPaths.MATCH_RESULT_JSP).forward(req, resp);
-        } else {
-            resp.sendRedirect(req.getContextPath() + "/match-score?uuid=" + uuid);
+            scoreCalculationService.winPoint(ongoingMatch, pointWinner);
+            logger.debug("Point awarded to player: {}", playerName);
+
+            if (isWinnerDetermined(ongoingMatch)) {
+                logger.info("Match completed - UUID: {}, Winner: {}", uuid, ongoingMatch.getWinner().getName());
+
+                finishedMatchPersistenceService.saveFinishedMatch(ongoingMatch);
+                ongoingMatchesService.delete(uuid);
+                matchLocks.remove(uuid);
+
+                req.setAttribute("matchResult", resultMapper.map(ongoingMatch));
+                getServletContext().getRequestDispatcher(WebPaths.MATCH_RESULT_JSP).forward(req, resp);
+            } else {
+                resp.sendRedirect(req.getContextPath() + "/match-score?uuid=" + uuid);
+            }
         }
     }
 

@@ -1,6 +1,8 @@
 package com.scoreboard.start_initialization.data_source;
 
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -10,10 +12,13 @@ import java.util.List;
 
 @AllArgsConstructor
 public class TextFileDataSource implements DataSource{
+    private static final Logger logger = LoggerFactory.getLogger(TextFileDataSource.class);
     private final String fileName;
 
     @Override
     public List<String> getPlayerNames() {
+        logger.debug("Reading player names from file: {}", fileName);
+
         List<String> lines = new ArrayList<>();
         InputStream input = getClass().getResourceAsStream(fileName);
 
@@ -35,6 +40,7 @@ public class TextFileDataSource implements DataSource{
             throw new RuntimeException("Error while reading file: " + fileName);
         }
 
+        logger.info("Loaded {} player names from file: {}", lines.size(), fileName);
         return lines;
     }
 }

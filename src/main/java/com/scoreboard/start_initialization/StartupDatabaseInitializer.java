@@ -56,12 +56,17 @@ public class StartupDatabaseInitializer implements ServiceProvider {
     }
 
     private List<Player> createPlayers() {
-        return dataSource.getPlayerNames().stream()
+        logger.debug("Creating players from data source");
+        List<Player> players = dataSource.getPlayerNames().stream()
                 .map(Player::new)
                 .toList();
+
+        logger.debug("Created {} players", players.size());
+        return players;
     }
 
     private List<OngoingMatch> createMatches(List<Player> players) {
+        logger.debug("Creating matches from {} players", players.size());
         List<OngoingMatch> matches = new ArrayList<>();
 
         for (int i = 0; i < players.size() - 1; i++) {
@@ -75,6 +80,7 @@ public class StartupDatabaseInitializer implements ServiceProvider {
             );
             matches.add(ongoingMatch);
         }
+        logger.debug("Created {} matches", matches.size());
         return matches;
     }
 

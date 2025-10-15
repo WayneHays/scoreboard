@@ -33,13 +33,6 @@
       </c:otherwise>
     </c:choose>
   </div>
-
-  <c:if test="${not empty requestedUrl}">
-    <div class="requested-url">
-      Requested: <span class="url-text"><c:out value="${requestedUrl}" escapeXml="true"/></span>
-    </div>
-  </c:if>
-
   <div class="actions">
     <a href="${pageContext.request.contextPath}/home" class="button button-primary">
       🏠 Home
