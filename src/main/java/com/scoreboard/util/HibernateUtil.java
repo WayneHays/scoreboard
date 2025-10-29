@@ -1,6 +1,7 @@
 package com.scoreboard.util;
 
-import com.scoreboard.config.Config;
+import com.scoreboard.config.properties.Config;
+import com.scoreboard.exception.ApplicationStartupException;
 import com.scoreboard.model.entity.Match;
 import com.scoreboard.model.entity.Player;
 import lombok.AccessLevel;
@@ -8,89 +9,111 @@ import lombok.NoArgsConstructor;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.service.ServiceRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HibernateUtil {
+    private static final Logger logger = LoggerFactory.getLogger(HibernateUtil.class);
+
     private static volatile SessionFactory sessionFactory;
-    private static volatile ServiceRegistry serviceRegistry;
+    private static volatile StandardServiceRegistry serviceRegistry;
 
     public static synchronized void initialize(Config config) {
         if (sessionFactory != null) {
             throw new IllegalStateException("HibernateUtil already initialized");
         }
 
+        logger.info("Initializing Hibernate SessionFactory");
+
         try {
-            serviceRegistry = configureServiceRegistry(config);
-            sessionFactory = buildSessionFactory();
+            Properties properties = HibernateConfigManager.loadHibernateProperties(config);
+            serviceRegistry = buildServiceRegistry(properties);
+            sessionFactory = buildSessionFactory(serviceRegistry);
+
+            logger.info("Hibernate SessionFactory initialized successfully");
         } catch (Exception e) {
-            throw new RuntimeException("Failed to initialize Hibernate", e);
+            logger.error("Failed to initialize Hibernate", e);
+            shutdown();
+            throw new ApplicationStartupException("Failed to initialize Hibernate", e);
         }
     }
 
     public static SessionFactory getSessionFactory() {
         if (sessionFactory == null) {
             throw new IllegalStateException(
-                    "HibernateUtil not initialized. Call initialize(Config) first."
-            );
+                    "HibernateUtil not initialized. Call initialize(Config) first.");
         }
         return sessionFactory;
     }
 
     public static synchronized void shutdown() {
-        if (sessionFactory != null) {
-            sessionFactory.close();
-            sessionFactory = null;
-        }
-        if (serviceRegistry != null) {
-            StandardServiceRegistryBuilder.destroy(serviceRegistry);
-            serviceRegistry = null;
-        }
+        logger.info("Shutting down Hibernate");
+
+        closeSessionFactory();
+        destroyServiceRegistry();
+
+        logger.info("Hibernate shutdown completed");
     }
 
-    private static ServiceRegistry configureServiceRegistry(Config config) {
+    private static StandardServiceRegistry buildServiceRegistry(Properties properties) {
         try {
-            Properties properties = loadHibernateProperties(config);
             return new StandardServiceRegistryBuilder()
                     .applySettings(properties)
                     .build();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to configure ServiceRegistry", e);
+            throw new ApplicationStartupException("Failed to build ServiceRegistry", e);
         }
     }
 
-    private static Properties loadHibernateProperties(Config config) {
-        String configFile = config.get("hibernate.config");
-
-        Properties properties = new Properties();
-        try (InputStream stream = HibernateUtil.class.getClassLoader()
-                .getResourceAsStream(configFile)) {
-
-            if (stream == null) {
-                throw new IllegalStateException(configFile + " file not found");
-            }
-
-            properties.load(stream);
-            return properties;
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to load " + configFile, e);
-        }
-    }
-
-    private static SessionFactory buildSessionFactory() {
+    private static SessionFactory buildSessionFactory(StandardServiceRegistry registry) {
         try {
-            MetadataSources sources = new MetadataSources(serviceRegistry);
-            sources.addAnnotatedClass(Player.class);
-            sources.addAnnotatedClass(Match.class);
+            logger.debug("Building Hibernate SessionFactory");
+
+            MetadataSources sources = new MetadataSources(registry);
+            addAnnotatedClasses(sources);
+
             Metadata metadata = sources.getMetadataBuilder().build();
-            return metadata.getSessionFactoryBuilder().build();
-        } catch (RuntimeException e) {
-            throw new RuntimeException("Failed to build SessionFactory", e);
+            SessionFactory factory = metadata.getSessionFactoryBuilder().build();
+
+            logger.debug("SessionFactory built successfully");
+            return factory;
+
+        } catch (Exception e) {
+            throw new ApplicationStartupException("Failed to build SessionFactory", e);
+        }
+    }
+
+    private static void addAnnotatedClasses(MetadataSources sources) {
+        sources.addAnnotatedClass(Player.class);
+        sources.addAnnotatedClass(Match.class);
+    }
+
+    private static void closeSessionFactory() {
+        if (sessionFactory != null) {
+            try {
+                sessionFactory.close();
+                sessionFactory = null;
+                logger.debug("SessionFactory closed");
+            } catch (Exception e) {
+                logger.error("Error closing SessionFactory", e);
+            }
+        }
+    }
+
+    private static void destroyServiceRegistry() {
+        if (serviceRegistry != null) {
+            try {
+                StandardServiceRegistryBuilder.destroy(serviceRegistry);
+                serviceRegistry = null;
+                logger.debug("ServiceRegistry destroyed");
+            } catch (Exception e) {
+                logger.error("Error destroying ServiceRegistry", e);
+            }
         }
     }
 }
