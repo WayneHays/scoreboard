@@ -1,67 +1,17 @@
 package com.scoreboard.dao;
 
-import com.scoreboard.config.ServiceProvider;
 import com.scoreboard.model.entity.Match;
-import com.scoreboard.util.HibernateUtil;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
 
 import java.util.List;
 
-public class MatchDao implements ServiceProvider {
-    private static final String FIND_ALL = "FROM Match ORDER BY id DESC";
-    private static final String FIND_BY_PLAYER_NAME =
-            "SELECT DISTINCT m FROM Match m " +
-            "WHERE LOWER(m.firstPlayer.name) LIKE LOWER(:namePattern) " +
-            "   OR LOWER(m.secondPlayer.name) LIKE LOWER(:namePattern) " +
-            "ORDER BY m.id DESC";
+public interface MatchDao {
+    void save(Match match);
 
-    private static final String COUNT_ALL = "SELECT COUNT(m) FROM Match m";
-    private static final String COUNT_BY_PLAYER_NAME =
-            "SELECT COUNT(DISTINCT m) FROM Match m " +
-            "WHERE LOWER(m.firstPlayer.name) LIKE LOWER(:namePattern) " +
-            "   OR LOWER(m.secondPlayer.name) LIKE LOWER(:namePattern)";
-    private static final String NAME_PATTERN_PARAM = "namePattern";
+    List<Match> find(int pageNumber, int pageSize);
 
-    public void save(Match match) {
-        getCurrentSession().persist(match);
-    }
+    List<Match> findByPlayerName(String name, int pageNumber, int pageSize);
 
-    public List<Match> find(int pageNumber, int pageSize) {
-        return createPaginatedQuery(FIND_ALL, pageNumber, pageSize ).getResultList();
-    }
+    long getTotalCountOfMatches();
 
-    public List<Match> findByPlayerName(String name, int pageNumber, int pageSize) {
-        return createPaginatedQuery(FIND_BY_PLAYER_NAME, pageNumber, pageSize)
-                .setParameter(NAME_PATTERN_PARAM, "%" + name + "%")
-                .getResultList();
-    }
-
-    public long getTotalCountOfMatches() {
-        return getCurrentSession()
-                .createQuery(COUNT_ALL, Long.class)
-                .getSingleResult();
-    }
-
-    public long getTotalCountOfMatchesByPlayerName(String playerName) {
-        return getCurrentSession()
-                .createQuery(COUNT_BY_PLAYER_NAME, Long.class)
-                .setParameter(NAME_PATTERN_PARAM, "%" + playerName + "%")
-                .getSingleResult();
-    }
-
-    private Query<Match> createPaginatedQuery(String hql, int pageNumber, int pageSize) {
-        if (pageNumber < 1) {
-            throw new IllegalArgumentException("Page number must be positive");
-        }
-
-        return getCurrentSession()
-                .createQuery(hql, Match.class)
-                .setMaxResults(pageSize)
-                .setFirstResult((pageNumber - 1) * pageSize);
-    }
-
-    private Session getCurrentSession() {
-        return HibernateUtil.getSessionFactory().getCurrentSession();
-    }
+    long getTotalCountOfMatchesByPlayerName(String name);
 }
