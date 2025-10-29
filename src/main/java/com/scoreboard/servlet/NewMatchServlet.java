@@ -1,14 +1,15 @@
 package com.scoreboard.servlet;
 
+import com.scoreboard.constant.WebPaths;
 import com.scoreboard.exception.ValidationException;
 import com.scoreboard.model.entity.Player;
-import com.scoreboard.service.OngoingMatchesService;
-import com.scoreboard.util.WebPaths;
+import com.scoreboard.service.ongoingmatchesservice.OngoingMatchesService;
 import com.scoreboard.validator.PlayerNameValidator;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,36 +35,41 @@ public class NewMatchServlet extends BaseServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws IOException, ServletException {
+            throws IOException{
         String player1name = req.getParameter("player1name");
         String player2name = req.getParameter("player2name");
 
-        logger.info("New match creation attempt - Player1: '{}', Player2: '{}'",
-                player1name, player2name);
+        logger.debug("Match creation attempt: '{}' vs '{}'", player1name, player2name);
 
         try {
-            String player1ValidName = PlayerNameValidator.validate(player1name);
-            String player2ValidName = PlayerNameValidator.validate(player2name);
-
-            if (player1ValidName.equalsIgnoreCase(player2ValidName)) {
-                logger.warn("Duplicate player names rejected: '{}'", player1ValidName);
-                throw new ValidationException("Players cannot have the same name");
-            }
-
-            Player firstPlayer = new Player(player1ValidName);
-            Player secondPlayer = new Player(player2ValidName);
-
-            UUID uuid = ongoingMatchesService.createMatch(firstPlayer, secondPlayer);
-            logger.info("New match created successfully - UUID: {}, Players: {} vs {}",
-                    uuid, player1ValidName, player2ValidName);
+            UUID uuid = createMatch(player1name, player2name);
+            logger.info("Match created: UUID={}, players='{}' vs '{}'", uuid, player1name, player2name);
 
             resp.sendRedirect(req.getContextPath() + "/match-score?uuid=" + uuid);
 
         } catch (ValidationException e) {
-            req.setAttribute("error", e.getMessage());
-            req.setAttribute("firstPlayerInput", player1name);
-            req.setAttribute("secondPlayerInput", player2name);
-            getServletContext().getRequestDispatcher(WebPaths.NEW_MATCH_JSP).forward(req, resp);
+            logger.debug("Validation failed: {}", e.getMessage());
+
+            HttpSession session = req.getSession();
+            session.setAttribute("error", e.getMessage());
+            session.setAttribute("player1Input", player1name);
+            session.setAttribute("player2Input", player2name);
+
+            resp.sendRedirect(req.getContextPath() + "/new-match");
         }
+    }
+
+    private UUID createMatch(String player1name, String player2name) {
+        String player1ValidName = PlayerNameValidator.validate(player1name);
+        String player2ValidName = PlayerNameValidator.validate(player2name);
+
+        if (player1ValidName.equalsIgnoreCase(player2ValidName)) {
+            throw new ValidationException("Players cannot have the same name");
+        }
+
+        Player firstPlayer = new Player(player1ValidName);
+        Player secondPlayer = new Player(player2ValidName);
+
+        return ongoingMatchesService.createMatch(firstPlayer, secondPlayer);
     }
 }

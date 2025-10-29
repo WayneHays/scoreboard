@@ -1,10 +1,10 @@
 package com.scoreboard.servlet;
 
-import com.scoreboard.config.Config;
-import com.scoreboard.dto.MatchesPage;
+import com.scoreboard.constant.AppDefaults;
+import com.scoreboard.constant.WebPaths;
+import com.scoreboard.dto.response.MatchesPage;
 import com.scoreboard.exception.ValidationException;
-import com.scoreboard.service.MatchesPageService;
-import com.scoreboard.util.WebPaths;
+import com.scoreboard.service.matchespageservice.MatchesPageService;
 import com.scoreboard.validator.PlayerNameValidator;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -18,17 +18,14 @@ import java.io.IOException;
 @WebServlet("/matches")
 public class MatchesServlet extends BaseServlet {
     private static final Logger logger = LoggerFactory.getLogger(MatchesServlet.class);
-    private static final int DEFAULT_PAGE_NUMBER = 1;
-    private MatchesPageService matchesPageServices;
-    private int matchesPerPage;
+
+    private MatchesPageService matchesPageService;
 
     @Override
     public void init() throws ServletException {
         super.init();
-        this.matchesPageServices = getService(MatchesPageService.class);
-        Config config = getService(Config.class);
-        this.matchesPerPage = config.getInt("matches.per.page");
-        logger.debug("MatchesServlet initialized with {} matches per page", matchesPerPage);
+        this.matchesPageService = getService(MatchesPageService.class);
+        logger.info("MatchesServlet initialized");
     }
 
     @Override
@@ -44,30 +41,34 @@ public class MatchesServlet extends BaseServlet {
     }
 
     private MatchesPage getMatchesPage(String playerName, int pageNumber) {
-        MatchesPage page;
         if (playerName == null || playerName.isBlank()) {
-            logger.debug("Loading all matches page {}", pageNumber);
-            page = matchesPageServices.getMatchesPage(pageNumber, matchesPerPage);
-        } else {
-            try {
-                String validName = PlayerNameValidator.validate(playerName);
-                logger.debug("Loading matches filtered by player: '{}', page: {}", validName, pageNumber);
-                page = matchesPageServices
-                        .getMatchesPageByPlayerName(validName, pageNumber, matchesPerPage);
-            } catch (ValidationException e) {
-                logger.warn("Player name validation failed: '{}' - {}", playerName, e.getMessage());
-                page = matchesPageServices
-                        .getMatchesPage(pageNumber, matchesPerPage)
-                        .withValidationError(e.getMessage(), playerName);
-            }
+            logger.debug("Loading matches page {}", pageNumber);
+            return matchesPageService.getPage(pageNumber);
         }
-        return page;
+
+        try {
+            String validName = PlayerNameValidator.validate(playerName);
+            logger.debug("Loading matches filtered by '{}', page {}", validName, pageNumber);
+            return matchesPageService.getPageByPlayerName(validName, pageNumber);
+
+        } catch (ValidationException e) {
+            logger.debug("Validation failed for player name '{}': {}", playerName, e.getMessage());
+            return matchesPageService
+                    .getPage(pageNumber)
+                    .withValidationError(e.getMessage(), playerName);
+        }
     }
 
     private int parsePageNumber(String pageNumberStr) {
         if (pageNumberStr == null || pageNumberStr.isBlank()) {
-            return DEFAULT_PAGE_NUMBER;
+            return AppDefaults.DEFAULT_PAGE_NUMBER;
         }
-        return Integer.parseInt(pageNumberStr);
+
+        try {
+            return Integer.parseInt(pageNumberStr);
+        } catch (NumberFormatException e) {
+            logger.warn("Invalid page number format: '{}'", pageNumberStr);
+            throw new ValidationException("Invalid page number: " + pageNumberStr, e);
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.scoreboard.servlet;
 
-import com.scoreboard.config.ApplicationContext;
+import com.scoreboard.config.context.ApplicationContext;
+import com.scoreboard.constant.WebPaths;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -9,11 +10,11 @@ import org.slf4j.LoggerFactory;
 
 public abstract class BaseServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(BaseServlet.class);
-    private static final String CONTEXT_ATTRIBUTE = "applicationContext";
 
     @Override
     public void init() throws ServletException {
         super.init();
+        getApplicationContext();
         logger.debug("Servlet {} initialized successfully", getClass().getSimpleName());
     }
 
@@ -24,13 +25,13 @@ public abstract class BaseServlet extends HttpServlet {
 
     private ApplicationContext getApplicationContext() {
         ServletContext servletContext = getServletContext();
-        ApplicationContext context = (ApplicationContext) servletContext.getAttribute(CONTEXT_ATTRIBUTE);
+        ApplicationContext context = (ApplicationContext) servletContext.getAttribute(WebPaths.APPLICATION_CONTEXT_ATTR);
 
         if (context == null) {
-            logger.error("ApplicationContext not found in ServletContext");
-            throw new IllegalStateException("ApplicationContext not found in ServletContext");
+            String message = "ApplicationContext not found in ServletContext";
+            logger.error(message);
+            throw new IllegalStateException(message);
         }
-
         return context;
     }
 }

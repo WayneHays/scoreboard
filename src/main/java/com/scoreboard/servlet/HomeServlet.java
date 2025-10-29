@@ -1,6 +1,6 @@
 package com.scoreboard.servlet;
 
-import com.scoreboard.util.WebPaths;
+import com.scoreboard.constant.WebPaths;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;

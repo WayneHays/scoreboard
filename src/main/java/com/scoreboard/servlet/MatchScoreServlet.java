@@ -1,18 +1,19 @@
 package com.scoreboard.servlet;
 
+import com.scoreboard.constant.WebPaths;
 import com.scoreboard.exception.ValidationException;
 import com.scoreboard.mapper.MatchLiveViewMapper;
 import com.scoreboard.mapper.MatchResultMapper;
-import com.scoreboard.model.OngoingMatch;
 import com.scoreboard.model.entity.Player;
-import com.scoreboard.service.FinishedMatchPersistenceService;
-import com.scoreboard.service.OngoingMatchesService;
-import com.scoreboard.service.ScoreCalculationService;
-import com.scoreboard.util.WebPaths;
+import com.scoreboard.model.ongoingmatch.OngoingMatch;
+import com.scoreboard.service.finishedmatchpersistenceservice.FinishedMatchPersistenceService;
+import com.scoreboard.service.ongoingmatchesservice.OngoingMatchesService;
+import com.scoreboard.service.scorecalculation.ScoreCalculationService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @WebServlet("/match-score")
 public class MatchScoreServlet extends BaseServlet {
     private static final Logger logger = LoggerFactory.getLogger(MatchScoreServlet.class);
+
     private OngoingMatchesService ongoingMatchesService;
     private ScoreCalculationService scoreCalculationService;
     private FinishedMatchPersistenceService finishedMatchPersistenceService;
@@ -37,53 +39,57 @@ public class MatchScoreServlet extends BaseServlet {
         this.ongoingMatchesService = getService(OngoingMatchesService.class);
         this.scoreCalculationService = getService(ScoreCalculationService.class);
         this.finishedMatchPersistenceService = getService(FinishedMatchPersistenceService.class);
-        this.liveViewMapper = getService(MatchLiveViewMapper.class);
-        this.resultMapper = getService(MatchResultMapper.class);
+        this.liveViewMapper = new MatchLiveViewMapper();
+        this.resultMapper = new MatchResultMapper();
 
-        logger.debug("MatchScoreServlet dependencies initialized");
+        logger.info("MatchScoreServlet initialized");
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String uuidStr = req.getParameter("uuid");
-        UUID uuid = parseUuid(uuidStr);
+        UUID uuid = parseUuid(req.getParameter("uuid"));
         OngoingMatch ongoingMatch = ongoingMatchesService.get(uuid);
+
+        logger.debug("Displaying match: UUID={}, players='{}' vs '{}'",
+                uuid, ongoingMatch.getPlayer1().getName(), ongoingMatch.getPlayer2().getName());
 
         req.setAttribute("matchView", liveViewMapper.map(ongoingMatch));
         getServletContext().getRequestDispatcher(WebPaths.MATCH_SCORE_JSP).forward(req, resp);
-
-        logger.debug("Match score page rendered - Players: {} vs {}",
-                ongoingMatch.getFirstPlayer().getName(), ongoingMatch.getSecondPlayer().getName());
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
-        String uuidStr = req.getParameter("uuid");
-        UUID uuid = parseUuid(uuidStr);
-
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException{
+        UUID uuid = parseUuid(req.getParameter("uuid"));
         Object matchLock = matchLocks.computeIfAbsent(uuid, k -> new Object());
 
         synchronized (matchLock) {
             OngoingMatch ongoingMatch = ongoingMatchesService.get(uuid);
             String playerName = req.getParameter("playerName");
-            Player pointWinner = ongoingMatch.getPlayer(playerName);
+            Player scorer = ongoingMatch.getPlayerByName(playerName);
 
-            scoreCalculationService.winPoint(ongoingMatch, pointWinner);
+            scoreCalculationService.awardPoint(ongoingMatch, scorer);
             logger.debug("Point awarded to player: {}", playerName);
 
-            if (isWinnerDetermined(ongoingMatch)) {
-                logger.info("Match completed - UUID: {}, Winner: {}", uuid, ongoingMatch.getWinner().getName());
-
-                finishedMatchPersistenceService.saveFinishedMatch(ongoingMatch);
-                ongoingMatchesService.delete(uuid);
-                matchLocks.remove(uuid);
-
-                req.setAttribute("matchResult", resultMapper.map(ongoingMatch));
-                getServletContext().getRequestDispatcher(WebPaths.MATCH_RESULT_JSP).forward(req, resp);
+            if (ongoingMatch.isFinished()) {
+                handleMatchCompletion(req, resp, ongoingMatch, uuid);
             } else {
                 resp.sendRedirect(req.getContextPath() + "/match-score?uuid=" + uuid);
             }
         }
+    }
+
+    private void handleMatchCompletion(HttpServletRequest req, HttpServletResponse resp, OngoingMatch ongoingMatch, UUID uuid) throws IOException {
+        Player winner = ongoingMatch.getWinner();
+        logger.info("Match completed - UUID: {}, Winner: {}", uuid, winner.getName());
+
+        finishedMatchPersistenceService.saveFinishedMatch(ongoingMatch);
+        HttpSession session = req.getSession();
+        session.setAttribute("matchResult", resultMapper.map(ongoingMatch));
+
+        ongoingMatchesService.delete(uuid);
+        matchLocks.remove(uuid);
+
+        resp.sendRedirect(req.getContextPath() + "/match-result");
     }
 
     private UUID parseUuid(String uuidStr) {
@@ -95,11 +101,7 @@ public class MatchScoreServlet extends BaseServlet {
         try {
             return UUID.fromString(uuidStr);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid UUID format", e);
+            throw new ValidationException("Invalid UUID format", e);
         }
-    }
-
-    private boolean isWinnerDetermined(OngoingMatch ongoingMatch) {
-        return ongoingMatch.getWinner() != null;
     }
 }
