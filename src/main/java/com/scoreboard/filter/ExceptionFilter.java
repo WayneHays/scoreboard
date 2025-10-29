@@ -1,15 +1,17 @@
 package com.scoreboard.filter;
 
-import com.scoreboard.exception.ApplicationStartupException;
 import com.scoreboard.exception.NotFoundException;
 import com.scoreboard.exception.ScoreboardServiceException;
 import com.scoreboard.exception.ValidationException;
 import com.scoreboard.util.ErrorHandler;
-import jakarta.servlet.*;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -17,53 +19,35 @@ import static jakarta.servlet.http.HttpServletResponse.*;
 
 @WebFilter(filterName = "ExceptionFilter", urlPatterns = "/*")
 public class ExceptionFilter extends HttpFilter {
+    private static final Logger logger = LoggerFactory.getLogger(ExceptionFilter.class);
+    private static final String GENERIC_ERROR_MESSAGE =
+            "An error occurred while processing your request. Please try again later.";
 
     @Override
-    protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
+    protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
+            throws IOException, ServletException {
         try {
             chain.doFilter(req, res);
+
         } catch (NotFoundException e) {
-            ErrorHandler.handleHttpError(
-                    req,
-                    res,
-                    SC_NOT_FOUND,
-                    e.getMessage());
+            logger.debug("Resource not found: {} {} - {}",
+                    req.getMethod(), req.getRequestURI(), e.getMessage());
+            ErrorHandler.handleHttpError(req, res, SC_NOT_FOUND, e.getMessage());
+
         } catch (ValidationException e) {
-            ErrorHandler.handleHttpError(
-                    req,
-                    res,
-                    SC_BAD_REQUEST,
-                    e.getMessage());
-        } catch (ApplicationStartupException e) {
-            ErrorHandler.handleHttpError(
-                    req,
-                    res,
-                    SC_INTERNAL_SERVER_ERROR,
-                    "Application initialization error: " + e.getMessage());
+            logger.debug("Validation error: {} {} - {}",
+                    req.getMethod(), req.getRequestURI(), e.getMessage());
+            ErrorHandler.handleHttpError(req, res, SC_BAD_REQUEST, e.getMessage());
+
         } catch (ScoreboardServiceException e) {
-            ErrorHandler.handleHttpError(
-                    req,
-                    res,
-                    SC_INTERNAL_SERVER_ERROR,
-                    "Service error occurred: " + e.getMessage());
-        } catch (NumberFormatException e) {
-            ErrorHandler.handleHttpError(
-                    req,
-                    res,
-                    SC_BAD_REQUEST,
-                    "Invalid number format");
-        } catch (IllegalArgumentException | IllegalStateException e) {
-            ErrorHandler.handleHttpError(
-                    req,
-                    res,
-                    SC_BAD_REQUEST,
-                    e.getMessage());
+            logger.error("Service error in request {} {}",
+                    req.getMethod(), req.getRequestURI(), e);
+            ErrorHandler.handleHttpError(req, res, SC_INTERNAL_SERVER_ERROR, GENERIC_ERROR_MESSAGE);
+
         } catch (Exception e) {
-            ErrorHandler.handleHttpError(
-                    req,
-                    res,
-                    SC_INTERNAL_SERVER_ERROR,
-                    "Internal server error");
+            logger.error("Unhandled exception in request {} {}",
+                    req.getMethod(), req.getRequestURI(), e);
+            ErrorHandler.handleHttpError(req, res, SC_INTERNAL_SERVER_ERROR, GENERIC_ERROR_MESSAGE);
         }
     }
 }
