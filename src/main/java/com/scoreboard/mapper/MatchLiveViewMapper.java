@@ -1,16 +1,16 @@
 package com.scoreboard.mapper;
 
-import com.scoreboard.config.ServiceProvider;
-import com.scoreboard.dto.MatchLiveView;
-import com.scoreboard.model.OngoingMatch;
+import com.scoreboard.dto.response.MatchLiveView;
 import com.scoreboard.model.entity.Player;
+import com.scoreboard.model.ongoingmatch.OngoingMatch;
+import com.scoreboard.service.scorecalculation.Points;
 
-public class MatchLiveViewMapper implements ServiceProvider {
-    private static final String ADVANTAGE_VIEW = "AD";
+public class MatchLiveViewMapper implements Mapper<OngoingMatch, MatchLiveView> {
 
     public MatchLiveView map(OngoingMatch ongoingMatch) {
-        Player player1 = ongoingMatch.getFirstPlayer();
-        Player player2 = ongoingMatch.getSecondPlayer();
+        Player player1 = ongoingMatch.getPlayer1();
+        Player player2 = ongoingMatch.getPlayer2();
+
         return MatchLiveView.builder()
                 .firstPlayerName(player1.getName())
                 .secondPlayerName(player2.getName())
@@ -26,18 +26,14 @@ public class MatchLiveViewMapper implements ServiceProvider {
     }
 
     private String formatPlayerPoints(OngoingMatch ongoingMatch, Player player) {
-        if (playerHasAdvantage(ongoingMatch, player)) {
-            return ADVANTAGE_VIEW;
+        if (player.equals(ongoingMatch.getAdvantage())) {
+            return Points.ADVANTAGE.getValue();
         }
 
         if (ongoingMatch.isTieBreak()) {
             return String.valueOf(ongoingMatch.getTieBreakPoints(player));
         }
 
-        return String.valueOf(ongoingMatch.getPoints(player));
-    }
-
-    private boolean playerHasAdvantage(OngoingMatch ongoingMatch, Player player) {
-        return ongoingMatch.getAdvantageStatus() != null && ongoingMatch.getAdvantageStatus().equals(player);
+        return ongoingMatch.getPoints(player).getValue();
     }
 }
