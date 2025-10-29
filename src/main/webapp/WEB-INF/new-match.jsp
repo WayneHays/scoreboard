@@ -23,9 +23,9 @@
     </header>
 
     <main>
-        <c:if test="${not empty error}">
+        <c:if test="${not empty sessionScope.error}">
             <div class="error-message general-error">
-                <c:out value="${error}"/>
+                <c:out value="${sessionScope.error}"/>
             </div>
         </c:if>
 
@@ -38,7 +38,7 @@
                         name="player1name"
                         class="form-input"
                         placeholder="First player's name"
-                        value="<c:out value='${player1Input}'/>"
+                        value="<c:out value='${sessionScope.player1Input}'/>"
                         required
                 >
             </div>
@@ -57,7 +57,7 @@
                         name="player2name"
                         class="form-input"
                         placeholder="Second player's name"
-                        value="<c:out value='${player2Input}'/>"
+                        value="<c:out value='${sessionScope.player2Input}'/>"
                         required
                 >
             </div>
@@ -66,6 +66,10 @@
                 Start Match!
             </button>
         </form>
+
+        <c:remove var="error" scope="session"/>
+        <c:remove var="player1Input" scope="session"/>
+        <c:remove var="player2Input" scope="session"/>
     </main>
 </div>
 </body>
