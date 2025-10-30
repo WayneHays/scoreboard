@@ -42,6 +42,7 @@ main {
     display: flex;
     gap: 15px;
     justify-content: center;
+    flex-wrap: wrap;
 }
 
 .nav-button {
@@ -159,7 +160,6 @@ main {
 }
 
 .results-section {
-
 }
 
 .matches-table {
@@ -260,6 +260,10 @@ main {
 }
 
 @media (max-width: 768px) {
+    .container {
+        padding: 20px;
+    }
+
     .search-form {
         padding: 20px;
         max-width: 100%;
@@ -286,28 +290,76 @@ main {
     }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
     body {
         padding: 10px;
+    }
+
+    .container {
+        padding: 15px;
     }
 
     .title {
         font-size: 1.8rem;
     }
 
-    .matches-table {
-        font-size: 0.8rem;
+    .matches-table thead {
+        display: none;
     }
 
-    .matches-table th,
+    .matches-table,
+    .matches-table tbody,
+    .matches-table tr,
     .matches-table td {
-        padding: 8px;
+        display: block;
+        width: 100%;
+    }
+
+    .matches-table tr {
+        margin-bottom: 15px;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 15px;
+        background: white;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .matches-table td {
+        padding: 10px 0;
+        border: none;
+        text-align: left;
+        position: relative;
+        padding-left: 110px;
+        min-height: 30px;
+        display: flex;
+        align-items: center;
+    }
+
+    .matches-table td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 0;
+        width: 100px;
+        padding-right: 10px;
+        font-weight: 600;
+        color: #667eea;
+        font-size: 0.9rem;
+    }
+
+    .matches-table tr td:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .winner-name {
+        color: #48bb78;
+        font-weight: 700;
     }
 
     .pagination-item {
-        padding: 5px 8px;
-        font-size: 0.8rem;
-        min-width: 30px;
+        padding: 6px 10px;
+        font-size: 0.85rem;
+        min-width: 35px;
     }
 
     .no-results {
@@ -322,5 +374,17 @@ main {
 
     .general-error::before {
         font-size: 1rem;
+    }
+}
+
+@media (max-width: 380px) {
+    .matches-table td {
+        padding-left: 95px;
+        font-size: 0.85rem;
+    }
+
+    .matches-table td::before {
+        width: 85px;
+        font-size: 0.8rem;
     }
 }
