@@ -8,8 +8,7 @@ import java.util.regex.Pattern;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PlayerNameValidator {
-    private static final int MIN_NAME_LENGTH = 2;
-    private static final int MAX_NAME_LENGTH = 30;
+    public static final int MAX_PLAYER_NAME_LENGTH = 30;
     private static final Pattern VALID_NAME_PATTERN = Pattern.compile("^[a-zA-Zа-яёА-ЯЁ\\s-']+$");
 
     public static String validate(String name) {
@@ -18,16 +17,13 @@ public final class PlayerNameValidator {
         }
         String trimmedName = name.trim();
 
-        if (trimmedName.length() < MIN_NAME_LENGTH) {
-            throw new ValidationException("Name too short (minimum %d characters)".formatted(MIN_NAME_LENGTH));
-        }
-
-        if (trimmedName.length() > MAX_NAME_LENGTH) {
-            throw new ValidationException("Name too long (maximum %d characters)".formatted(MAX_NAME_LENGTH));
+        if (trimmedName.length() > MAX_PLAYER_NAME_LENGTH) {
+            throw new ValidationException("Name too long (maximum %d characters)".formatted(MAX_PLAYER_NAME_LENGTH));
         }
 
         if (!VALID_NAME_PATTERN.matcher(trimmedName).matches()) {
-            throw new ValidationException("Name contains invalid characters (a-zA-Zа-яёА-ЯЁ symbols only)");
+            throw new ValidationException("Name contains invalid characters (%s) symbols only)"
+                    .formatted(VALID_NAME_PATTERN.toString()));
         }
 
         return trimmedName;
