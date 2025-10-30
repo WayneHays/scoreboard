@@ -1,4 +1,4 @@
-package com.scoreboard.util;
+package com.scoreboard.constant;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -11,4 +11,6 @@ public final class WebPaths {
     public static final String MATCH_SCORE_JSP = "/WEB-INF/match-score.jsp";
     public static final String MATCH_RESULT_JSP = "/WEB-INF/match-result.jsp";
     public static final String NEW_MATCH_JSP = "/WEB-INF/new-match.jsp";
+
+    public static final String APPLICATION_CONTEXT_ATTR = "applicationContext";
 }
