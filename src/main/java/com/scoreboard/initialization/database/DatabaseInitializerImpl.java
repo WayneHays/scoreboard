@@ -23,7 +23,6 @@ public class DatabaseInitializerImpl implements DatabaseInitializer {
     private final FinishedMatchPersistenceService finishedMatchPersistenceService;
     private final TestMatchFactory testMatchFactory;
 
-
     public void initialize() {
         logger.info("Starting database initialization...");
 

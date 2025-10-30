@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PlayerNameValidator {
-    public static final int MAX_PLAYER_NAME_LENGTH = 30;
+    private static final int MAX_PLAYER_NAME_LENGTH = 30;
     private static final Pattern VALID_NAME_PATTERN = Pattern.compile("^[a-zA-Zа-яёА-ЯЁ\\s-']+$");
 
     public static String validate(String name) {
