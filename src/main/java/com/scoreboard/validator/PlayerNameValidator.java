@@ -8,26 +8,37 @@ import java.util.regex.Pattern;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PlayerNameValidator {
-    private static final int MAX_PLAYER_NAME_LENGTH = 30;
-    private static final Pattern VALID_NAME_PATTERN = Pattern.compile("^[a-zA-Zа-яёА-ЯЁ -']+$");
-    private static final String MESSAGE_FOR_USER =
-            "Name can only contain letters, spaces, hyphens and apostrophes (e.g., John Doe, Mary-Jane, O'Brien)";
+    private static final int MIN_NAME_LENGTH = 2;
+    private static final int MAX_NAME_LENGTH = 30;
+    private static final Pattern VALID_NAME_PATTERN =
+            Pattern.compile("^(?!.*[\\-\\s']{2})[A-Za-zА-Яа-яЁё]+(?:[\\s\\-'][A-Za-zА-Яа-яЁё]+)*$");
+
+    private static final String ERROR_EMPTY = "Player name is required";
+    private static final String ERROR_TOO_SHORT = "Name must be at least " + MIN_NAME_LENGTH + " characters";
+    private static final String ERROR_TOO_LONG = "Name cannot exceed " + MAX_NAME_LENGTH + " characters";
+    private static final String ERROR_INVALID_CHARS =
+            "Name can contain letters, single spaces, hyphens or apostrophes. " +
+            "Cannot start/end with special characters or have them consecutively.";
 
     public static String validate(String name) {
-        if (name == null || name.trim().isEmpty()) {
-            throw new ValidationException("Player name is required");
-        }
-        String trimmedName = name.trim();
-
-        if (trimmedName.length() > MAX_PLAYER_NAME_LENGTH) {
-            throw new ValidationException("Name too long (maximum %d characters)".formatted(MAX_PLAYER_NAME_LENGTH));
+        if (name == null || name.isBlank()) {
+            throw new ValidationException(ERROR_EMPTY);
         }
 
-        if (!VALID_NAME_PATTERN.matcher(trimmedName).matches()) {
-            throw new ValidationException("Name contains invalid characters (%s) symbols only)"
-                    .formatted(MESSAGE_FOR_USER));
+        String trimmed = name.trim();
+
+        if (trimmed.length() < MIN_NAME_LENGTH) {
+            throw new ValidationException(ERROR_TOO_SHORT);
         }
 
-        return trimmedName;
+        if (trimmed.length() > MAX_NAME_LENGTH) {
+            throw new ValidationException(ERROR_TOO_LONG);
+        }
+
+        if (!VALID_NAME_PATTERN.matcher(trimmed).matches()) {
+            throw new ValidationException(ERROR_INVALID_CHARS);
+        }
+
+        return trimmed;
     }
 }
