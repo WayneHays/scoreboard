@@ -1,0 +1,17 @@
+# Config
+com.scoreboard.config.properties.PropertiesConfigProvider
+
+# DAO
+com.scoreboard.dao.PlayerDaoProvider
+com.scoreboard.dao.MatchDaoProvider
+
+# Services
+com.scoreboard.service.ongoingmatchesservice.OngoingMatchesServiceProvider
+com.scoreboard.service.scorecalculation.ScoreCalculationServiceProvider
+com.scoreboard.service.finishedmatchpersistenceservice.FinishedMatchPersistenceServiceProvider
+com.scoreboard.service.matchespageservice.MatchesPageServiceProvider
+
+# Initialization Providers
+com.scoreboard.initialization.datasource.TextFileDataSourceProvider
+com.scoreboard.initialization.factory.TestMatchFactoryProvider
+com.scoreboard.initialization.database.DatabaseInitializerProvider
