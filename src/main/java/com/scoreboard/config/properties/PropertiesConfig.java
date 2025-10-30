@@ -1,5 +1,6 @@
-package com.scoreboard.config;
+package com.scoreboard.config.properties;
 
+import com.scoreboard.exception.ApplicationStartupException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,13 +10,13 @@ import java.util.Properties;
 
 public class PropertiesConfig implements Config {
     private static final Logger logger = LoggerFactory.getLogger(PropertiesConfig.class);
-    private static final String DEFAULT_CONFIG_FILE = "application.properties";
+    public static final String DEFAULT_PROPERTIES_FILE = "application.properties";
 
     private final Properties properties;
     private final String configFile;
 
     public PropertiesConfig() {
-        this(DEFAULT_CONFIG_FILE);
+        this(DEFAULT_PROPERTIES_FILE);
     }
 
     public PropertiesConfig(String configFile) {
@@ -33,31 +34,36 @@ public class PropertiesConfig implements Config {
                 .getResourceAsStream(configFile)) {
 
             if (input == null) {
-                throw new RuntimeException("Properties file not found");
+                throw new ApplicationStartupException("Properties file not found");
             }
 
             props.load(input);
 
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load configuration", e);
+            throw new ApplicationStartupException("Failed to load configuration", e);
         }
         return props;
     }
 
     @Override
-    public String get(String key) {
+    public String get(String key, String defaultValue) {
         String value = properties.getProperty(key);
 
         if (value == null) {
-            logger.warn("Configuration property not found: {}", key);
-            throw new IllegalArgumentException("Configuration property not found: " + key);
+            return defaultValue;
         }
 
         return value.trim();
     }
 
     @Override
-    public int getInt(String key) {
-        return Integer.parseInt(get(key));
+    public int getInt(String key, int defaultValue) {
+        String value = properties.getProperty(key);
+
+        if (value == null) {
+            return defaultValue;
+        }
+
+        return Integer.parseInt(value.trim());
     }
 }
