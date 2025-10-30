@@ -1,4 +1,4 @@
-package com.scoreboard.dto;
+package com.scoreboard.dto.response;
 
 import lombok.Builder;
 

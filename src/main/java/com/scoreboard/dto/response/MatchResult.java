@@ -1,4 +1,4 @@
-package com.scoreboard.dto;
+package com.scoreboard.dto.response;
 
 import lombok.Builder;
 
@@ -11,5 +11,4 @@ public record MatchResult(
         int secondPlayerFinalSets,
         String firstPlayerRowClass,
         String secondPlayerRowClass
-) {
-}
+) {}
