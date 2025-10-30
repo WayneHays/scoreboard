@@ -26,19 +26,9 @@ public class Match {
     @JoinColumn(name = "winner", referencedColumnName = "id")
     private Player winner;
 
-    public Match(Player firstPlayer, Player secondPlayer) {
-        this.firstPlayer = firstPlayer;
-        this.secondPlayer = secondPlayer;
-    }
-
     public Match(Player firstPlayer, Player secondPlayer, Player winner) {
         this.firstPlayer = firstPlayer;
         this.secondPlayer = secondPlayer;
         this.winner = winner;
-    }
-
-    public void setPlayers(Player firstPlayer, Player secondPlayer) {
-        this.firstPlayer = firstPlayer;
-        this.secondPlayer = secondPlayer;
     }
 }

@@ -1,28 +1,25 @@
-package com.scoreboard.service;
+package com.scoreboard.service.ongoingmatchesservice;
 
-import com.scoreboard.config.ServiceProvider;
 import com.scoreboard.exception.NotFoundException;
-import com.scoreboard.model.OngoingMatch;
-import com.scoreboard.model.Score;
-import com.scoreboard.model.entity.Match;
 import com.scoreboard.model.entity.Player;
+import com.scoreboard.model.ongoingmatch.OngoingMatch;
 
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class OngoingMatchesService implements ServiceProvider {
+public class OngoingMatchesService {
     private final Map<UUID, OngoingMatch> ongoingMatches;
 
     public OngoingMatchesService() {
         this.ongoingMatches = new ConcurrentHashMap<>();
     }
 
-    public UUID createMatch(Player first, Player second) {
-        Match match = new Match(first, second);
-        Score score = new Score(first, second);
+    public UUID createMatch(Player player1, Player player2) {
+        OngoingMatch ongoing = new OngoingMatch(player1, player2);
+
         UUID uuid = UUID.randomUUID();
-        ongoingMatches.put(uuid, new OngoingMatch(match, score));
+        ongoingMatches.put(uuid, ongoing);
         return uuid;
     }
 
