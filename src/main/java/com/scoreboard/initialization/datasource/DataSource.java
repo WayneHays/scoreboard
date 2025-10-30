@@ -1,4 +1,4 @@
-package com.scoreboard.start_initialization.data_source;
+package com.scoreboard.initialization.datasource;
 
 import java.util.List;
 
