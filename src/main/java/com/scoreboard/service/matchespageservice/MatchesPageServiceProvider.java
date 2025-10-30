@@ -1,10 +1,9 @@
-package com.scoreboard.service.providers;
+package com.scoreboard.service.matchespageservice;
 
-import com.scoreboard.config.ApplicationContext;
-import com.scoreboard.config.ServiceProvider;
+import com.scoreboard.config.context.ApplicationContext;
+import com.scoreboard.config.properties.Config;
+import com.scoreboard.config.servicediscovery.ServiceProvider;
 import com.scoreboard.dao.MatchDao;
-import com.scoreboard.mapper.MatchesPageMapper;
-import com.scoreboard.service.MatchesPageService;
 
 public class MatchesPageServiceProvider implements ServiceProvider {
 
@@ -17,6 +16,6 @@ public class MatchesPageServiceProvider implements ServiceProvider {
     public Object createService(ApplicationContext context) {
         return new MatchesPageService(
                 context.get(MatchDao.class),
-                context.get(MatchesPageMapper.class));
+                context.get(Config.class));
     }
 }

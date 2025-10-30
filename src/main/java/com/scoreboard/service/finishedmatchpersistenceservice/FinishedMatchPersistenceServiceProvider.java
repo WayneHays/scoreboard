@@ -1,10 +1,9 @@
-package com.scoreboard.service.providers;
+package com.scoreboard.service.finishedmatchpersistenceservice;
 
-import com.scoreboard.config.ApplicationContext;
-import com.scoreboard.config.ServiceProvider;
+import com.scoreboard.config.context.ApplicationContext;
+import com.scoreboard.config.servicediscovery.ServiceProvider;
 import com.scoreboard.dao.MatchDao;
 import com.scoreboard.dao.PlayerDao;
-import com.scoreboard.service.FinishedMatchPersistenceService;
 
 public class FinishedMatchPersistenceServiceProvider implements ServiceProvider {
 
