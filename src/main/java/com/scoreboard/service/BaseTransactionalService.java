@@ -3,7 +3,7 @@ package com.scoreboard.service;
 import com.scoreboard.exception.NotFoundException;
 import com.scoreboard.exception.ScoreboardServiceException;
 import com.scoreboard.exception.ValidationException;
-import com.scoreboard.util.HibernateUtil;
+import com.scoreboard.config.hibernate.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
