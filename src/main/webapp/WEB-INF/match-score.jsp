@@ -34,14 +34,14 @@
                 <div class="player-name"><c:out value="${matchView.firstPlayerName}"/></div>
                 <div class="sets-score">${matchView.firstPlayerSets}</div>
                 <div class="games-score">${matchView.firstPlayerGames}</div>
-                <div class="regularPoints-score">${matchView.firstPlayerPoints}</div>
+                <div class="points-score">${matchView.firstPlayerPoints}</div>
             </div>
 
             <div class="score-row">
                 <div class="player-name"><c:out value="${matchView.secondPlayerName}"/></div>
                 <div class="sets-score">${matchView.secondPlayerSets}</div>
                 <div class="games-score">${matchView.secondPlayerGames}</div>
-                <div class="regularPoints-score">${matchView.secondPlayerPoints}</div>
+                <div class="points-score">${matchView.secondPlayerPoints}</div>
             </div>
         </section>
 
