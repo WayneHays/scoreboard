@@ -5,13 +5,18 @@ com.scoreboard.config.properties.PropertiesConfigProvider
 com.scoreboard.dao.PlayerDaoProvider
 com.scoreboard.dao.MatchDaoProvider
 
-# Services
-com.scoreboard.service.ongoingmatchesservice.OngoingMatchesServiceProvider
+# Service
+com.scoreboard.service.ongoingmatches.OngoingMatchesServiceProvider
 com.scoreboard.service.scorecalculation.ScoreCalculationServiceProvider
-com.scoreboard.service.finishedmatchpersistenceservice.FinishedMatchPersistenceServiceProvider
-com.scoreboard.service.matchespageservice.MatchesPageServiceProvider
+com.scoreboard.service.finishedmatchpersistence.FinishedMatchPersistenceServiceProvider
+com.scoreboard.service.matchespage.MatchesPageServiceProvider
 
-# Initialization Providers
+# Servlet
+com.scoreboard.service.matchprocess.MatchLockManagerProvider
+com.scoreboard.service.matchprocess.MatchViewResolverProvider
+com.scoreboard.service.matchprocess.MatchProcessorProvider
+
+# Initialization Provider
 com.scoreboard.initialization.datasource.TextFileDataSourceProvider
 com.scoreboard.initialization.factory.TestMatchFactoryProvider
 com.scoreboard.initialization.database.DatabaseInitializerProvider
