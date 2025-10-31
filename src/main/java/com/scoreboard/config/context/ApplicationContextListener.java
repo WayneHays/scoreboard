@@ -1,7 +1,7 @@
 package com.scoreboard.config.context;
 
 import com.scoreboard.config.lifecycle.*;
-import com.scoreboard.constant.WebPaths;
+import com.scoreboard.constant.JspPaths;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
@@ -26,7 +26,7 @@ public class ApplicationContextListener implements ServletContextListener {
         ApplicationContext context = lifecycleManager.startup();
 
         ServletContext servletContext = sce.getServletContext();
-        servletContext.setAttribute(WebPaths.APPLICATION_CONTEXT_ATTR, context);
+        servletContext.setAttribute(JspPaths.APPLICATION_CONTEXT_ATTR, context);
     }
 
     @Override
@@ -38,7 +38,7 @@ public class ApplicationContextListener implements ServletContextListener {
     private void cleanupServletContext(ServletContextEvent sce) {
         try {
             ServletContext servletContext = sce.getServletContext();
-            servletContext.removeAttribute(WebPaths.APPLICATION_CONTEXT_ATTR);
+            servletContext.removeAttribute(JspPaths.APPLICATION_CONTEXT_ATTR);
             logger.debug("Application context removed from servlet context");
         } catch (Exception e) {
             logger.error("Error removing application context", e);

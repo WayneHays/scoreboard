@@ -1,9 +1,9 @@
 package com.scoreboard.service.scorecalculation.rules;
 
-import com.scoreboard.service.scorecalculation.rules.standart.StandardGameRules;
-import com.scoreboard.service.scorecalculation.rules.standart.StandardMatchRules;
-import com.scoreboard.service.scorecalculation.rules.standart.StandardSetRules;
-import com.scoreboard.service.scorecalculation.rules.standart.StandardTiebreakRules;
+import com.scoreboard.service.scorecalculation.rules.standard.StandardGameRules;
+import com.scoreboard.service.scorecalculation.rules.standard.StandardMatchRules;
+import com.scoreboard.service.scorecalculation.rules.standard.StandardSetRules;
+import com.scoreboard.service.scorecalculation.rules.standard.StandardTiebreakRules;
 
 import java.util.Objects;
 

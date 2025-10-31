@@ -2,7 +2,7 @@ package com.scoreboard.initialization.database;
 
 import com.scoreboard.config.context.ApplicationContext;
 import com.scoreboard.config.servicediscovery.ServiceProvider;
-import com.scoreboard.service.finishedmatchpersistenceservice.FinishedMatchPersistenceService;
+import com.scoreboard.service.finishedmatchpersistence.FinishedMatchPersistenceService;
 import com.scoreboard.initialization.factory.TestMatchFactory;
 import com.scoreboard.initialization.datasource.DataSource;
 

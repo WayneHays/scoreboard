@@ -1,7 +1,7 @@
 package com.scoreboard.service.scorecalculation.handler;
 
 import com.scoreboard.model.entity.Player;
-import com.scoreboard.model.ongoingmatch.OngoingMatch;
+import com.scoreboard.model.domain.OngoingMatch;
 import com.scoreboard.service.scorecalculation.rules.MatchRules;
 import lombok.AllArgsConstructor;
 

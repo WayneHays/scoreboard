@@ -1,13 +1,13 @@
 package com.scoreboard.service.scorecalculation;
 
 import com.scoreboard.model.entity.Player;
-import com.scoreboard.model.ongoingmatch.OngoingMatch;
+import com.scoreboard.model.domain.OngoingMatch;
 import com.scoreboard.service.scorecalculation.handler.Handler;
 import com.scoreboard.service.scorecalculation.handler.MatchHandler;
 import com.scoreboard.service.scorecalculation.handler.SetHandler;
 import com.scoreboard.service.scorecalculation.handler.TiebreakHandler;
-import com.scoreboard.service.scorecalculation.handler.game_handler.GameHandler;
-import com.scoreboard.service.scorecalculation.handler.game_handler.GameHandlerFactory;
+import com.scoreboard.service.scorecalculation.handler.GameHandler;
+import com.scoreboard.service.scorecalculation.handler.GameHandlerFactory;
 import com.scoreboard.service.scorecalculation.rules.*;
 import lombok.AllArgsConstructor;
 

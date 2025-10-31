@@ -2,7 +2,7 @@ package com.scoreboard.mapper;
 
 import com.scoreboard.dto.response.MatchLiveView;
 import com.scoreboard.model.entity.Player;
-import com.scoreboard.model.ongoingmatch.OngoingMatch;
+import com.scoreboard.model.domain.OngoingMatch;
 import com.scoreboard.service.scorecalculation.Points;
 
 public class MatchLiveViewMapper implements Mapper<OngoingMatch, MatchLiveView> {

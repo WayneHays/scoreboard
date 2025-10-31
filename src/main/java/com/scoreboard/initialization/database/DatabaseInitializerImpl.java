@@ -2,8 +2,8 @@ package com.scoreboard.initialization.database;
 
 import com.scoreboard.exception.ApplicationStartupException;
 import com.scoreboard.model.entity.Player;
-import com.scoreboard.model.ongoingmatch.OngoingMatch;
-import com.scoreboard.service.finishedmatchpersistenceservice.FinishedMatchPersistenceService;
+import com.scoreboard.model.domain.OngoingMatch;
+import com.scoreboard.service.finishedmatchpersistence.FinishedMatchPersistenceService;
 import com.scoreboard.initialization.factory.TestMatchFactory;
 import com.scoreboard.initialization.datasource.DataSource;
 import lombok.AllArgsConstructor;

@@ -1,7 +1,7 @@
 package com.scoreboard.servlet;
 
 import com.scoreboard.config.context.ApplicationContext;
-import com.scoreboard.constant.WebPaths;
+import com.scoreboard.constant.JspPaths;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -25,7 +25,7 @@ public abstract class BaseServlet extends HttpServlet {
 
     private ApplicationContext getApplicationContext() {
         ServletContext servletContext = getServletContext();
-        ApplicationContext context = (ApplicationContext) servletContext.getAttribute(WebPaths.APPLICATION_CONTEXT_ATTR);
+        ApplicationContext context = (ApplicationContext) servletContext.getAttribute(JspPaths.APPLICATION_CONTEXT_ATTR);
 
         if (context == null) {
             String message = "ApplicationContext not found in ServletContext";

@@ -1,7 +1,7 @@
 package handler_test;
 
 import com.scoreboard.model.entity.Player;
-import com.scoreboard.model.ongoingmatch.OngoingMatch;
+import com.scoreboard.model.domain.OngoingMatch;
 import com.scoreboard.service.scorecalculation.Points;
 import com.scoreboard.service.scorecalculation.handler.TiebreakHandler;
 import com.scoreboard.service.scorecalculation.rules.TiebreakRules;

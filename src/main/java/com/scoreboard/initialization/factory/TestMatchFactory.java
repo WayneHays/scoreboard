@@ -1,7 +1,7 @@
 package com.scoreboard.initialization.factory;
 
 import com.scoreboard.model.entity.Player;
-import com.scoreboard.model.ongoingmatch.OngoingMatch;
+import com.scoreboard.model.domain.OngoingMatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

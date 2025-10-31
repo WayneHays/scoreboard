@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class WebPaths {
+public final class JspPaths {
     public static final String ERROR_JSP = "/WEB-INF/error.jsp";
     public static final String HOME_JSP = "/WEB-INF/home.jsp";
     public static final String MATCHES_JSP = "/WEB-INF/matches.jsp";

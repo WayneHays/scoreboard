@@ -2,7 +2,7 @@ package com.scoreboard.config.lifecycle;
 
 import com.scoreboard.config.context.ApplicationContext;
 import com.scoreboard.config.properties.Config;
-import com.scoreboard.util.HibernateUtil;
+import com.scoreboard.config.hibernate.HibernateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

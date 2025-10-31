@@ -2,7 +2,7 @@ package com.scoreboard.mapper;
 
 import com.scoreboard.dto.response.MatchResult;
 import com.scoreboard.model.entity.Player;
-import com.scoreboard.model.ongoingmatch.OngoingMatch;
+import com.scoreboard.model.domain.OngoingMatch;
 
 public class MatchResultMapper implements Mapper<OngoingMatch, MatchResult> {
     private static final String WINNER_CSS_CLASS = "winner";

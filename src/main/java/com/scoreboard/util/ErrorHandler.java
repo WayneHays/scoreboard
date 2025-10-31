@@ -1,6 +1,6 @@
 package com.scoreboard.util;
 
-import com.scoreboard.constant.WebPaths;
+import com.scoreboard.constant.JspPaths;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -28,7 +28,7 @@ public final class ErrorHandler {
         req.setAttribute("requestedUrl", requestedUrl);
 
         req.getServletContext()
-                .getRequestDispatcher(WebPaths.ERROR_JSP)
+                .getRequestDispatcher(JspPaths.ERROR_JSP)
                 .forward(req, resp);
     }
 
