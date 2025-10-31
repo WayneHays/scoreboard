@@ -4,7 +4,7 @@ import com.scoreboard.model.entity.Match;
 
 import java.util.List;
 
-public class MatchDaoImpl extends BaseHibernateDao<Match> implements MatchDao{
+public class MatchDaoImpl extends BaseDao<Match> implements MatchDao{
     private static final String FIND_ALL = "FROM Match ORDER BY id DESC";
     private static final String FIND_BY_PLAYER_NAME =
             "SELECT DISTINCT m FROM Match m " +

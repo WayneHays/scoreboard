@@ -4,7 +4,7 @@ import com.scoreboard.config.hibernate.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
-public abstract class BaseHibernateDao<T> {
+public abstract class BaseDao<T> {
 
     public void save(T entity) {
         getCurrentSession().persist(entity);
