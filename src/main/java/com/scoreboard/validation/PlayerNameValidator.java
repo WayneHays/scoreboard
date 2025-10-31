@@ -1,4 +1,4 @@
-package com.scoreboard.validator;
+package com.scoreboard.validation;
 
 import com.scoreboard.exception.ValidationException;
 import lombok.AccessLevel;

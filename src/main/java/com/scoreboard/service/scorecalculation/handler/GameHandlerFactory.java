@@ -1,4 +1,4 @@
-package com.scoreboard.service.scorecalculation.handler.game_handler;
+package com.scoreboard.service.scorecalculation.handler;
 
 import com.scoreboard.service.scorecalculation.rules.GameRules;
 import lombok.AccessLevel;

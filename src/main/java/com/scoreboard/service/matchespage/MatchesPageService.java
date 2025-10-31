@@ -1,4 +1,4 @@
-package com.scoreboard.service.matchespageservice;
+package com.scoreboard.service.matchespage;
 
 import com.scoreboard.config.properties.Config;
 import com.scoreboard.constant.AppDefaults;
@@ -9,7 +9,7 @@ import com.scoreboard.dto.response.MatchesPage;
 import com.scoreboard.mapper.MatchesPageMapper;
 import com.scoreboard.model.entity.Match;
 import com.scoreboard.service.BaseTransactionalService;
-import com.scoreboard.validator.PaginationValidator;
+import com.scoreboard.validation.PaginationValidator;
 
 import java.util.Collections;
 import java.util.List;

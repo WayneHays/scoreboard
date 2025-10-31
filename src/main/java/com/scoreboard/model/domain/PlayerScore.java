@@ -1,4 +1,4 @@
-package com.scoreboard.model.ongoingmatch;
+package com.scoreboard.model.domain;
 
 import com.scoreboard.service.scorecalculation.Points;
 import lombok.Getter;

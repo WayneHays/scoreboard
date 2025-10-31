@@ -1,4 +1,4 @@
-package com.scoreboard.service.scorecalculation.rules.standart;
+package com.scoreboard.service.scorecalculation.rules.standard;
 
 import com.scoreboard.service.scorecalculation.rules.TiebreakRules;
 

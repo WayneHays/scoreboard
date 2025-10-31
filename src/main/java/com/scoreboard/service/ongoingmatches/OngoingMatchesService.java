@@ -1,8 +1,8 @@
-package com.scoreboard.service.ongoingmatchesservice;
+package com.scoreboard.service.ongoingmatches;
 
 import com.scoreboard.exception.NotFoundException;
 import com.scoreboard.model.entity.Player;
-import com.scoreboard.model.ongoingmatch.OngoingMatch;
+import com.scoreboard.model.domain.OngoingMatch;
 
 import java.util.Map;
 import java.util.UUID;
@@ -35,5 +35,9 @@ public class OngoingMatchesService {
 
     public void delete(UUID uuid) {
         ongoingMatches.remove(uuid);
+    }
+
+    public boolean contains(UUID uuid) {
+        return ongoingMatches.containsKey(uuid);
     }
 }

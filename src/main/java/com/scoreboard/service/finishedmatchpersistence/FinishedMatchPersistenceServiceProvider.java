@@ -1,21 +1,21 @@
-package com.scoreboard.service.matchespageservice;
+package com.scoreboard.service.finishedmatchpersistence;
 
 import com.scoreboard.config.context.ApplicationContext;
-import com.scoreboard.config.properties.Config;
 import com.scoreboard.config.servicediscovery.ServiceProvider;
 import com.scoreboard.dao.MatchDao;
+import com.scoreboard.dao.PlayerDao;
 
-public class MatchesPageServiceProvider implements ServiceProvider {
+public class FinishedMatchPersistenceServiceProvider implements ServiceProvider {
 
     @Override
     public Class<?> getServiceType() {
-        return MatchesPageService.class;
+        return FinishedMatchPersistenceService.class;
     }
 
     @Override
     public Object createService(ApplicationContext context) {
-        return new MatchesPageService(
+        return new FinishedMatchPersistenceService(
                 context.get(MatchDao.class),
-                context.get(Config.class));
+                context.get(PlayerDao.class));
     }
 }

@@ -1,10 +1,10 @@
-package com.scoreboard.service.finishedmatchpersistenceservice;
+package com.scoreboard.service.finishedmatchpersistence;
 
 import com.scoreboard.dao.MatchDao;
 import com.scoreboard.dao.PlayerDao;
 import com.scoreboard.model.entity.Match;
 import com.scoreboard.model.entity.Player;
-import com.scoreboard.model.ongoingmatch.OngoingMatch;
+import com.scoreboard.model.domain.OngoingMatch;
 import com.scoreboard.service.BaseTransactionalService;
 import lombok.AllArgsConstructor;
 

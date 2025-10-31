@@ -1,4 +1,4 @@
-package com.scoreboard.service.ongoingmatchesservice;
+package com.scoreboard.service.ongoingmatches;
 
 import com.scoreboard.config.context.ApplicationContext;
 import com.scoreboard.config.servicediscovery.ServiceProvider;

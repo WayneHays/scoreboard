@@ -1,4 +1,4 @@
-package com.scoreboard.model.ongoingmatch;
+package com.scoreboard.model.domain;
 
 import com.scoreboard.model.entity.Player;
 import com.scoreboard.service.scorecalculation.Points;

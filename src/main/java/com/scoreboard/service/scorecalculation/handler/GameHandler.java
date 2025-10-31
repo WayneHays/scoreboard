@@ -1,9 +1,8 @@
-package com.scoreboard.service.scorecalculation.handler.game_handler;
+package com.scoreboard.service.scorecalculation.handler;
 
 import com.scoreboard.model.entity.Player;
-import com.scoreboard.model.ongoingmatch.OngoingMatch;
+import com.scoreboard.model.domain.OngoingMatch;
 import com.scoreboard.service.scorecalculation.PointResult;
-import com.scoreboard.service.scorecalculation.handler.AbstractHandler;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 

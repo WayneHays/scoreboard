@@ -1,4 +1,4 @@
-package com.scoreboard.util;
+package com.scoreboard.config.hibernate;
 
 import com.scoreboard.config.properties.Config;
 import com.scoreboard.constant.AppDefaults;
