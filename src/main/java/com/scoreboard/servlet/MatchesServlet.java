@@ -1,11 +1,11 @@
 package com.scoreboard.servlet;
 
-import com.scoreboard.constant.AppDefaults;
-import com.scoreboard.constant.WebPaths;
+import com.scoreboard.constant.JspPaths;
 import com.scoreboard.dto.response.MatchesPage;
 import com.scoreboard.exception.ValidationException;
-import com.scoreboard.service.matchespageservice.MatchesPageService;
-import com.scoreboard.validator.PlayerNameValidator;
+import com.scoreboard.service.matchespage.MatchesPageService;
+import com.scoreboard.util.ServletHelper;
+import com.scoreboard.validation.PlayerNameValidator;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +18,8 @@ import java.io.IOException;
 @WebServlet("/matches")
 public class MatchesServlet extends BaseServlet {
     private static final Logger logger = LoggerFactory.getLogger(MatchesServlet.class);
+    private static final String PLAYER_FILTER_PARAM = "filter_by_player_name";
+    private static final String PAGE_ATTR = "page";
 
     private MatchesPageService matchesPageService;
 
@@ -31,13 +33,13 @@ public class MatchesServlet extends BaseServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        String playerName = req.getParameter("filter_by_player_name");
-        int pageNumber = parsePageNumber(req.getParameter("page"));
+        String playerName = req.getParameter(PLAYER_FILTER_PARAM);
+        int pageNumber = ServletHelper.parsePageNumber(req.getParameter(PAGE_ATTR));
 
         MatchesPage page = getMatchesPage(playerName, pageNumber);
 
-        req.setAttribute("page", page);
-        getServletContext().getRequestDispatcher(WebPaths.MATCHES_JSP).forward(req, resp);
+        req.setAttribute(PAGE_ATTR, page);
+        getServletContext().getRequestDispatcher(JspPaths.MATCHES_JSP).forward(req, resp);
     }
 
     private MatchesPage getMatchesPage(String playerName, int pageNumber) {
@@ -56,19 +58,6 @@ public class MatchesServlet extends BaseServlet {
             return matchesPageService
                     .getPage(pageNumber)
                     .withValidationError(e.getMessage(), playerName);
-        }
-    }
-
-    private int parsePageNumber(String pageNumberStr) {
-        if (pageNumberStr == null || pageNumberStr.isBlank()) {
-            return AppDefaults.DEFAULT_PAGE_NUMBER;
-        }
-
-        try {
-            return Integer.parseInt(pageNumberStr);
-        } catch (NumberFormatException e) {
-            logger.warn("Invalid page number format: '{}'", pageNumberStr);
-            throw new ValidationException("Invalid page number: " + pageNumberStr, e);
         }
     }
 }
