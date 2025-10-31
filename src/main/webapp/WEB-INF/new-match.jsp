@@ -57,7 +57,7 @@
                         name="player2name"
                         class="form-input"
                         placeholder="Second player's name"
-                        value="<c:out value='${sessionScope.player2Input}'/>"
+                        value="<c:out value='${player2Input}'/>"
                         required
                 >
             </div>
