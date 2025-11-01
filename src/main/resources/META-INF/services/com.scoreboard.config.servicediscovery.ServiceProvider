@@ -5,6 +5,9 @@ com.scoreboard.config.properties.PropertiesConfigProvider
 com.scoreboard.dao.PlayerDaoProvider
 com.scoreboard.dao.MatchDaoProvider
 
+# Tennis rules
+com.scoreboard.service.scorecalculation.rules.standard.StandardTennisMatchRulesProvider
+
 # Service
 com.scoreboard.service.ongoingmatches.OngoingMatchesServiceProvider
 com.scoreboard.service.scorecalculation.ScoreCalculationServiceProvider

@@ -1,28 +1,30 @@
 package com.scoreboard.service.scorecalculation;
 
-import com.scoreboard.model.entity.Player;
 import com.scoreboard.model.domain.OngoingMatch;
-import com.scoreboard.service.scorecalculation.handler.Handler;
-import com.scoreboard.service.scorecalculation.handler.MatchHandler;
-import com.scoreboard.service.scorecalculation.handler.SetHandler;
-import com.scoreboard.service.scorecalculation.handler.TiebreakHandler;
-import com.scoreboard.service.scorecalculation.handler.GameHandler;
-import com.scoreboard.service.scorecalculation.handler.GameHandlerFactory;
-import com.scoreboard.service.scorecalculation.rules.*;
+import com.scoreboard.model.entity.Player;
+import com.scoreboard.service.scorecalculation.handler.*;
+import com.scoreboard.service.scorecalculation.rules.TennisMatchRules;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @AllArgsConstructor
 public class ScoreCalculationService {
+    private static final Logger logger = LoggerFactory.getLogger(ScoreCalculationService.class);
+
     private final TennisMatchRules rules;
     private final Handler handlerChain;
 
-    public ScoreCalculationService() {
-        this(TennisMatchRules.standard());
-    }
-
     public ScoreCalculationService(TennisMatchRules rules) {
+        if (rules == null) {
+            throw new RuntimeException("TennisMatchRules cannot be null");
+        }
+
         this.rules = rules;
         this.handlerChain = createHandlerChain();
+
+        logger.info("ScoreCalculationService initialized with rules: {}",
+                rules.getClass().getSimpleName());
     }
 
     public void awardPoint(OngoingMatch match, Player scorer) {

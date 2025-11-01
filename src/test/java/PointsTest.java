@@ -37,7 +37,7 @@ class PointsTest {
     void next_fromAdvantage_shouldThrowIllegalStateException() {
         IllegalStateException exception = assertThrows(
                 IllegalStateException.class,
-                () -> Points.ADVANTAGE.next()
+                Points.ADVANTAGE::next
         );
 
         assertEquals("Cannot advance beyond ADVANTAGE. Game should be finished.",
@@ -47,16 +47,16 @@ class PointsTest {
     @Test
     void next_multipleProgression_shouldAdvanceCorrectly() {
         Points current = Points.ZERO;
-        current = current.next();  // ZERO -> FIFTEEN
+        current = current.next();
         assertEquals(Points.FIFTEEN, current);
 
-        current = current.next();  // FIFTEEN -> THIRTY
+        current = current.next();
         assertEquals(Points.THIRTY, current);
 
-        current = current.next();  // THIRTY -> FORTY
+        current = current.next();
         assertEquals(Points.FORTY, current);
 
-        current = current.next();  // FORTY -> ADVANTAGE
+        current = current.next();
         assertEquals(Points.ADVANTAGE, current);
     }
 
@@ -111,7 +111,6 @@ class PointsTest {
 
     @Test
     void points_shouldBeComparable() {
-        // Проверяем, что enum можно сравнивать через ==
         Points point1 = Points.ZERO;
         Points point2 = Points.ZERO;
         assertSame(point1, point2);

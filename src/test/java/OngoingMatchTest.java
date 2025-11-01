@@ -131,14 +131,13 @@ class OngoingMatchTest {
 
         @Test
         void awardPointTo_toAdvantage_shouldWork() {
-            // Setup: 40-40, then player1 scores
-            ongoingMatch.awardPointTo(player1); // 15-0
-            ongoingMatch.awardPointTo(player1); // 30-0
-            ongoingMatch.awardPointTo(player1); // 40-0
-            ongoingMatch.awardPointTo(player2); // 40-15
-            ongoingMatch.awardPointTo(player2); // 40-30
-            ongoingMatch.awardPointTo(player2); // 40-40
-            ongoingMatch.awardPointTo(player1); // AD-40
+            ongoingMatch.awardPointTo(player1);
+            ongoingMatch.awardPointTo(player1);
+            ongoingMatch.awardPointTo(player1);
+            ongoingMatch.awardPointTo(player2);
+            ongoingMatch.awardPointTo(player2);
+            ongoingMatch.awardPointTo(player2);
+            ongoingMatch.awardPointTo(player1);
 
             assertEquals(Points.ADVANTAGE, ongoingMatch.getPoints(player1));
             assertEquals(Points.FORTY, ongoingMatch.getPoints(player2));
@@ -326,7 +325,6 @@ class OngoingMatchTest {
 
         @Test
         void resetPointsToForty_fromAdvantage_shouldSetToForty() {
-            // Setup: give player1 advantage
             ongoingMatch.awardPointTo(player1);
             ongoingMatch.awardPointTo(player1);
             ongoingMatch.awardPointTo(player1);
@@ -389,7 +387,6 @@ class OngoingMatchTest {
 
         @Test
         void completeGame_scenario_shouldWorkCorrectly() {
-            // Player1 wins game: 15-0, 30-0, 40-0, Game
             ongoingMatch.awardPointTo(player1);
             ongoingMatch.awardPointTo(player1);
             ongoingMatch.awardPointTo(player1);
@@ -402,7 +399,6 @@ class OngoingMatchTest {
 
         @Test
         void completeSet_scenario_shouldWorkCorrectly() {
-            // Simulate winning 6 games
             for (int i = 0; i < 6; i++) {
                 ongoingMatch.awardGameTo(player1);
             }
@@ -416,16 +412,13 @@ class OngoingMatchTest {
 
         @Test
         void tiebreakScenario_shouldWorkCorrectly() {
-            // Setup: 6-6 in games
             for (int i = 0; i < 6; i++) {
                 ongoingMatch.awardGameTo(player1);
                 ongoingMatch.awardGameTo(player2);
             }
 
-            // Activate tiebreak
             ongoingMatch.setTieBreak(true);
 
-            // Player1 wins tiebreak 7-5
             for (int i = 0; i < 7; i++) {
                 ongoingMatch.awardTieBreakPointTo(player1);
             }
@@ -436,7 +429,6 @@ class OngoingMatchTest {
             assertEquals(7, ongoingMatch.getTieBreakPoints(player1));
             assertEquals(5, ongoingMatch.getTieBreakPoints(player2));
 
-            // Award game and set
             ongoingMatch.awardGameTo(player1);
 
             assertEquals(0, ongoingMatch.getTieBreakPoints(player1));
@@ -446,7 +438,6 @@ class OngoingMatchTest {
 
         @Test
         void deuceAndAdvantageScenario_shouldWorkCorrectly() {
-            // Setup: 40-40
             ongoingMatch.awardPointTo(player1);
             ongoingMatch.awardPointTo(player1);
             ongoingMatch.awardPointTo(player1);
@@ -457,14 +448,12 @@ class OngoingMatchTest {
             assertEquals(Points.FORTY, ongoingMatch.getPoints(player1));
             assertEquals(Points.FORTY, ongoingMatch.getPoints(player2));
 
-            // Player1 gets advantage
             ongoingMatch.awardPointTo(player1);
             ongoingMatch.setAdvantage(player1);
 
             assertEquals(Points.ADVANTAGE, ongoingMatch.getPoints(player1));
             assertEquals(player1, ongoingMatch.getAdvantage());
 
-            // Reset to deuce
             ongoingMatch.resetPointsToForty(player1);
             ongoingMatch.setAdvantage(null);
 
@@ -474,7 +463,6 @@ class OngoingMatchTest {
 
         @Test
         void completeMatch_scenario_shouldWorkCorrectly() {
-            // Player1 wins 2 sets (best of 3)
             ongoingMatch.awardSetTo(player1);
             ongoingMatch.awardSetTo(player1);
             ongoingMatch.setWinner(player1);

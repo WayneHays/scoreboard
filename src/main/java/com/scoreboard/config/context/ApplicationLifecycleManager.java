@@ -1,7 +1,6 @@
-package com.scoreboard.config.lifecycle;
+package com.scoreboard.config.context;
 
-import com.scoreboard.config.context.ApplicationContext;
-import com.scoreboard.config.context.ApplicationContextInitializer;
+import com.scoreboard.config.lifecycle.LifecycleComponent;
 import com.scoreboard.exception.ApplicationStartupException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
