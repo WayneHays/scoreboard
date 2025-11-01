@@ -17,7 +17,7 @@ public class ScoreCalculationService {
 
     public ScoreCalculationService(TennisMatchRules rules) {
         if (rules == null) {
-            throw new RuntimeException("TennisMatchRules cannot be null");
+            throw new IllegalArgumentException("TennisMatchRules cannot be null");
         }
 
         this.rules = rules;
