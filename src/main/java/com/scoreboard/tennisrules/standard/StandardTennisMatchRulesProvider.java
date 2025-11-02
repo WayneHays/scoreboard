@@ -1,9 +1,9 @@
-package com.scoreboard.service.scorecalculation.rules.standard;
+package com.scoreboard.tennisrules.standard;
 
 import com.scoreboard.config.context.ApplicationContext;
 import com.scoreboard.config.servicediscovery.ServiceProvider;
-import com.scoreboard.service.scorecalculation.rules.TennisMatchRules;
-import com.scoreboard.service.scorecalculation.rules.TennisMatchRulesImpl;
+import com.scoreboard.tennisrules.TennisMatchRules;
+import com.scoreboard.tennisrules.TennisMatchRulesImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

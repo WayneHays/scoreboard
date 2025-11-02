@@ -1,6 +1,6 @@
 package com.scoreboard.service.scorecalculation.handler;
 
-import com.scoreboard.service.scorecalculation.rules.GameRules;
+import com.scoreboard.tennisrules.GameRules;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

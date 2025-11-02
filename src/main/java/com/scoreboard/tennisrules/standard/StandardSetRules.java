@@ -1,6 +1,6 @@
-package com.scoreboard.service.scorecalculation.rules.standard;
+package com.scoreboard.tennisrules.standard;
 
-import com.scoreboard.service.scorecalculation.rules.SetRules;
+import com.scoreboard.tennisrules.SetRules;
 
 public class StandardSetRules implements SetRules {
     private static final int GAMES_TO_WIN_SET = 6;

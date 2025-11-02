@@ -2,7 +2,7 @@ package com.scoreboard.service.scorecalculation.handler;
 
 import com.scoreboard.model.entity.Player;
 import com.scoreboard.model.domain.OngoingMatch;
-import com.scoreboard.service.scorecalculation.rules.TiebreakRules;
+import com.scoreboard.tennisrules.TiebreakRules;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor

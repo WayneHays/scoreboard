@@ -1,6 +1,6 @@
-package com.scoreboard.service.scorecalculation.rules.standard;
+package com.scoreboard.tennisrules.standard;
 
-import com.scoreboard.service.scorecalculation.rules.TiebreakRules;
+import com.scoreboard.tennisrules.TiebreakRules;
 
 public class StandardTiebreakRules implements TiebreakRules {
     private static final int POINTS_TO_WIN_TIEBREAK = 7;

@@ -1,6 +1,6 @@
-package com.scoreboard.service.scorecalculation.rules.standard;
+package com.scoreboard.tennisrules.standard;
 
-import com.scoreboard.service.scorecalculation.rules.GameRules;
+import com.scoreboard.tennisrules.GameRules;
 
 public class StandardGameRules implements GameRules {
     private static final boolean IS_ADVANTAGE_ENABLED = true;

@@ -1,4 +1,4 @@
-package com.scoreboard.service.scorecalculation.rules;
+package com.scoreboard.tennisrules;
 
 public interface GameRules {
     boolean isAdvantageEnabled();

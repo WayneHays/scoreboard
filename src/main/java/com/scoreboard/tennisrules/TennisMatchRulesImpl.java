@@ -1,11 +1,14 @@
-package com.scoreboard.service.scorecalculation.rules;
+package com.scoreboard.tennisrules;
 
-import com.scoreboard.service.scorecalculation.rules.standard.StandardGameRules;
-import com.scoreboard.service.scorecalculation.rules.standard.StandardMatchRules;
-import com.scoreboard.service.scorecalculation.rules.standard.StandardSetRules;
-import com.scoreboard.service.scorecalculation.rules.standard.StandardTiebreakRules;
+import com.scoreboard.tennisrules.standard.StandardGameRules;
+import com.scoreboard.tennisrules.standard.StandardMatchRules;
+import com.scoreboard.tennisrules.standard.StandardSetRules;
+import com.scoreboard.tennisrules.standard.StandardTiebreakRules;
+import com.scoreboard.validation.TennisRulesValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Objects;
 
 public class TennisMatchRulesImpl implements TennisMatchRules {
     private static final Logger logger = LoggerFactory.getLogger(TennisMatchRulesImpl.class);
@@ -26,10 +29,11 @@ public class TennisMatchRulesImpl implements TennisMatchRules {
     public TennisMatchRulesImpl(GameRules gameRules, TiebreakRules tiebreakRules,
                                 SetRules setRules, MatchRules matchRules) {
         logger.debug("Creating TennisMatchRulesImpl with custom rules");
-        this.gameRules = gameRules;
-        this.tiebreakRules = tiebreakRules;
-        this.setRules = setRules;
-        this.matchRules = matchRules;
+        this.gameRules = Objects.requireNonNull(gameRules);
+        this.tiebreakRules = Objects.requireNonNull(tiebreakRules);
+        this.setRules = Objects.requireNonNull(setRules);
+        this.matchRules = Objects.requireNonNull(matchRules);
+        TennisRulesValidator.validate(this);
     }
 
     @Override

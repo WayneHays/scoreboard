@@ -1,12 +1,12 @@
 import com.scoreboard.model.entity.Player;
 import com.scoreboard.model.domain.OngoingMatch;
+import com.scoreboard.tennisrules.TennisMatchRulesImpl;
 import com.scoreboard.service.scorecalculation.Points;
 import com.scoreboard.service.scorecalculation.ScoreCalculationService;
-import com.scoreboard.service.scorecalculation.rules.*;
-import com.scoreboard.service.scorecalculation.rules.standard.StandardGameRules;
-import com.scoreboard.service.scorecalculation.rules.standard.StandardMatchRules;
-import com.scoreboard.service.scorecalculation.rules.standard.StandardSetRules;
-import com.scoreboard.service.scorecalculation.rules.standard.StandardTiebreakRules;
+import com.scoreboard.tennisrules.standard.StandardGameRules;
+import com.scoreboard.tennisrules.standard.StandardMatchRules;
+import com.scoreboard.tennisrules.standard.StandardSetRules;
+import com.scoreboard.tennisrules.standard.StandardTiebreakRules;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

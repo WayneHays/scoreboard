@@ -3,7 +3,7 @@ package com.scoreboard.service.scorecalculation;
 import com.scoreboard.model.domain.OngoingMatch;
 import com.scoreboard.model.entity.Player;
 import com.scoreboard.service.scorecalculation.handler.*;
-import com.scoreboard.service.scorecalculation.rules.TennisMatchRules;
+import com.scoreboard.tennisrules.TennisMatchRules;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -6,7 +6,7 @@ com.scoreboard.dao.PlayerDaoProvider
 com.scoreboard.dao.MatchDaoProvider
 
 # Tennis rules
-com.scoreboard.service.scorecalculation.rules.standard.StandardTennisMatchRulesProvider
+com.scoreboard.tennisrules.standard.StandardTennisMatchRulesProvider
 
 # Service
 com.scoreboard.service.ongoingmatches.OngoingMatchesServiceProvider

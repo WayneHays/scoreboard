@@ -4,7 +4,6 @@ import com.scoreboard.model.entity.Player;
 import com.scoreboard.model.domain.OngoingMatch;
 import com.scoreboard.service.scorecalculation.Points;
 import com.scoreboard.service.scorecalculation.handler.WithoutAdvantageGameHandler;
-import com.scoreboard.service.scorecalculation.rules.GameRules;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
