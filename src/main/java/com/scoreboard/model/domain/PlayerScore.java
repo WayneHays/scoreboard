@@ -10,12 +10,11 @@ public class PlayerScore {
     private int sets;
     private int tieBreakPoints;
 
-
-    public PlayerScore() {
+    PlayerScore() {
         this.points = Points.ZERO;
     }
 
-    public void awardPoint() {
+    void awardPoint() {
         this.points = points.next();
     }
 
@@ -31,7 +30,7 @@ public class PlayerScore {
         tieBreakPoints++;
     }
 
-    public void setPointsToForty() {
+    void setPointsToForty() {
         this.points = Points.FORTY;
     }
 
