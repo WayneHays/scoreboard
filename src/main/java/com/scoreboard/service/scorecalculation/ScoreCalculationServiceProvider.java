@@ -2,8 +2,8 @@ package com.scoreboard.service.scorecalculation;
 
 import com.scoreboard.config.context.ApplicationContext;
 import com.scoreboard.config.servicediscovery.ServiceProvider;
-import com.scoreboard.tennisrules.TennisMatchRules;
-import com.scoreboard.tennisrules.TennisMatchRulesImpl;
+import com.scoreboard.tennisrules.TennisRules;
+import com.scoreboard.tennisrules.TennisRulesImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,25 +12,25 @@ public class ScoreCalculationServiceProvider implements ServiceProvider {
 
     @Override
     public Class<?> getServiceType() {
-        return ScoreCalculationService.class;
+        return MatchService.class;
     }
 
     @Override
     public Object createService(ApplicationContext context) {
-        TennisMatchRules rules;
+        TennisRules rules;
 
         try {
-            rules = context.get(TennisMatchRules.class);
-            logger.info("Using TennisMatchRules from context: {}",
+            rules = context.get(TennisRules.class);
+            logger.info("Using TennisRules from context: {}",
                     rules.getClass().getSimpleName());
 
         } catch (IllegalStateException e) {
-            logger.warn("TennisMatchRules not found in context, using standard rules as fallback");
-            logger.warn("Make sure a TennisMatchRules provider is registered in META-INF/services");
+            logger.warn("TennisRules not found in context, using standard rules as fallback");
+            logger.warn("Make sure a TennisRules provider is registered in META-INF/services");
 
-            rules = new TennisMatchRulesImpl();
+            rules = new TennisRulesImpl();
         }
 
-        return new ScoreCalculationService(rules);
+        return new MatchService(rules);
     }
 }

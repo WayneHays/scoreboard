@@ -2,7 +2,7 @@ package handler_test;
 
 import com.scoreboard.model.domain.OngoingMatch;
 import com.scoreboard.model.entity.Player;
-import com.scoreboard.service.scorecalculation.Points;
+import com.scoreboard.model.domain.Points;
 import com.scoreboard.service.scorecalculation.handler.WithAdvantageGameHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,7 +34,7 @@ class WithAdvantageGameHandlerTest {
         void handle_from0to15_shouldAwardPoint() {
             assertEquals(Points.ZERO, match.getPoints(player1));
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertEquals(Points.FIFTEEN, match.getPoints(player1));
             assertEquals(Points.ZERO, match.getPoints(player2));
@@ -44,7 +44,7 @@ class WithAdvantageGameHandlerTest {
         void handle_from15to30_shouldAwardPoint() {
             match.awardPointTo(player1);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertEquals(Points.THIRTY, match.getPoints(player1));
         }
@@ -54,7 +54,7 @@ class WithAdvantageGameHandlerTest {
             match.awardPointTo(player1);
             match.awardPointTo(player1);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertEquals(Points.FORTY, match.getPoints(player1));
         }
@@ -68,7 +68,7 @@ class WithAdvantageGameHandlerTest {
         void handle_40vs0_shouldWinGame() {
             setupScore(Points.FORTY, Points.ZERO);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertEquals(1, match.getGames(player1));
             assertEquals(0, match.getGames(player2));
@@ -80,7 +80,7 @@ class WithAdvantageGameHandlerTest {
         void handle_40vs15_shouldWinGame() {
             setupScore(Points.FORTY, Points.FIFTEEN);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertEquals(1, match.getGames(player1));
         }
@@ -89,7 +89,7 @@ class WithAdvantageGameHandlerTest {
         void handle_40vs30_shouldWinGame() {
             setupScore(Points.FORTY, Points.THIRTY);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertEquals(1, match.getGames(player1));
         }
@@ -103,7 +103,7 @@ class WithAdvantageGameHandlerTest {
         void handle_40vs40_player1Scores_shouldGetAdvantage() {
             setupScore(Points.FORTY, Points.FORTY);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertEquals(Points.ADVANTAGE, match.getPoints(player1));
             assertEquals(Points.FORTY, match.getPoints(player2));
@@ -114,7 +114,7 @@ class WithAdvantageGameHandlerTest {
         void handle_40vs40_player2Scores_shouldGetAdvantage() {
             setupScore(Points.FORTY, Points.FORTY);
 
-            handler.handle(match, player2);
+            handler.handle(, player2);
 
             assertEquals(Points.FORTY, match.getPoints(player1));
             assertEquals(Points.ADVANTAGE, match.getPoints(player2));
@@ -131,7 +131,7 @@ class WithAdvantageGameHandlerTest {
             setupScore(Points.ADVANTAGE, Points.FORTY);
             match.setAdvantage(player1);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertEquals(1, match.getGames(player1));
             assertEquals(0, match.getGames(player2));
@@ -145,7 +145,7 @@ class WithAdvantageGameHandlerTest {
             setupScore(Points.FORTY, Points.ADVANTAGE);
             match.setAdvantage(player2);
 
-            handler.handle(match, player2);
+            handler.handle(, player2);
 
             assertEquals(0, match.getGames(player1));
             assertEquals(1, match.getGames(player2));
@@ -161,7 +161,7 @@ class WithAdvantageGameHandlerTest {
             setupScore(Points.FORTY, Points.ADVANTAGE);
             match.setAdvantage(player2);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertEquals(Points.FORTY, match.getPoints(player1));
             assertEquals(Points.FORTY, match.getPoints(player2));
@@ -173,7 +173,7 @@ class WithAdvantageGameHandlerTest {
             setupScore(Points.ADVANTAGE, Points.FORTY);
             match.setAdvantage(player1);
 
-            handler.handle(match, player2);
+            handler.handle(, player2);
 
             assertEquals(Points.FORTY, match.getPoints(player1));
             assertEquals(Points.FORTY, match.getPoints(player2));
@@ -189,28 +189,28 @@ class WithAdvantageGameHandlerTest {
         void handle_multipleDeuces_shouldHandleCorrectly() {
             setupScore(Points.FORTY, Points.FORTY);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
             assertEquals(Points.ADVANTAGE, match.getPoints(player1));
             assertEquals(player1, match.getAdvantage());
 
-            handler.handle(match, player2);
+            handler.handle(, player2);
             assertEquals(Points.FORTY, match.getPoints(player1));
             assertEquals(Points.FORTY, match.getPoints(player2));
             assertNull(match.getAdvantage());
 
-            handler.handle(match, player2);
+            handler.handle(, player2);
             assertEquals(Points.ADVANTAGE, match.getPoints(player2));
             assertEquals(player2, match.getAdvantage());
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
             assertEquals(Points.FORTY, match.getPoints(player1));
             assertEquals(Points.FORTY, match.getPoints(player2));
             assertNull(match.getAdvantage());
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
             assertEquals(Points.ADVANTAGE, match.getPoints(player1));
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
             assertEquals(1, match.getGames(player1));
         }
 
@@ -219,16 +219,16 @@ class WithAdvantageGameHandlerTest {
             setupScore(Points.FORTY, Points.FORTY);
 
             for (int i = 0; i < 5; i++) {
-                handler.handle(match, player1);
+                handler.handle(, player1);
                 assertEquals(Points.ADVANTAGE, match.getPoints(player1));
 
-                handler.handle(match, player2);
+                handler.handle(, player2);
                 assertEquals(Points.FORTY, match.getPoints(player1));
                 assertEquals(Points.FORTY, match.getPoints(player2));
             }
 
-            handler.handle(match, player1);
-            handler.handle(match, player1);
+            handler.handle(, player1);
+            handler.handle(, player1);
 
             assertEquals(1, match.getGames(player1));
         }
@@ -240,39 +240,39 @@ class WithAdvantageGameHandlerTest {
 
         @Test
         void completeGame_straightWin_40to0() {
-            handler.handle(match, player1);
-            handler.handle(match, player1);
-            handler.handle(match, player1);
-            handler.handle(match, player1);
+            handler.handle(, player1);
+            handler.handle(, player1);
+            handler.handle(, player1);
+            handler.handle(, player1);
 
             assertEquals(1, match.getGames(player1));
         }
 
         @Test
         void completeGame_withDeuce() {
-            handler.handle(match, player1);
-            handler.handle(match, player2);
-            handler.handle(match, player1);
-            handler.handle(match, player2);
-            handler.handle(match, player1);
-            handler.handle(match, player2);
+            handler.handle(, player1);
+            handler.handle(, player2);
+            handler.handle(, player1);
+            handler.handle(, player2);
+            handler.handle(, player1);
+            handler.handle(, player2);
 
             assertEquals(Points.FORTY, match.getPoints(player1));
             assertEquals(Points.FORTY, match.getPoints(player2));
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
             assertEquals(Points.ADVANTAGE, match.getPoints(player1));
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
             assertEquals(1, match.getGames(player1));
         }
 
         @Test
         void completeGame_player2Wins() {
-            handler.handle(match, player2);
-            handler.handle(match, player2);
-            handler.handle(match, player2);
-            handler.handle(match, player2);
+            handler.handle(, player2);
+            handler.handle(, player2);
+            handler.handle(, player2);
+            handler.handle(, player2);
 
             assertEquals(0, match.getGames(player1));
             assertEquals(1, match.getGames(player2));
@@ -289,7 +289,7 @@ class WithAdvantageGameHandlerTest {
             int initialGames = match.getGames(player1);
             Points initialPoints = match.getPoints(player1);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertEquals(initialGames, match.getGames(player1));
             assertEquals(initialPoints, match.getPoints(player1));
@@ -305,7 +305,7 @@ class WithAdvantageGameHandlerTest {
             match.setTieBreak(true);
             Points initialPoints = match.getPoints(player1);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertEquals(initialPoints, match.getPoints(player1));
         }

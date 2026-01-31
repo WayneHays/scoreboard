@@ -31,34 +31,52 @@
             </div>
 
             <div class="score-row">
-                <div class="player-name"><c:out value="${matchView.firstPlayerName}"/></div>
-                <div class="sets-score">${matchView.firstPlayerSets}</div>
-                <div class="games-score">${matchView.firstPlayerGames}</div>
-                <div class="points-score">${matchView.firstPlayerPoints}</div>
+                <div class="player-name"><c:out value="${matchDto.firstPlayerName}"/></div>
+                <div class="sets-score">${matchDto.firstPlayerSets}</div>
+                <div class="games-score">${matchDto.firstPlayerGames}</div>
+                <div class="points-score">
+                    <c:choose>
+                        <c:when test="${matchDto.isTieBreak}">
+                            ${matchDto.firstPlayerTieBreakPoints}
+                        </c:when>
+                        <c:otherwise>
+                            ${matchDto.firstPlayerPoints}
+                        </c:otherwise>
+                    </c:choose>
+                </div>
             </div>
 
             <div class="score-row">
-                <div class="player-name"><c:out value="${matchView.secondPlayerName}"/></div>
-                <div class="sets-score">${matchView.secondPlayerSets}</div>
-                <div class="games-score">${matchView.secondPlayerGames}</div>
-                <div class="points-score">${matchView.secondPlayerPoints}</div>
+                <div class="player-name"><c:out value="${matchDto.secondPlayerName}"/></div>
+                <div class="sets-score">${matchDto.secondPlayerSets}</div>
+                <div class="games-score">${matchDto.secondPlayerGames}/></div>
+                <div class="points-score">
+                    <c:choose>
+                        <c:when test="${matchDto.isTieBreak}">
+                           ${matchDto.secondPlayerTieBreakPoints}
+                        </c:when>
+                        <c:otherwise>
+                            ${matchDto.secondPlayerPoints}
+                        </c:otherwise>
+                    </c:choose>
+                </div>
             </div>
         </section>
 
         <section class="actions-container">
             <form action="${pageContext.request.contextPath}/match-score" method="POST" class="point-form">
                 <input type="hidden" name="uuid" value="${param.uuid}">
-                <input type="hidden" name="playerName" value="${matchView.firstPlayerName}">
+                <input type="hidden" name="playerName" value="${matchDto.firstPlayerName}">
                 <button type="submit" class="action-button">
-                    <c:out value="${matchView.firstPlayerName}"/> Wins Point
+                    <c:out value="${matchDto.firstPlayerName}"/> Wins Point
                 </button>
             </form>
 
             <form action="${pageContext.request.contextPath}/match-score" method="POST" class="point-form">
                 <input type="hidden" name="uuid" value="${param.uuid}">
-                <input type="hidden" name="playerName" value="${matchView.secondPlayerName}">
+                <input type="hidden" name="playerName" value="${matchDto.secondPlayerName}">
                 <button type="submit" class="action-button player2-button">
-                    <c:out value="${matchView.secondPlayerName}"/> Wins Point
+                    <c:out value="${matchDto.secondPlayerName}"/> Wins Point
                 </button>
             </form>
         </section>

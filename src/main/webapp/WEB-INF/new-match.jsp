@@ -23,22 +23,33 @@
     </header>
 
     <main>
-        <c:if test="${not empty error}">
-            <div class="error-message general-error">
-                <c:out value="${error}"/>
-            </div>
+        <c:if test="${not empty commonErrors}">
+          <ul>
+              <c:forEach var="error" items="${commonErrors}">
+                  <li>${error}</li>
+              </c:forEach>
+          </ul>
         </c:if>
 
         <form action="${pageContext.request.contextPath}/new-match" method="POST">
+            <div>
+                <c:if test="${not empty firstNameErrors}">
+                    <ul>
+                        <c:forEach var="error" items="${firstNameErrors}">
+                            <li>${error}</li>
+                        </c:forEach>
+                    </ul>
+                </c:if>
+            </div>
             <div class="form-group">
-                <label for="player1" class="form-label">Player 1</label>
+                <label for="firstPlayer" class="form-label">Player 1</label>
                 <input
                         type="text"
-                        id="player1"
-                        name="player1name"
+                        id="firstPlayer"
+                        name="firstPlayerName"
                         class="form-input"
                         placeholder="First player's name"
-                        value="<c:out value='${player1Input}'/>"
+                        value="<c:out value='${param.firstPlayerName}'/>"
                         required
                 >
             </div>
@@ -48,16 +59,24 @@
                 <div class="vs-text">VS</div>
                 <div class="vs-line"></div>
             </div>
-
+            <div>
+                <c:if test="${not empty secondNameErrors}">
+                    <ul>
+                        <c:forEach var="error" items="${secondNameErrors}">
+                            <li>${error}</li>
+                        </c:forEach>
+                    </ul>
+                </c:if>
+            </div>
             <div class="form-group">
-                <label for="player2" class="form-label">Player 2</label>
+                <label for="secondPlayer" class="form-label">Player 2</label>
                 <input
                         type="text"
-                        id="player2"
-                        name="player2name"
+                        id="secondPlayer"
+                        name="secondPlayerName"
                         class="form-input"
                         placeholder="Second player's name"
-                        value="<c:out value='${player2Input}'/>"
+                        value="<c:out value='${param.secondPlayerName}'/>"
                         required
                 >
             </div>

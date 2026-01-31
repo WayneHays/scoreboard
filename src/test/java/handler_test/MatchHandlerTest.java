@@ -2,7 +2,7 @@ package handler_test;
 
 import com.scoreboard.model.entity.Player;
 import com.scoreboard.model.domain.OngoingMatch;
-import com.scoreboard.service.scorecalculation.Points;
+import com.scoreboard.model.domain.Points;
 import com.scoreboard.service.scorecalculation.handler.MatchHandler;
 import com.scoreboard.tennisrules.MatchRules;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,9 +36,9 @@ class MatchHandlerTest {
         void handle_2to0_shouldWinMatch() {
             awardSets(player1, 2);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
-            assertEquals(player1, match.getWinner());
+            assertEquals(player1, match.getWinnerName());
             assertTrue(match.isFinished());
         }
 
@@ -47,9 +47,9 @@ class MatchHandlerTest {
             awardSets(player1, 2);
             awardSets(player2, 1);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
-            assertEquals(player1, match.getWinner());
+            assertEquals(player1, match.getWinnerName());
             assertTrue(match.isFinished());
         }
 
@@ -57,9 +57,9 @@ class MatchHandlerTest {
         void handle_0to2_player2Wins() {
             awardSets(player2, 2);
 
-            handler.handle(match, player2);
+            handler.handle(, player2);
 
-            assertEquals(player2, match.getWinner());
+            assertEquals(player2, match.getWinnerName());
             assertTrue(match.isFinished());
         }
 
@@ -68,9 +68,9 @@ class MatchHandlerTest {
             awardSets(player1, 1);
             awardSets(player2, 2);
 
-            handler.handle(match, player2);
+            handler.handle(, player2);
 
-            assertEquals(player2, match.getWinner());
+            assertEquals(player2, match.getWinnerName());
             assertTrue(match.isFinished());
         }
     }
@@ -82,9 +82,9 @@ class MatchHandlerTest {
         @Test
         void handle_0to0_shouldNotWinMatch() {
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
-            assertNull(match.getWinner());
+            assertNull(match.getWinnerName());
             assertFalse(match.isFinished());
         }
 
@@ -92,9 +92,9 @@ class MatchHandlerTest {
         void handle_1to0_shouldNotWinMatch() {
             awardSets(player1, 1);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
-            assertNull(match.getWinner());
+            assertNull(match.getWinnerName());
             assertFalse(match.isFinished());
             assertEquals(1, match.getSets(player1));
         }
@@ -104,9 +104,9 @@ class MatchHandlerTest {
             awardSets(player1, 1);
             awardSets(player2, 1);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
-            assertNull(match.getWinner());
+            assertNull(match.getWinnerName());
             assertFalse(match.isFinished());
         }
 
@@ -114,9 +114,9 @@ class MatchHandlerTest {
         void handle_0to1_shouldNotWinMatch() {
             awardSets(player2, 1);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
-            assertNull(match.getWinner());
+            assertNull(match.getWinnerName());
             assertFalse(match.isFinished());
         }
     }
@@ -135,9 +135,9 @@ class MatchHandlerTest {
         void handle_3to0_shouldWinMatch() {
             awardSets(player1, 3);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
-            assertEquals(player1, match.getWinner());
+            assertEquals(player1, match.getWinnerName());
             assertTrue(match.isFinished());
         }
 
@@ -146,9 +146,9 @@ class MatchHandlerTest {
             awardSets(player1, 3);
             awardSets(player2, 1);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
-            assertEquals(player1, match.getWinner());
+            assertEquals(player1, match.getWinnerName());
             assertTrue(match.isFinished());
         }
 
@@ -157,9 +157,9 @@ class MatchHandlerTest {
             awardSets(player1, 3);
             awardSets(player2, 2);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
-            assertEquals(player1, match.getWinner());
+            assertEquals(player1, match.getWinnerName());
             assertTrue(match.isFinished());
         }
 
@@ -168,9 +168,9 @@ class MatchHandlerTest {
             awardSets(player1, 2);
             awardSets(player2, 3);
 
-            handler.handle(match, player2);
+            handler.handle(, player2);
 
-            assertEquals(player2, match.getWinner());
+            assertEquals(player2, match.getWinnerName());
             assertTrue(match.isFinished());
         }
     }
@@ -189,9 +189,9 @@ class MatchHandlerTest {
         void handle_2to0_shouldNotWinMatch() {
             awardSets(player1, 2);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
-            assertNull(match.getWinner());
+            assertNull(match.getWinnerName());
             assertFalse(match.isFinished());
         }
 
@@ -200,9 +200,9 @@ class MatchHandlerTest {
             awardSets(player1, 2);
             awardSets(player2, 1);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
-            assertNull(match.getWinner());
+            assertNull(match.getWinnerName());
             assertFalse(match.isFinished());
         }
 
@@ -211,9 +211,9 @@ class MatchHandlerTest {
             awardSets(player1, 2);
             awardSets(player2, 2);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
-            assertNull(match.getWinner());
+            assertNull(match.getWinnerName());
             assertFalse(match.isFinished());
         }
 
@@ -222,9 +222,9 @@ class MatchHandlerTest {
             awardSets(player1, 1);
             awardSets(player2, 2);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
-            assertNull(match.getWinner());
+            assertNull(match.getWinnerName());
             assertFalse(match.isFinished());
         }
     }
@@ -236,15 +236,15 @@ class MatchHandlerTest {
         @Test
         void completeMatch_straightSetsWin_2to0() {
             match.awardSetTo(player1);
-            handler.handle(match, player1);
+            handler.handle(, player1);
             assertFalse(match.isFinished());
 
             match.awardSetTo(player1);
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
 
             assertTrue(match.isFinished());
-            assertEquals(player1, match.getWinner());
+            assertEquals(player1, match.getWinnerName());
             assertEquals(2, match.getSets(player1));
             assertEquals(0, match.getSets(player2));
         }
@@ -252,18 +252,18 @@ class MatchHandlerTest {
         @Test
         void completeMatch_threeSetBattle_2to1() {
             match.awardSetTo(player1);
-            handler.handle(match, player1);
+            handler.handle(, player1);
             assertFalse(match.isFinished());
 
             match.awardSetTo(player2);
-            handler.handle(match, player2);
+            handler.handle(, player2);
             assertFalse(match.isFinished());
 
             match.awardSetTo(player1);
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertTrue(match.isFinished());
-            assertEquals(player1, match.getWinner());
+            assertEquals(player1, match.getWinnerName());
             assertEquals(2, match.getSets(player1));
             assertEquals(1, match.getSets(player2));
         }
@@ -271,16 +271,16 @@ class MatchHandlerTest {
         @Test
         void completeMatch_player2Comeback_1to2() {
             match.awardSetTo(player1);
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             match.awardSetTo(player2);
-            handler.handle(match, player2);
+            handler.handle(, player2);
 
             match.awardSetTo(player2);
-            handler.handle(match, player2);
+            handler.handle(, player2);
 
             assertTrue(match.isFinished());
-            assertEquals(player2, match.getWinner());
+            assertEquals(player2, match.getWinnerName());
             assertEquals(1, match.getSets(player1));
             assertEquals(2, match.getSets(player2));
         }
@@ -299,43 +299,43 @@ class MatchHandlerTest {
         @Test
         void completeMatch_straightSets_3to0() {
             match.awardSetTo(player1);
-            handler.handle(match, player1);
+            handler.handle(, player1);
             assertFalse(match.isFinished());
 
             match.awardSetTo(player1);
-            handler.handle(match, player1);
+            handler.handle(, player1);
             assertFalse(match.isFinished());
 
             match.awardSetTo(player1);
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertTrue(match.isFinished());
-            assertEquals(player1, match.getWinner());
+            assertEquals(player1, match.getWinnerName());
         }
 
         @Test
         void completeMatch_fiveSetter_3to2() {
             match.awardSetTo(player1);
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             match.awardSetTo(player2);
-            handler.handle(match, player2);
+            handler.handle(, player2);
 
             match.awardSetTo(player1);
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             match.awardSetTo(player2);
-            handler.handle(match, player2);
+            handler.handle(, player2);
 
             assertEquals(2, match.getSets(player1));
             assertEquals(2, match.getSets(player2));
             assertFalse(match.isFinished());
 
             match.awardSetTo(player1);
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertTrue(match.isFinished());
-            assertEquals(player1, match.getWinner());
+            assertEquals(player1, match.getWinnerName());
             assertEquals(3, match.getSets(player1));
             assertEquals(2, match.getSets(player2));
         }
@@ -343,24 +343,24 @@ class MatchHandlerTest {
         @Test
         void completeMatch_epicComeback_2to3() {
             match.awardSetTo(player1);
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             match.awardSetTo(player1);
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             match.awardSetTo(player2);
-            handler.handle(match, player2);
+            handler.handle(, player2);
 
             match.awardSetTo(player2);
-            handler.handle(match, player2);
+            handler.handle(, player2);
 
             assertFalse(match.isFinished());
 
             match.awardSetTo(player2);
-            handler.handle(match, player2);
+            handler.handle(, player2);
 
             assertTrue(match.isFinished());
-            assertEquals(player2, match.getWinner());
+            assertEquals(player2, match.getWinnerName());
             assertEquals(2, match.getSets(player1));
             assertEquals(3, match.getSets(player2));
         }
@@ -373,25 +373,25 @@ class MatchHandlerTest {
         @Test
         void handle_matchAlreadyFinished_shouldNotChangeWinner() {
             match.setWinner(player1);
-            Player initialWinner = match.getWinner();
+            Player initialWinner = match.getWinnerName();
 
-            handler.handle(match, player2);
+            handler.handle(, player2);
 
-            assertEquals(initialWinner, match.getWinner());
-            assertEquals(player1, match.getWinner());
+            assertEquals(initialWinner, match.getWinnerName());
+            assertEquals(player1, match.getWinnerName());
         }
 
         @Test
         void handle_matchFinished_multipleCallsNoEffect() {
             awardSets(player1, 2);
-            handler.handle(match, player1);
+            handler.handle(, player1);
             assertTrue(match.isFinished());
 
-            handler.handle(match, player1);
-            handler.handle(match, player2);
-            handler.handle(match, player1);
+            handler.handle(, player1);
+            handler.handle(, player2);
+            handler.handle(, player1);
 
-            assertEquals(player1, match.getWinner());
+            assertEquals(player1, match.getWinnerName());
             assertEquals(2, match.getSets(player1));
         }
 
@@ -399,16 +399,16 @@ class MatchHandlerTest {
         void handle_afterMatchFinished_stateUnchanged() {
             awardSets(player1, 2);
             awardSets(player2, 1);
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             int player1Sets = match.getSets(player1);
             int player2Sets = match.getSets(player2);
 
-            handler.handle(match, player2);
+            handler.handle(, player2);
 
             assertEquals(player1Sets, match.getSets(player1));
             assertEquals(player2Sets, match.getSets(player2));
-            assertEquals(player1, match.getWinner());
+            assertEquals(player1, match.getWinnerName());
         }
     }
 
@@ -418,9 +418,9 @@ class MatchHandlerTest {
 
         @Test
         void handle_zeroSets_shouldNotWin() {
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
-            assertNull(match.getWinner());
+            assertNull(match.getWinnerName());
             assertFalse(match.isFinished());
         }
 
@@ -428,9 +428,9 @@ class MatchHandlerTest {
         void handle_oneLessThanRequired_shouldNotWin() {
             awardSets(player1, 1);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
-            assertNull(match.getWinner());
+            assertNull(match.getWinnerName());
             assertFalse(match.isFinished());
         }
 
@@ -438,9 +438,9 @@ class MatchHandlerTest {
         void handle_exactlyRequired_shouldWin() {
             awardSets(player1, 2);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
-            assertEquals(player1, match.getWinner());
+            assertEquals(player1, match.getWinnerName());
             assertTrue(match.isFinished());
         }
 
@@ -448,9 +448,9 @@ class MatchHandlerTest {
         void handle_moreThanRequired_shouldStillWin() {
             awardSets(player1, 3);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
-            assertEquals(player1, match.getWinner());
+            assertEquals(player1, match.getWinnerName());
             assertTrue(match.isFinished());
         }
     }
@@ -470,7 +470,7 @@ class MatchHandlerTest {
                 match.awardGameTo(player2);
             }
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertEquals(3, match.getGames(player1));
             assertEquals(2, match.getGames(player2));
@@ -484,7 +484,7 @@ class MatchHandlerTest {
             match.awardPointTo(player1);
             match.awardPointTo(player1);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertEquals(Points.THIRTY, match.getPoints(player1));
             assertFalse(match.isFinished());
@@ -495,7 +495,7 @@ class MatchHandlerTest {
             awardSets(player1, 2);
             awardSets(player2, 1);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertEquals(2, match.getSets(player1));
             assertEquals(1, match.getSets(player2));
@@ -511,29 +511,29 @@ class MatchHandlerTest {
         void handle_player1Wins_winnerShouldBePlayer1() {
             awardSets(player1, 2);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
-            assertEquals(player1, match.getWinner());
-            assertNotEquals(player2, match.getWinner());
+            assertEquals(player1, match.getWinnerName());
+            assertNotEquals(player2, match.getWinnerName());
         }
 
         @Test
         void handle_player2Wins_winnerShouldBePlayer2() {
             awardSets(player2, 2);
 
-            handler.handle(match, player2);
+            handler.handle(, player2);
 
-            assertEquals(player2, match.getWinner());
-            assertNotEquals(player1, match.getWinner());
+            assertEquals(player2, match.getWinnerName());
+            assertNotEquals(player1, match.getWinnerName());
         }
 
         @Test
         void handle_beforeWin_winnerShouldBeNull() {
             awardSets(player1, 1);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
-            assertNull(match.getWinner());
+            assertNull(match.getWinnerName());
         }
     }
 
@@ -547,10 +547,10 @@ class MatchHandlerTest {
             handler = new MatchHandler(matchRules);
 
             awardSets(player1, 2);
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertTrue(match.isFinished());
-            assertEquals(player1, match.getWinner());
+            assertEquals(player1, match.getWinnerName());
         }
 
         @Test
@@ -559,11 +559,11 @@ class MatchHandlerTest {
             handler = new MatchHandler(matchRules);
 
             awardSets(player1, 2);
-            handler.handle(match, player1);
+            handler.handle(, player1);
             assertFalse(match.isFinished());
 
             awardSets(player1, 1);
-            handler.handle(match, player1);
+            handler.handle(, player1);
             assertTrue(match.isFinished());
         }
 
@@ -573,10 +573,10 @@ class MatchHandlerTest {
             handler = new MatchHandler(matchRules);
 
             awardSets(player1, 1);
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertTrue(match.isFinished());
-            assertEquals(player1, match.getWinner());
+            assertEquals(player1, match.getWinnerName());
         }
 
         @Test
@@ -585,10 +585,10 @@ class MatchHandlerTest {
             handler = new MatchHandler(matchRules);
 
             awardSets(player1, 4);
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertTrue(match.isFinished());
-            assertEquals(player1, match.getWinner());
+            assertEquals(player1, match.getWinnerName());
         }
     }
 

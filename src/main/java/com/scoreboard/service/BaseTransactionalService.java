@@ -1,43 +1,49 @@
 package com.scoreboard.service;
 
-import com.scoreboard.exception.NotFoundException;
-import com.scoreboard.exception.ScoreboardServiceException;
-import com.scoreboard.exception.ValidationException;
 import com.scoreboard.config.hibernate.HibernateUtil;
+import com.scoreboard.exception.ScoreboardServiceException;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import java.util.function.Supplier;
 
-public abstract class BaseTransactionalService {
+@Slf4j
+public class BaseTransactionalService {
 
-    protected <T> T executeInTransaction(Supplier<T> operation, String errorMessage) {
-        return executeCommon(operation, errorMessage);
+    public <T> T executeInTransaction(Supplier<T> operation) {
+        return executeCommon(operation);
     }
 
-    protected void executeInTransaction(Runnable operation, String errorMessage) {
+    public void executeInTransaction(Runnable operation) {
         executeCommon(() -> {
             operation.run();
             return null;
-        }, errorMessage);
+        });
     }
 
-    private <T> T executeCommon(Supplier<T> operation, String errorMessage) {
+    private <T> T executeCommon(Supplier<T> operation) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-        Transaction transaction = session.beginTransaction();
+        Transaction transaction = null;
 
         try {
+            transaction = session.beginTransaction();
             T result = operation.get();
             transaction.commit();
             return result;
+        } catch (Exception e) {
+            safeRollback(transaction, e);
+            throw new ScoreboardServiceException("Failed to execute DB request",e);
+        }
+    }
 
-        } catch (NotFoundException | ValidationException e) {
-            transaction.rollback();
-            throw e;
-
-        } catch (RuntimeException e) {
-            transaction.rollback();
-            throw new ScoreboardServiceException(errorMessage, e);
+    private void safeRollback(Transaction transaction, Exception originalException) {
+        try {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+        } catch (Exception rollbackException) {
+            originalException.addSuppressed(rollbackException);
         }
     }
 }

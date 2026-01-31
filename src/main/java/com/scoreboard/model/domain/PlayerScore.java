@@ -1,6 +1,5 @@
 package com.scoreboard.model.domain;
 
-import com.scoreboard.service.scorecalculation.Points;
 import lombok.Getter;
 
 @Getter
@@ -14,23 +13,23 @@ public class PlayerScore {
         this.points = Points.ZERO;
     }
 
-    void awardPoint() {
+    void addPoint() {
         this.points = points.next();
     }
 
-    void awardGame() {
+    void addGame() {
         games++;
     }
 
-    void awardSet() {
+    void addSet() {
         sets++;
     }
 
-    void awardTieBreakPoint() {
+    void addTieBreakPoint() {
         tieBreakPoints++;
     }
 
-    void setPointsToForty() {
+    void resetToDeuce() {
         this.points = Points.FORTY;
     }
 

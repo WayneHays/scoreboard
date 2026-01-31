@@ -1,4 +1,4 @@
-package com.scoreboard.service.scorecalculation;
+package com.scoreboard.model.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,9 +23,5 @@ public enum Points {
             case ADVANTAGE -> throw new IllegalStateException(
                     "Cannot advance beyond ADVANTAGE. Game should be finished.");
         };
-    }
-
-    public boolean canAdvance() {
-        return this != ADVANTAGE;
     }
 }

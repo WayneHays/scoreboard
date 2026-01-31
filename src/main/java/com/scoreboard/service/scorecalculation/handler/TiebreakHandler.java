@@ -10,9 +10,9 @@ public class TiebreakHandler extends AbstractHandler{
     private final TiebreakRules tiebreakRules;
 
     @Override
-    protected void doHandle(OngoingMatch ongoingMatch, Player scorer) {
+    protected void doHandle(Player scorer) {
         if (!ongoingMatch.isTieBreak()) {
-            callNext(ongoingMatch, scorer);
+            callNext(scorer);
             return;
         }
 
@@ -22,7 +22,7 @@ public class TiebreakHandler extends AbstractHandler{
         if (isTieBreakFinished(ongoingMatch, scorer, opponent)) {
             ongoingMatch.awardGameTo(scorer);
             ongoingMatch.setTieBreak(false);
-            callNext(ongoingMatch, scorer);
+            callNext(scorer);
         }
     }
 

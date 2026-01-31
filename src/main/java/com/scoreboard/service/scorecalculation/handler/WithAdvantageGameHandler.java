@@ -3,7 +3,7 @@ package com.scoreboard.service.scorecalculation.handler;
 import com.scoreboard.model.entity.Player;
 import com.scoreboard.model.domain.OngoingMatch;
 import com.scoreboard.service.scorecalculation.PointResult;
-import com.scoreboard.service.scorecalculation.Points;
+import com.scoreboard.model.domain.Points;
 
 public class WithAdvantageGameHandler extends GameHandler {
 
@@ -18,7 +18,7 @@ public class WithAdvantageGameHandler extends GameHandler {
         }
 
         if (opponentPoints == Points.ADVANTAGE) {
-            ongoingMatch.resetPointsToForty(opponent);
+            ongoingMatch.resetToDeuce(opponent);
             ongoingMatch.setAdvantage(null);
             return PointResult.ADVANTAGE_RESET;
         }

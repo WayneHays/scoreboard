@@ -10,9 +10,9 @@ import lombok.AllArgsConstructor;
 public abstract class GameHandler extends AbstractHandler {
 
     @Override
-    protected final void doHandle(OngoingMatch ongoingMatch, Player scorer) {
+    protected final void doHandle(Player scorer) {
         if (ongoingMatch.isTieBreak()) {
-            callNext(ongoingMatch, scorer);
+            callNext(scorer);
             return;
         }
 
@@ -20,7 +20,7 @@ public abstract class GameHandler extends AbstractHandler {
         PointResult pointResult = handleGamePoint(ongoingMatch, scorer, opponent);
 
         if (pointResult == PointResult.GAME_FINISHED) {
-            callNext(ongoingMatch, scorer);
+            callNext(scorer);
         }
     }
 

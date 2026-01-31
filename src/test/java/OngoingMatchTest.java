@@ -1,6 +1,6 @@
 import com.scoreboard.model.entity.Player;
 import com.scoreboard.model.domain.OngoingMatch;
-import com.scoreboard.service.scorecalculation.Points;
+import com.scoreboard.model.domain.Points;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -27,8 +27,8 @@ class OngoingMatchTest {
 
         @Test
         void constructor_shouldInitializePlayers() {
-            assertEquals(player1, ongoingMatch.getPlayer1());
-            assertEquals(player2, ongoingMatch.getPlayer2());
+            assertEquals(player1, ongoingMatch.getFirstPlayer());
+            assertEquals(player2, ongoingMatch.getSecondPlayer());
         }
 
         @Test
@@ -45,7 +45,7 @@ class OngoingMatchTest {
 
         @Test
         void constructor_shouldInitializeWinnerAsNull() {
-            assertNull(ongoingMatch.getWinner());
+            assertNull(ongoingMatch.getWinnerName());
         }
 
         @Test
@@ -330,14 +330,14 @@ class OngoingMatchTest {
             ongoingMatch.awardPointTo(player1);
             ongoingMatch.awardPointTo(player1);
 
-            ongoingMatch.resetPointsToForty(player1);
+            ongoingMatch.resetToDeuce(player1);
 
             assertEquals(Points.FORTY, ongoingMatch.getPoints(player1));
         }
 
         @Test
         void resetPointsToForty_fromZero_shouldSetToForty() {
-            ongoingMatch.resetPointsToForty(player1);
+            ongoingMatch.resetToDeuce(player1);
             assertEquals(Points.FORTY, ongoingMatch.getPoints(player1));
         }
 
@@ -345,7 +345,7 @@ class OngoingMatchTest {
         void resetPointsToForty_shouldOnlyAffectSpecifiedPlayer() {
             ongoingMatch.awardPointTo(player2);
 
-            ongoingMatch.resetPointsToForty(player1);
+            ongoingMatch.resetToDeuce(player1);
 
             assertEquals(Points.FORTY, ongoingMatch.getPoints(player1));
             assertEquals(Points.FIFTEEN, ongoingMatch.getPoints(player2));
@@ -359,7 +359,7 @@ class OngoingMatchTest {
         @Test
         void setWinner_player1_shouldSetWinner() {
             ongoingMatch.setWinner(player1);
-            assertEquals(player1, ongoingMatch.getWinner());
+            assertEquals(player1, ongoingMatch.getWinnerName());
         }
 
         @Test
@@ -377,7 +377,7 @@ class OngoingMatchTest {
         void setWinner_canChangeWinner() {
             ongoingMatch.setWinner(player1);
             ongoingMatch.setWinner(player2);
-            assertEquals(player2, ongoingMatch.getWinner());
+            assertEquals(player2, ongoingMatch.getWinnerName());
         }
     }
 
@@ -454,7 +454,7 @@ class OngoingMatchTest {
             assertEquals(Points.ADVANTAGE, ongoingMatch.getPoints(player1));
             assertEquals(player1, ongoingMatch.getAdvantage());
 
-            ongoingMatch.resetPointsToForty(player1);
+            ongoingMatch.resetToDeuce(player1);
             ongoingMatch.setAdvantage(null);
 
             assertEquals(Points.FORTY, ongoingMatch.getPoints(player1));
@@ -468,7 +468,7 @@ class OngoingMatchTest {
             ongoingMatch.setWinner(player1);
 
             assertEquals(2, ongoingMatch.getSets(player1));
-            assertEquals(player1, ongoingMatch.getWinner());
+            assertEquals(player1, ongoingMatch.getWinnerName());
             assertTrue(ongoingMatch.isFinished());
         }
     }

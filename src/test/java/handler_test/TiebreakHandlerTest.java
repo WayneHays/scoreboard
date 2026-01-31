@@ -2,15 +2,13 @@ package handler_test;
 
 import com.scoreboard.model.domain.OngoingMatch;
 import com.scoreboard.model.entity.Player;
-import com.scoreboard.service.scorecalculation.Points;
+import com.scoreboard.model.domain.Points;
 import com.scoreboard.service.scorecalculation.handler.TiebreakHandler;
 import com.scoreboard.tennisrules.TiebreakRules;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class TiebreakHandlerTest {
     private Player player1;
@@ -36,7 +34,7 @@ class TiebreakHandlerTest {
         void handle_tiebreakNotActive_shouldNotProcessPoints() {
             assertFalse(match.isTieBreak());
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertEquals(0, match.getTieBreakPoints(player1));
             assertEquals(0, match.getTieBreakPoints(player2));
@@ -48,7 +46,7 @@ class TiebreakHandlerTest {
             match.awardPointTo(player1);
             Points initialPoints = match.getPoints(player1);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertEquals(initialPoints, match.getPoints(player1));
         }
@@ -65,7 +63,7 @@ class TiebreakHandlerTest {
 
         @Test
         void handle_tiebreakActive_shouldAwardTiebreakPoint() {
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertEquals(1, match.getTieBreakPoints(player1));
             assertEquals(0, match.getTieBreakPoints(player2));
@@ -73,9 +71,9 @@ class TiebreakHandlerTest {
 
         @Test
         void handle_multiplePoints_shouldAccumulate() {
-            handler.handle(match, player1);
-            handler.handle(match, player1);
-            handler.handle(match, player1);
+            handler.handle(, player1);
+            handler.handle(, player1);
+            handler.handle(, player1);
 
             assertEquals(3, match.getTieBreakPoints(player1));
             assertEquals(0, match.getTieBreakPoints(player2));
@@ -83,11 +81,11 @@ class TiebreakHandlerTest {
 
         @Test
         void handle_bothPlayersScoring_shouldTrackSeparately() {
-            handler.handle(match, player1);
-            handler.handle(match, player2);
-            handler.handle(match, player1);
-            handler.handle(match, player2);
-            handler.handle(match, player1);
+            handler.handle(, player1);
+            handler.handle(, player2);
+            handler.handle(, player1);
+            handler.handle(, player2);
+            handler.handle(, player1);
 
             assertEquals(3, match.getTieBreakPoints(player1));
             assertEquals(2, match.getTieBreakPoints(player2));
@@ -106,7 +104,7 @@ class TiebreakHandlerTest {
         @Test
         void handle_7to0_shouldWinTiebreak() {
             for (int i = 0; i < 7; i++) {
-                handler.handle(match, player1);
+                handler.handle(, player1);
             }
 
             assertEquals(1, match.getGames(player1));
@@ -120,7 +118,7 @@ class TiebreakHandlerTest {
         void handle_7to5_shouldWinTiebreak() {
             playTiebreakToScore(6, 5);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertEquals(1, match.getGames(player1));
             assertFalse(match.isTieBreak());
@@ -130,7 +128,7 @@ class TiebreakHandlerTest {
         void handle_7to3_shouldWinTiebreak() {
             playTiebreakToScore(6, 3);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertEquals(1, match.getGames(player1));
             assertFalse(match.isTieBreak());
@@ -140,7 +138,7 @@ class TiebreakHandlerTest {
         void handle_player2Wins7to4() {
             playTiebreakToScore(4, 6);
 
-            handler.handle(match, player2);
+            handler.handle(, player2);
 
             assertEquals(0, match.getGames(player1));
             assertEquals(1, match.getGames(player2));
@@ -172,7 +170,7 @@ class TiebreakHandlerTest {
         void handle_7to6_shouldNotFinish() {
             playTiebreakToScore(6, 6);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertTrue(match.isTieBreak());
             assertEquals(7, match.getTieBreakPoints(player1));
@@ -184,7 +182,7 @@ class TiebreakHandlerTest {
         void handle_8to6_shouldFinish() {
             playTiebreakToScore(7, 6);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertEquals(1, match.getGames(player1));
             assertFalse(match.isTieBreak());
@@ -194,7 +192,7 @@ class TiebreakHandlerTest {
         void handle_10to8_shouldFinish() {
             playTiebreakToScore(9, 8);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertEquals(1, match.getGames(player1));
             assertFalse(match.isTieBreak());
@@ -204,7 +202,7 @@ class TiebreakHandlerTest {
         void handle_15to13_shouldFinish() {
             playTiebreakToScore(14, 13);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertEquals(1, match.getGames(player1));
             assertFalse(match.isTieBreak());
@@ -214,28 +212,28 @@ class TiebreakHandlerTest {
         void handle_longTiebreak_multipleLeadChanges() {
             playTiebreakToScore(6, 6);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
             assertTrue(match.isTieBreak());
 
-            handler.handle(match, player2);
+            handler.handle(, player2);
             assertTrue(match.isTieBreak());
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
             assertTrue(match.isTieBreak());
 
-            handler.handle(match, player2);
+            handler.handle(, player2);
             assertTrue(match.isTieBreak());
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
             assertTrue(match.isTieBreak());
 
-            handler.handle(match, player2);
+            handler.handle(, player2);
             assertTrue(match.isTieBreak());
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
             assertTrue(match.isTieBreak());
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
             assertFalse(match.isTieBreak());
             assertEquals(1, match.getGames(player1));
         }
@@ -253,7 +251,7 @@ class TiebreakHandlerTest {
         @Test
         void completeTiebreak_straightWin7to0() {
             for (int i = 0; i < 7; i++) {
-                handler.handle(match, player1);
+                handler.handle(, player1);
             }
 
             assertEquals(1, match.getGames(player1));
@@ -263,21 +261,21 @@ class TiebreakHandlerTest {
 
         @Test
         void completeTiebreak_7to5() {
-            handler.handle(match, player1);
-            handler.handle(match, player2);
-            handler.handle(match, player1);
-            handler.handle(match, player2);
-            handler.handle(match, player1);
-            handler.handle(match, player2);
-            handler.handle(match, player1);
-            handler.handle(match, player1);
-            handler.handle(match, player1);
-            handler.handle(match, player2);
-            handler.handle(match, player2);
+            handler.handle(, player1);
+            handler.handle(, player2);
+            handler.handle(, player1);
+            handler.handle(, player2);
+            handler.handle(, player1);
+            handler.handle(, player2);
+            handler.handle(, player1);
+            handler.handle(, player1);
+            handler.handle(, player1);
+            handler.handle(, player2);
+            handler.handle(, player2);
 
             assertTrue(match.isTieBreak());
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertFalse(match.isTieBreak());
             assertEquals(1, match.getGames(player1));
@@ -286,17 +284,17 @@ class TiebreakHandlerTest {
         @Test
         void completeTiebreak_8to6() {
             for (int i = 0; i < 6; i++) {
-                handler.handle(match, player1);
-                handler.handle(match, player2);
+                handler.handle(, player1);
+                handler.handle(, player2);
             }
 
             assertEquals(6, match.getTieBreakPoints(player1));
             assertEquals(6, match.getTieBreakPoints(player2));
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
             assertTrue(match.isTieBreak());
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
             assertFalse(match.isTieBreak());
             assertEquals(1, match.getGames(player1));
         }
@@ -304,7 +302,7 @@ class TiebreakHandlerTest {
         @Test
         void completeTiebreak_player2Wins() {
             playTiebreakToScore(4, 6);
-            handler.handle(match, player2);
+            handler.handle(, player2);
 
             assertEquals(0, match.getGames(player1));
             assertEquals(1, match.getGames(player2));
@@ -329,7 +327,7 @@ class TiebreakHandlerTest {
         void handle_afterTiebreakWin_shouldAwardGame() {
             playTiebreakToScore(6, 5);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertEquals(7, match.getGames(player1));
             assertEquals(6, match.getGames(player2));
@@ -338,7 +336,7 @@ class TiebreakHandlerTest {
         @Test
         void handle_afterTiebreakWin_shouldResetTiebreakPoints() {
             for (int i = 0; i < 7; i++) {
-                handler.handle(match, player1);
+                handler.handle(, player1);
             }
 
             assertEquals(0, match.getTieBreakPoints(player1));
@@ -348,7 +346,7 @@ class TiebreakHandlerTest {
         @Test
         void handle_afterTiebreakWin_shouldDisableTiebreakMode() {
             for (int i = 0; i < 7; i++) {
-                handler.handle(match, player1);
+                handler.handle(, player1);
             }
 
             assertFalse(match.isTieBreak());
@@ -357,7 +355,7 @@ class TiebreakHandlerTest {
         @Test
         void handle_afterTiebreakWin_regularPointsShouldBeZero() {
             for (int i = 0; i < 7; i++) {
-                handler.handle(match, player1);
+                handler.handle(, player1);
             }
 
             assertEquals(Points.ZERO, match.getPoints(player1));
@@ -378,7 +376,7 @@ class TiebreakHandlerTest {
         void handle_matchAlreadyFinished_shouldNotProcessPoints() {
             match.setWinner(player1);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertEquals(0, match.getTieBreakPoints(player1));
             assertEquals(0, match.getTieBreakPoints(player2));
@@ -389,8 +387,8 @@ class TiebreakHandlerTest {
             match.setWinner(player2);
             assertTrue(match.isTieBreak());
 
-            handler.handle(match, player1);
-            handler.handle(match, player1);
+            handler.handle(, player1);
+            handler.handle(, player1);
 
             assertTrue(match.isTieBreak());
             assertEquals(0, match.getTieBreakPoints(player1));
@@ -405,7 +403,7 @@ class TiebreakHandlerTest {
         void handle_tiebreakJustActivated_shouldStartFrom0() {
             match.setTieBreak(true);
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertEquals(1, match.getTieBreakPoints(player1));
             assertEquals(0, match.getTieBreakPoints(player2));
@@ -416,7 +414,7 @@ class TiebreakHandlerTest {
             match.setTieBreak(true);
 
             for (int i = 0; i < 6; i++) {
-                handler.handle(match, player1);
+                handler.handle(, player1);
             }
 
             assertTrue(match.isTieBreak());
@@ -428,20 +426,20 @@ class TiebreakHandlerTest {
         void handle_exactlyMinimumWith2PointLead_shouldFinish() {
             match.setTieBreak(true);
 
-            handler.handle(match, player1);
-            handler.handle(match, player1);
-            handler.handle(match, player1);
-            handler.handle(match, player2);
-            handler.handle(match, player2);
-            handler.handle(match, player2);
-            handler.handle(match, player1);
-            handler.handle(match, player1);
-            handler.handle(match, player1);
+            handler.handle(, player1);
+            handler.handle(, player1);
+            handler.handle(, player1);
+            handler.handle(, player2);
+            handler.handle(, player2);
+            handler.handle(, player2);
+            handler.handle(, player1);
+            handler.handle(, player1);
+            handler.handle(, player1);
 
             assertTrue(match.isTieBreak());
             assertEquals(6, match.getTieBreakPoints(player1));
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertFalse(match.isTieBreak());
             assertEquals(1, match.getGames(player1));
@@ -452,22 +450,22 @@ class TiebreakHandlerTest {
             match.setTieBreak(true);
 
             for (int i = 0; i < 6; i++) {
-                handler.handle(match, player1);
-                handler.handle(match, player2);
+                handler.handle(, player1);
+                handler.handle(, player2);
             }
 
             for (int i = 6; i < 19; i++) {
-                handler.handle(match, player1);
-                handler.handle(match, player2);
+                handler.handle(, player1);
+                handler.handle(, player2);
             }
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertEquals(20, match.getTieBreakPoints(player1));
             assertEquals(19, match.getTieBreakPoints(player2));
             assertTrue(match.isTieBreak());
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
 
             assertFalse(match.isTieBreak());
             assertEquals(1, match.getGames(player1));
@@ -491,17 +489,17 @@ class TiebreakHandlerTest {
             };
 
             for (Player scorer : scorers) {
-                handler.handle(match, scorer);
+                handler.handle(, scorer);
                 assertTrue(match.isTieBreak());
             }
 
             assertEquals(6, match.getTieBreakPoints(player1));
             assertEquals(6, match.getTieBreakPoints(player2));
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
             assertTrue(match.isTieBreak());
 
-            handler.handle(match, player1);
+            handler.handle(, player1);
             assertFalse(match.isTieBreak());
             assertEquals(1, match.getGames(player1));
         }
@@ -511,19 +509,19 @@ class TiebreakHandlerTest {
         int minPoints = Math.min(player1Points, player2Points);
 
         for (int i = 0; i < minPoints; i++) {
-            handler.handle(match, player1);
-            handler.handle(match, player2);
+            handler.handle(, player1);
+            handler.handle(, player2);
         }
 
         int remainingPlayer1 = player1Points - minPoints;
         int remainingPlayer2 = player2Points - minPoints;
 
         for (int i = 0; i < remainingPlayer1; i++) {
-            handler.handle(match, player1);
+            handler.handle(, player1);
         }
 
         for (int i = 0; i < remainingPlayer2; i++) {
-            handler.handle(match, player2);
+            handler.handle(, player2);
         }
     }
 

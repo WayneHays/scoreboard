@@ -1,6 +1,6 @@
 package com.scoreboard.tennisrules;
 
-public interface TennisMatchRules {
+public interface TennisRules {
     GameRules gameRules();
     TiebreakRules tiebreakRules();
     SetRules setRules();

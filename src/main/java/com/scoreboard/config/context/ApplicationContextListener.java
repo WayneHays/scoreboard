@@ -6,14 +6,15 @@ import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+@Slf4j
 @WebListener
 public class ApplicationContextListener implements ServletContextListener {
-    private static final Logger logger = LoggerFactory.getLogger(ApplicationContextListener.class);
     private final ApplicationLifecycleManager lifecycleManager;
 
     public ApplicationContextListener() {
@@ -26,7 +27,7 @@ public class ApplicationContextListener implements ServletContextListener {
         ApplicationContext context = lifecycleManager.startup();
 
         ServletContext servletContext = sce.getServletContext();
-        servletContext.setAttribute(JspPaths.APPLICATION_CONTEXT_ATTR, context);
+        servletContext.setAttribute(ServletContext.class.getSimpleName(), context);
     }
 
     @Override
@@ -38,10 +39,10 @@ public class ApplicationContextListener implements ServletContextListener {
     private void cleanupServletContext(ServletContextEvent sce) {
         try {
             ServletContext servletContext = sce.getServletContext();
-            servletContext.removeAttribute(JspPaths.APPLICATION_CONTEXT_ATTR);
-            logger.debug("Application context removed from servlet context");
+            servletContext.removeAttribute(ServletContext.class.getSimpleName());
+            log.debug("Application context removed from servlet context");
         } catch (Exception e) {
-            logger.error("Error removing application context", e);
+            log.error("Error removing application context", e);
         }
     }
 }

@@ -1,8 +1,8 @@
 import com.scoreboard.model.entity.Player;
 import com.scoreboard.model.domain.OngoingMatch;
-import com.scoreboard.tennisrules.TennisMatchRulesImpl;
-import com.scoreboard.service.scorecalculation.Points;
-import com.scoreboard.service.scorecalculation.ScoreCalculationService;
+import com.scoreboard.tennisrules.TennisRulesImpl;
+import com.scoreboard.model.domain.Points;
+import com.scoreboard.service.scorecalculation.MatchService;
 import com.scoreboard.tennisrules.standard.StandardGameRules;
 import com.scoreboard.tennisrules.standard.StandardMatchRules;
 import com.scoreboard.tennisrules.standard.StandardSetRules;
@@ -18,14 +18,14 @@ class ScoreCalculationServiceTest {
     private Player player1;
     private Player player2;
     private OngoingMatch match;
-    private ScoreCalculationService service;
+    private MatchService service;
 
     @BeforeEach
     void setUp() {
         player1 = new Player("Rafael Nadal");
         player2 = new Player("Novak Djokovic");
         match = new OngoingMatch(player1, player2);
-        service = new ScoreCalculationService(new TennisMatchRulesImpl(
+        service = new MatchService(new TennisRulesImpl(
                 new StandardGameRules(),
                 new StandardTiebreakRules(),
                 new StandardSetRules(),
@@ -41,7 +41,7 @@ class ScoreCalculationServiceTest {
         void constructor_noArgs_shouldUseStandardRules() {
             OngoingMatch testMatch = new OngoingMatch(player1, player2);
 
-            service.awardPoint(testMatch, player1);
+            service.awardPoint(testMatch, , player1);
 
             assertEquals(Points.FIFTEEN, testMatch.getPoints(player1));
         }
@@ -52,7 +52,7 @@ class ScoreCalculationServiceTest {
 
             @Test
             void awardPoint_singlePoint_shouldIncrease() {
-                service.awardPoint(match, player1);
+                service.awardPoint(match, , player1);
 
                 assertEquals(Points.FIFTEEN, match.getPoints(player1));
                 assertEquals(Points.ZERO, match.getPoints(player2));
@@ -60,18 +60,18 @@ class ScoreCalculationServiceTest {
 
             @Test
             void awardPoint_multiplePoints_shouldAccumulate() {
-                service.awardPoint(match, player1);
-                service.awardPoint(match, player1);
-                service.awardPoint(match, player1);
+                service.awardPoint(match, , player1);
+                service.awardPoint(match, , player1);
+                service.awardPoint(match, , player1);
 
                 assertEquals(Points.FORTY, match.getPoints(player1));
             }
 
             @Test
             void awardPoint_alternatingPlayers_shouldTrackSeparately() {
-                service.awardPoint(match, player1);
-                service.awardPoint(match, player2);
-                service.awardPoint(match, player1);
+                service.awardPoint(match, , player1);
+                service.awardPoint(match, , player2);
+                service.awardPoint(match, , player1);
 
                 assertEquals(Points.THIRTY, match.getPoints(player1));
                 assertEquals(Points.FIFTEEN, match.getPoints(player2));
@@ -96,14 +96,14 @@ class ScoreCalculationServiceTest {
                 awardPoints(service, match, player1, 3);
                 awardPoints(service, match, player2, 3);
 
-                service.awardPoint(match, player1);
+                service.awardPoint(match, , player1);
                 assertEquals(player1, match.getAdvantage());
 
-                service.awardPoint(match, player2);
+                service.awardPoint(match, , player2);
                 assertNull(match.getAdvantage());
 
-                service.awardPoint(match, player1);
-                service.awardPoint(match, player1);
+                service.awardPoint(match, , player1);
+                service.awardPoint(match, , player1);
 
                 assertEquals(1, match.getGames(player1));
             }
@@ -204,15 +204,15 @@ class ScoreCalculationServiceTest {
                 assertEquals(6, match.getGames(player2));
 
                 for (int i = 0; i < 6; i++) {
-                    service.awardPoint(match, player1);
+                    service.awardPoint(match, , player1);
                 }
                 for (int i = 0; i < 5; i++) {
-                    service.awardPoint(match, player2);
+                    service.awardPoint(match, , player2);
                 }
 
                 assertTrue(match.isTieBreak());
 
-                service.awardPoint(match, player1);
+                service.awardPoint(match, , player1);
 
                 assertFalse(match.isTieBreak());
                 assertEquals(1, match.getSets(player1));
@@ -228,14 +228,14 @@ class ScoreCalculationServiceTest {
                 }
 
                 for (int i = 0; i < 6; i++) {
-                    service.awardPoint(match, player1);
-                    service.awardPoint(match, player2);
+                    service.awardPoint(match, , player1);
+                    service.awardPoint(match, , player2);
                 }
 
                 assertTrue(match.isTieBreak());
 
-                service.awardPoint(match, player1);
-                service.awardPoint(match, player1);
+                service.awardPoint(match, , player1);
+                service.awardPoint(match, , player1);
 
                 assertFalse(match.isTieBreak());
                 assertEquals(1, match.getSets(player1));
@@ -260,7 +260,7 @@ class ScoreCalculationServiceTest {
 
                 assertEquals(2, match.getSets(player1));
                 assertTrue(match.isFinished());
-                assertEquals(player1, match.getWinner());
+                assertEquals(player1, match.getWinnerName());
             }
 
             @Test
@@ -280,7 +280,7 @@ class ScoreCalculationServiceTest {
                 playGames(player1, 6);
 
                 assertTrue(match.isFinished());
-                assertEquals(player1, match.getWinner());
+                assertEquals(player1, match.getWinnerName());
                 assertEquals(2, match.getSets(player1));
             }
         }
@@ -301,11 +301,11 @@ class ScoreCalculationServiceTest {
                 assertTrue(match.isFinished());
                 int finalSets = match.getSets(player1);
 
-                service.awardPoint(match, player2);
-                service.awardPoint(match, player2);
+                service.awardPoint(match, , player2);
+                service.awardPoint(match, , player2);
 
                 assertEquals(finalSets, match.getSets(player1));
-                assertEquals(player1, match.getWinner());
+                assertEquals(player1, match.getWinnerName());
             }
         }
 
@@ -335,7 +335,7 @@ class ScoreCalculationServiceTest {
                 awardPoints(service, match, player1, 4);
 
                 assertTrue(match.isFinished());
-                assertEquals(player1, match.getWinner());
+                assertEquals(player1, match.getWinnerName());
                 assertEquals(2, match.getSets(player1));
             }
 
@@ -348,18 +348,18 @@ class ScoreCalculationServiceTest {
 
                 assertTrue(match.isTieBreak());
 
-                service.awardPoint(match, player1);
-                service.awardPoint(match, player2);
-                service.awardPoint(match, player1);
-                service.awardPoint(match, player2);
-                service.awardPoint(match, player1);
-                service.awardPoint(match, player2);
-                service.awardPoint(match, player1);
-                service.awardPoint(match, player2);
-                service.awardPoint(match, player1);
-                service.awardPoint(match, player2);
-                service.awardPoint(match, player1);
-                service.awardPoint(match, player1);
+                service.awardPoint(match, , player1);
+                service.awardPoint(match, , player2);
+                service.awardPoint(match, , player1);
+                service.awardPoint(match, , player2);
+                service.awardPoint(match, , player1);
+                service.awardPoint(match, , player2);
+                service.awardPoint(match, , player1);
+                service.awardPoint(match, , player2);
+                service.awardPoint(match, , player1);
+                service.awardPoint(match, , player2);
+                service.awardPoint(match, , player1);
+                service.awardPoint(match, , player1);
 
                 assertFalse(match.isTieBreak());
                 assertEquals(1, match.getSets(player1));
@@ -372,7 +372,7 @@ class ScoreCalculationServiceTest {
                 awardPoints(service, match, player1, 4);
 
                 assertTrue(match.isFinished());
-                assertEquals(player1, match.getWinner());
+                assertEquals(player1, match.getWinnerName());
                 assertEquals(2, match.getSets(player1));
             }
 
@@ -389,7 +389,7 @@ class ScoreCalculationServiceTest {
                 playGames(player2, 6);
 
                 assertTrue(match.isFinished());
-                assertEquals(player2, match.getWinner());
+                assertEquals(player2, match.getWinnerName());
                 assertEquals(1, match.getSets(player1));
                 assertEquals(2, match.getSets(player2));
             }
@@ -409,7 +409,7 @@ class ScoreCalculationServiceTest {
                 playGames(player1, 6);
 
                 assertTrue(match.isFinished());
-                assertEquals(player1, match.getWinner());
+                assertEquals(player1, match.getWinnerName());
             }
         }
 
@@ -444,10 +444,10 @@ class ScoreCalculationServiceTest {
                 }
 
                 for (int i = 0; i < 7; i++) {
-                    service.awardPoint(match, player1);
+                    service.awardPoint(match, , player1);
                 }
                 for (int i = 0; i < 5; i++) {
-                    service.awardPoint(match, player2);
+                    service.awardPoint(match, , player2);
                 }
 
                 assertEquals(0, match.getTieBreakPoints(player1));
@@ -455,9 +455,9 @@ class ScoreCalculationServiceTest {
             }
         }
 
-        private void awardPoints(ScoreCalculationService svc, OngoingMatch m, Player p, int count) {
+        private void awardPoints(MatchService svc, OngoingMatch m, Player p, int count) {
             for (int i = 0; i < count; i++) {
-                svc.awardPoint(m, p);
+                svc.awardPoint(m, , p);
             }
         }
 

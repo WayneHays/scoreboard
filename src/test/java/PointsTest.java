@@ -1,4 +1,4 @@
-import com.scoreboard.service.scorecalculation.Points;
+import com.scoreboard.model.domain.Points;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

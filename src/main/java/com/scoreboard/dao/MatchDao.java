@@ -7,11 +7,11 @@ import java.util.List;
 public interface MatchDao {
     void save(Match match);
 
-    List<Match> find(int pageNumber, int pageSize);
+    List<Match> find(int offset, int pageSize);
 
-    List<Match> findByPlayerName(String name, int pageNumber, int pageSize);
+    List<Match> findByPlayerName(String name, int offset, int pageSize);
 
-    long getTotalCountOfMatches();
+    int countTotal();
 
-    long getTotalCountOfMatchesByPlayerName(String name);
+    int countWithPlayer(String name);
 }

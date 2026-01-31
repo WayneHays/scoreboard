@@ -6,6 +6,7 @@ import com.scoreboard.model.entity.Match;
 import com.scoreboard.model.entity.Player;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
@@ -16,10 +17,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
 
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HibernateUtil {
-    private static final Logger logger = LoggerFactory.getLogger(HibernateUtil.class);
-
     private static volatile SessionFactory sessionFactory;
     private static volatile StandardServiceRegistry serviceRegistry;
 
@@ -28,16 +28,16 @@ public final class HibernateUtil {
             throw new IllegalStateException("HibernateUtil already initialized");
         }
 
-        logger.info("Initializing Hibernate SessionFactory");
+        log.info("Initializing Hibernate SessionFactory");
 
         try {
             Properties properties = HibernateConfigManager.loadHibernateProperties(config);
             serviceRegistry = buildServiceRegistry(properties);
             sessionFactory = buildSessionFactory(serviceRegistry);
 
-            logger.info("Hibernate SessionFactory initialized successfully");
+            log.info("Hibernate SessionFactory initialized successfully");
         } catch (Exception e) {
-            logger.error("Failed to initialize Hibernate", e);
+            log.error("Failed to initialize Hibernate", e);
             shutdown();
             throw new ApplicationStartupException("Failed to initialize Hibernate", e);
         }
@@ -52,12 +52,12 @@ public final class HibernateUtil {
     }
 
     public static synchronized void shutdown() {
-        logger.info("Shutting down Hibernate");
+        log.info("Shutting down Hibernate");
 
         closeSessionFactory();
         destroyServiceRegistry();
 
-        logger.info("Hibernate shutdown completed");
+        log.info("Hibernate shutdown completed");
     }
 
     private static StandardServiceRegistry buildServiceRegistry(Properties properties) {
@@ -72,7 +72,7 @@ public final class HibernateUtil {
 
     private static SessionFactory buildSessionFactory(StandardServiceRegistry registry) {
         try {
-            logger.debug("Building Hibernate SessionFactory");
+            log.debug("Building Hibernate SessionFactory");
 
             MetadataSources sources = new MetadataSources(registry);
             addAnnotatedClasses(sources);
@@ -80,7 +80,7 @@ public final class HibernateUtil {
             Metadata metadata = sources.getMetadataBuilder().build();
             SessionFactory factory = metadata.getSessionFactoryBuilder().build();
 
-            logger.debug("SessionFactory built successfully");
+            log.debug("SessionFactory built successfully");
             return factory;
 
         } catch (Exception e) {
@@ -98,9 +98,9 @@ public final class HibernateUtil {
             try {
                 sessionFactory.close();
                 sessionFactory = null;
-                logger.debug("SessionFactory closed");
+                log.debug("SessionFactory closed");
             } catch (Exception e) {
-                logger.error("Error closing SessionFactory", e);
+                log.error("Error closing SessionFactory", e);
             }
         }
     }
@@ -110,9 +110,9 @@ public final class HibernateUtil {
             try {
                 StandardServiceRegistryBuilder.destroy(serviceRegistry);
                 serviceRegistry = null;
-                logger.debug("ServiceRegistry destroyed");
+                log.debug("ServiceRegistry destroyed");
             } catch (Exception e) {
-                logger.error("Error destroying ServiceRegistry", e);
+                log.error("Error destroying ServiceRegistry", e);
             }
         }
     }

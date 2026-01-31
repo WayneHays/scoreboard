@@ -23,19 +23,13 @@
     <a href="${pageContext.request.contextPath}/new-match"
        class="nav-button results-button">New Match</a>
 </nav>
-
-<c:if test="${page.hasValidationError()}">
-    <div class="error-message general-error">
-        <c:out value="${page.validationError}"/>
-    </div>
-</c:if>
     <section class="search-form">
         <form method="GET" action="${baseUrl}" class="search-form-grid">
             <input type="text"
                    name="filter_by_player_name"
                    class="search-input"
-                   placeholder="Search by player name..."
-                   value="<c:out value="${page.hasValidationError() ? page.invalidPlayerName : page.filterByPlayerName}"/>">
+                   placeholder="Filter by player name..."
+                   value="<c:out value="${page.playerName}"/>">
             <input type="hidden" name="page" value="1">
 
             <c:choose>
@@ -49,9 +43,9 @@
         </form>
     </section>
 
-    <c:if test="${page.hasFilter}">
+    <c:if test="${page.playerName != null}">
         <div class="search-info">
-            Results for: <strong><c:out value="${page.filterByPlayerName}"/></strong>
+            Results for: <strong><c:out value="${page.playerName}"/></strong>
         </div>
     </c:if>
 
@@ -60,8 +54,8 @@
             <c:when test="${empty page.matches}">
                 <div class="no-results">
                     <c:choose>
-                        <c:when test="${page.hasFilter}">
-                            No matches found for player "<c:out value="${page.filterByPlayerName}"/>"
+                        <c:when test="${page.playerName != null}">
+                            No matches found for player "<c:out value="${page.playerName}"/>"
                         </c:when>
                         <c:otherwise>
                             No matches found
@@ -81,16 +75,15 @@
                     <tbody>
                     <c:forEach items="${page.matches}" var="match">
                         <tr>
-                            <!-- ✅ ДОБАВЛЕНЫ data-label атрибуты -->
                             <td data-label="Player 1">
-                                <c:out value="${match.firstPlayer.name}"/>
+                                <c:out value="${match.firstPlayerName}"/>
                             </td>
                             <td data-label="Player 2">
-                                <c:out value="${match.secondPlayer.name}"/>
+                                <c:out value="${match.secondPlayerName}"/>
                             </td>
                             <td data-label="Winner">
                                     <span class="winner-name">
-                                        <c:out value="${match.winner.name}"/>
+                                        <c:out value="${match.winnerName}"/>
                                     </span>
                             </td>
                         </tr>
@@ -101,11 +94,11 @@
         </c:choose>
     </section>
 
-    <c:if test="${page.shouldShowPagination}">
+    <c:if test="${page.totalPages > 1}">
         <nav class="pagination">
             <c:choose>
-                <c:when test="${page.hasPrevious}">
-                    <a href="${baseUrl}?page=${page.previousPage}<c:if test='${page.hasFilter}'>&filter_by_player_name=<c:out value='${page.filterByPlayerName}'/></c:if>"
+                <c:when test="${page.pageNumber > 1}">
+                    <a href="${baseUrl}?page=${page.pageNumber - 1} <c:if test='${page.playerName != null}'>&filter_by_player_name=<c:out value='${page.playerName}'/></c:if>"
                        class="pagination-item">Previous</a>
                 </c:when>
                 <c:otherwise>
@@ -116,8 +109,8 @@
             <span class="pagination-item active">${page.pageNumber}</span>
 
             <c:choose>
-                <c:when test="${page.hasNext}">
-                    <a href="${baseUrl}?page=${page.nextPage}<c:if test='${page.hasFilter}'>&filter_by_player_name=<c:out value='${page.filterByPlayerName}'/></c:if>"
+                <c:when test="${page.pageNumber < page.totalPages}">
+                    <a href="${baseUrl}?page=${page.pageNumber + 1}<c:if test='${page.playerName != null}'>&filter_by_player_name=<c:out value='${page.playerName}'/></c:if>"
                        class="pagination-item">Next</a>
                 </c:when>
                 <c:otherwise>

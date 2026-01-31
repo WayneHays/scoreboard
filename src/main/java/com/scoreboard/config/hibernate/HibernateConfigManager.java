@@ -2,34 +2,33 @@ package com.scoreboard.config.hibernate;
 
 import com.scoreboard.config.properties.Config;
 import com.scoreboard.constant.AppDefaults;
-import com.scoreboard.constant.ConfigKeys;
 import com.scoreboard.exception.ApplicationStartupException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class HibernateConfigManager {
-    private static final Logger logger = LoggerFactory.getLogger(HibernateConfigManager.class);
+    private static final String HIBERNATE_CONFIG = "hibernate.properties";
 
     public static Properties loadHibernateProperties(Config config) {
         String configFile = config.get(
-                ConfigKeys.HIBERNATE_CONFIG_FILE,
-                AppDefaults.HIBERNATE_CONFIG
+                HIBERNATE_CONFIG,
+                HIBERNATE_CONFIG
         );
 
-        logger.debug("Loading Hibernate configuration from: {}", configFile);
+        log.debug("Loading Hibernate configuration from: {}", configFile);
 
         try (InputStream stream = getConfigStream(configFile)) {
             Properties properties = new Properties();
             properties.load(stream);
 
-            logger.debug("Loaded {} Hibernate properties", properties.size());
+            log.debug("Loaded {} Hibernate properties", properties.size());
             return properties;
 
         } catch (IOException e) {

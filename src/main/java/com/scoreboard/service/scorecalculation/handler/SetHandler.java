@@ -1,7 +1,6 @@
 package com.scoreboard.service.scorecalculation.handler;
 
 import com.scoreboard.model.entity.Player;
-import com.scoreboard.model.domain.OngoingMatch;
 import com.scoreboard.tennisrules.SetRules;
 import lombok.AllArgsConstructor;
 
@@ -10,7 +9,7 @@ public class SetHandler extends AbstractHandler {
     private final SetRules setRules;
 
     @Override
-    protected void doHandle(OngoingMatch ongoingMatch, Player scorer) {
+    protected void doHandle(Player scorer) {
         Player opponent = ongoingMatch.getOpponent(scorer);
         int scorerGames = ongoingMatch.getGames(scorer);
         int opponentGames = ongoingMatch.getGames(opponent);
@@ -22,7 +21,7 @@ public class SetHandler extends AbstractHandler {
 
         if (isSetWon(scorerGames, opponentGames)) {
             ongoingMatch.awardSetTo(scorer);
-            callNext(ongoingMatch, scorer);
+            callNext(scorer);
         }
     }
 

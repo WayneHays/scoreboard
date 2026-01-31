@@ -1,9 +1,8 @@
 package com.scoreboard.validation;
 
-import com.scoreboard.exception.ValidationException;
 import com.scoreboard.tennisrules.MatchRules;
 import com.scoreboard.tennisrules.SetRules;
-import com.scoreboard.tennisrules.TennisMatchRules;
+import com.scoreboard.tennisrules.TennisRules;
 import com.scoreboard.tennisrules.TiebreakRules;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -20,7 +19,7 @@ public final class TennisRulesValidator {
     private static final int MIN_SETS_TO_WIN = 1;
     private static final int MAX_SETS_TO_WIN = 5;
 
-    public static void validate(TennisMatchRules rules) {
+    public static void validate(TennisRules rules) {
         validateTiebreakRules(rules.tiebreakRules());
         validateSetRules(rules.setRules());
         validateMatchRules(rules.matchRules());
@@ -30,7 +29,7 @@ public final class TennisRulesValidator {
         int points = rules.pointsToWinTieBreak();
 
         if (points < MIN_TIEBREAK_POINTS || points > MAX_TIEBREAK_POINTS) {
-            throw new ValidationException(
+            throw new SingleNameValidationException(
                     String.format(
                             "Tiebreak points must be between %d and %d, got: %d",
                             MIN_TIEBREAK_POINTS, MAX_TIEBREAK_POINTS, points
@@ -43,7 +42,7 @@ public final class TennisRulesValidator {
         int games = rules.gamesToWinSet();
 
         if (games < MIN_GAMES_TO_WIN || games > MAX_GAMES_TO_WIN) {
-            throw new ValidationException(
+            throw new SingleNameValidationException(
                     String.format(
                             "Games to win must be between %d and %d, got: %d",
                             MIN_GAMES_TO_WIN, MAX_GAMES_TO_WIN, games
@@ -56,7 +55,7 @@ public final class TennisRulesValidator {
         int sets = rules.setsToWinMatch();
 
         if (sets < MIN_SETS_TO_WIN || sets > MAX_SETS_TO_WIN) {
-            throw new ValidationException(
+            throw new SingleNameValidationException(
                     String.format(
                             "Sets to win must be between %d and %d, got: %d",
                             MIN_SETS_TO_WIN, MAX_SETS_TO_WIN, sets

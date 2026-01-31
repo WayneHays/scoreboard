@@ -9,4 +9,5 @@ public class ScoreboardServiceException extends RuntimeException{
     public ScoreboardServiceException(String message) {
         super(message);
     }
+
 }

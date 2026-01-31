@@ -10,15 +10,15 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
-public class TennisMatchRulesImpl implements TennisMatchRules {
-    private static final Logger logger = LoggerFactory.getLogger(TennisMatchRulesImpl.class);
+public class TennisRulesImpl implements TennisRules {
+    private static final Logger logger = LoggerFactory.getLogger(TennisRulesImpl.class);
 
     private final GameRules gameRules;
     private final TiebreakRules tiebreakRules;
     private final SetRules setRules;
     private final MatchRules matchRules;
 
-    public TennisMatchRulesImpl() {
+    public TennisRulesImpl() {
         logger.debug("Initializing standard tennis match rules");
         this.gameRules = new StandardGameRules();
         this.tiebreakRules = new StandardTiebreakRules();
@@ -26,8 +26,8 @@ public class TennisMatchRulesImpl implements TennisMatchRules {
         this.matchRules = new StandardMatchRules();
     }
 
-    public TennisMatchRulesImpl(GameRules gameRules, TiebreakRules tiebreakRules,
-                                SetRules setRules, MatchRules matchRules) {
+    public TennisRulesImpl(GameRules gameRules, TiebreakRules tiebreakRules,
+                           SetRules setRules, MatchRules matchRules) {
         logger.debug("Creating TennisMatchRulesImpl with custom rules");
         this.gameRules = Objects.requireNonNull(gameRules);
         this.tiebreakRules = Objects.requireNonNull(tiebreakRules);

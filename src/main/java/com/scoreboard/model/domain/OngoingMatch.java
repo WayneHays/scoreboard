@@ -1,111 +1,168 @@
 package com.scoreboard.model.domain;
 
-import com.scoreboard.model.entity.Player;
-import com.scoreboard.service.scorecalculation.Points;
+import com.scoreboard.service.scorecalculation.PointResult;
+import com.scoreboard.service.scorecalculation.handler.Handler;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
+import java.util.Optional;
+import java.util.function.Consumer;
+
+@Slf4j
+@Getter
 public class OngoingMatch {
-    @Getter
-    private final Player player1;
+    private final TennisPlayer firstPlayer;
+    private final TennisPlayer  secondPlayer;
+    private final Handler handlerChain;
+    private final PlayerScore firstPlayerScore;
+    private final PlayerScore secondPlayerScore;
+    private MatchState matchState;
 
-    @Getter
-    private final Player player2;
+    public OngoingMatch(TennisPlayer  firstPlayer, TennisPlayer  secondPlayer, Handler handlerChain) {
+        this.firstPlayer = firstPlayer;
+        this.secondPlayer = secondPlayer;
+        this.handlerChain = handlerChain;
+        this.firstPlayerScore = new PlayerScore();
+        this.secondPlayerScore = new PlayerScore();
+        this.matchState = MatchState.REGULAR;
+    }
 
-    @Getter
-    @Setter
-    private Player winner;
+    public void awardPoint(TennisPlayer  scorer) {
+        PointResult pointResult = handlerChain.handle(this, scorer);
+        PlayerScore pointWinnerScore = scorer.equals(firstPlayer) ? firstPlayerScore : secondPlayerScore;
 
-    @Getter
-    @Setter
-    private Player advantage;
+        switch (pointResult) {
+            case POINT_AWARDED -> {
+                pointWinnerScore.addPoint();
+                matchState = MatchState.REGULAR;
+            }
 
-    @Getter
-    @Setter
-    private boolean tieBreak;
+            case GAME_FINISHED -> {
+                resetPointsForBoth();
+                resetTieBreakPointsForBoth();
+                pointWinnerScore.addGame();
+                matchState = MatchState.REGULAR;
+            }
 
-    private final PlayerScore player1Score;
-    private final PlayerScore player2Score;
+            case ADVANTAGE -> {
+                pointWinnerScore.addPoint();
+                matchState = MatchState.ADVANTAGE;
+            }
 
-    public OngoingMatch(Player player1, Player player2) {
-        this.player1 = player1;
-        this.player2 = player2;
-        this.player1Score = new PlayerScore();
-        this.player2Score = new PlayerScore();
+            case DEUCE -> {
+                resetToDeuce();
+                matchState = MatchState.REGULAR;
+            }
+
+            case SET_FINISHED -> {
+                resetPointsForBoth();
+                resetGamesForBoth();
+                resetTieBreakPointsForBoth();
+                pointWinnerScore.addSet();
+                matchState = MatchState.REGULAR;
+            }
+
+            case TIE_BREAK_STARTED -> {
+                resetPointsForBoth();
+                matchState = MatchState.TIEBREAK;
+            }
+
+            case TIE_BREAK_POINT_AWARDED -> {
+                pointWinnerScore.addTieBreakPoint();
+                matchState = MatchState.TIEBREAK;
+            }
+
+            case MATCH_OVER -> {
+                resetPointsForBoth();
+                resetGamesForBoth();
+                resetTieBreakPointsForBoth();
+                pointWinnerScore.addSet();
+                matchState = MatchState.FINISHED;
+            }
+        }
+    }
+
+    public Optional<String> getWinnerName() {
+        if (isFinished()) {
+            return Optional.of(getFirstPlayerSets() > getSecondPlayerSets() ? firstPlayer.name() : secondPlayer.name());
+        }
+        return Optional.empty();
+    }
+
+    public Optional<TennisPlayer> findPlayerByName(String name) {
+
+    }
+
+    public boolean isTieBreak() {
+        return matchState == MatchState.TIEBREAK;
     }
 
     public boolean isFinished() {
-        return winner != null;
+        return matchState == MatchState.FINISHED;
     }
 
-    public Player getPlayerByName(String playerName) {
-        return player1.getName().equals(playerName) ? player1 : player2;
+    public boolean isAdvantage() {
+        return matchState == MatchState.ADVANTAGE;
     }
 
-    public Player getOpponent(Player player) {
-        return player.equals(player1) ? player2 : player1;
+    public String getFirstPlayerName() {
+        return firstPlayer.name();
     }
 
-    public Points getPoints(Player player) {
-        return getPlayerScore(player).getPoints();
+    public String getSecondPlayerName() {
+        return secondPlayer.name();
     }
 
-    public int getGames(Player player) {
-        return getPlayerScore(player).getGames();
+    public String getFirstPlayerPoints() {
+        return firstPlayerScore.getPoints().getValue();
     }
 
-    public int getSets(Player player) {
-        return getPlayerScore(player).getSets();
+    public String getSecondPlayerPoints() {
+        return secondPlayerScore.getPoints().getValue();
     }
 
-    public int getTieBreakPoints(Player player) {
-        return getPlayerScore(player).getTieBreakPoints();
+    public int getFirstPlayerGames() {
+        return firstPlayerScore.getGames();
     }
 
-    public void awardPointTo(Player scorer) {
-        getPlayerScore(scorer).awardPoint();
+    public int getSecondPlayerGames() {
+        return secondPlayerScore.getGames();
     }
 
-    public void awardGameTo(Player scorer) {
-        getPlayerScore(scorer).awardGame();
-        resetPointsForBoth();
-        resetTieBreakPointsForBoth();
-        setAdvantage(null);
+    public int getFirstPlayerTieBreakPoints() {
+        return firstPlayerScore.getTieBreakPoints();
     }
 
-    public void awardSetTo(Player scorer) {
-        getPlayerScore(scorer).awardSet();
-        resetPointsForBoth();
-        resetGamesForBoth();
-        resetTieBreakPointsForBoth();
-        setTieBreak(false);
-        setAdvantage(null);
+    public int getSecondPlayerTieBreakPoints() {
+        return secondPlayerScore.getTieBreakPoints();
     }
 
-    public void resetPointsToForty(Player player) {
-        getPlayerScore(player).setPointsToForty();
+    public int getFirstPlayerSets() {
+        return firstPlayerScore.getSets();
     }
 
-    public void awardTieBreakPointTo(Player scorer) {
-        getPlayerScore(scorer).awardTieBreakPoint();
+    public int getSecondPlayerSets() {
+        return secondPlayerScore.getSets();
+    }
+
+    private void resetToDeuce() {
+        forBothScores(PlayerScore::resetToDeuce);
     }
 
     private void resetPointsForBoth() {
-        player1Score.resetPoints();
-        player2Score.resetPoints();
+        forBothScores(PlayerScore::resetPoints);
     }
 
     private void resetGamesForBoth() {
-        player1Score.resetGames();
-        player2Score.resetGames();
+        forBothScores(PlayerScore::resetGames);
     }
 
     private void resetTieBreakPointsForBoth() {
-        player1Score.resetTieBreakPoints();
-        player2Score.resetTieBreakPoints();
+        forBothScores(PlayerScore::resetTieBreakPoints);
     }
 
-    private PlayerScore getPlayerScore(Player player) {
-        return player.equals(player1) ? player1Score : player2Score;
+    private void forBothScores(Consumer<PlayerScore> action) {
+        action.accept(firstPlayerScore);
+        action.accept(secondPlayerScore);
     }
 }

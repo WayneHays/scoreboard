@@ -16,9 +16,8 @@ public final class ApplicationContext {
         logger.debug("Registered service: {}", type.getSimpleName());
     }
 
-    @SuppressWarnings("unchecked")
     public <T> T get(Class<T> type) {
-        T service = (T) services.get(type);
+        T service = type.cast(services.get(type));
 
         if (service == null) {
             throw new IllegalStateException(
