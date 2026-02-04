@@ -1,9 +1,9 @@
 package com.scoreboard.servlet;
 
-import com.scoreboard.dto.MatchDto;
+import com.scoreboard.dto.OngoingMatchDto;
 import com.scoreboard.exception.UuidParsingException;
 import com.scoreboard.mapper.MatchResultMapper;
-import com.scoreboard.service.scorecalculation.MatchService;
+import com.scoreboard.service.MatchFacade;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,9 +15,10 @@ import java.util.UUID;
 
 @WebServlet("/match-score")
 public class MatchScoreServlet extends BaseServlet {
+    private static final String MATCH_SCORE_JSP_NAME = "match-score";
+    private static final String RESULTS_JSP_NAME = "match-result";
+
     private static final String UUID_PARAM = "uuid";
-    private static final String JSP_NAME = "match-score";
-    private static final String RESULTS_JSP = "match-result";
     private static final String PLAYER_NAME_PARAM = "playerName";
 
     private static final String UUID_REQUIRED_MSG = "UUID is required";
@@ -26,23 +27,23 @@ public class MatchScoreServlet extends BaseServlet {
     private static final String MATCH_RESULT = "matchResult";
     private static final String MATCH_DTO = "matchDto";
 
-    private MatchService matchService;
+    private MatchFacade matchFacade;
     private MatchResultMapper resultMapper;
 
     @Override
     public void init() throws ServletException {
         super.init();
-        this.matchService = getService(MatchService.class);
+        this.matchFacade = getService(MatchFacade.class);
         this.resultMapper = getService(MatchResultMapper.class);
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         UUID matchId = parse(req.getParameter(UUID_PARAM));
-        MatchDto dto = matchService.getMatchDto(matchId);
+        OngoingMatchDto dto = matchFacade.getMatchDto(matchId);
 
         req.setAttribute(MATCH_DTO, dto);
-        forwardTo(JSP_NAME, req, resp);
+        forwardTo(MATCH_SCORE_JSP_NAME, req, resp);
     }
 
     @Override
@@ -50,16 +51,16 @@ public class MatchScoreServlet extends BaseServlet {
         UUID matchId = parse(req.getParameter(UUID_PARAM));
         String playerName = req.getParameter(PLAYER_NAME_PARAM);
 
-        MatchDto dto = matchService.awardPoint(matchId, playerName);
+        OngoingMatchDto dto = matchFacade.awardPoint(matchId, playerName);
 
         if (dto.isFinished()) {
-            req.setAttribute(MATCH_RESULT, resultMapper.toResult(dto));
-            forwardTo(RESULTS_JSP, req, resp);
+            req.setAttribute(MATCH_RESULT, resultMapper.toResult(dto, playerName));
+            forwardTo(RESULTS_JSP_NAME, req, resp);
             return;
         }
 
         req.setAttribute(MATCH_DTO, dto);
-        forwardTo(JSP_NAME, req, resp);
+        forwardTo(MATCH_SCORE_JSP_NAME, req, resp);
     }
 
     private UUID parse(String str) {
@@ -71,7 +72,6 @@ public class MatchScoreServlet extends BaseServlet {
             return UUID.fromString(str);
         } catch (IllegalArgumentException e) {
             throw new UuidParsingException(INVALID_UUID_FORMAT);
-
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.scoreboard.servlet;
 
 import com.scoreboard.exception.PairNameValidationException;
-import com.scoreboard.service.OngoingMatchesService;
+import com.scoreboard.service.OngoingMatchService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,6 +11,7 @@ import org.apache.commons.lang3.ObjectUtils;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -25,14 +26,15 @@ public class NewMatchServlet extends BaseServlet {
     private static final String SECOND_NAME_ERRORS = "secondNameErrors";
 
     private static final String FIRST_PLAYER_NAME = "firstPlayerName";
-    private final String SECOND_PLAYER_NAME = "secondPlayerName";
+    private static final String SECOND_PLAYER_NAME = "secondPlayerName";
+    public static final String NAMES_VALIDATION_FAIL_MESSAGE = "Player names validation failed with errors: {}, {}, {}";
 
-    private OngoingMatchesService ongoingMatchesService;
+    private OngoingMatchService ongoingMatchService;
 
     @Override
     public void init() throws ServletException {
         super.init();
-        this.ongoingMatchesService = getService(OngoingMatchesService.class);
+        this.ongoingMatchService = getService(OngoingMatchService.class);
         log.debug("NewMatchServlet initialized");
     }
 
@@ -47,16 +49,27 @@ public class NewMatchServlet extends BaseServlet {
         String secondPlayerName = req.getParameter(SECOND_PLAYER_NAME).trim();
 
         try {
-            UUID matchId = ongoingMatchesService.createMatch(firstPlayerName, secondPlayerName);
+            UUID matchId = ongoingMatchService.createMatch(firstPlayerName, secondPlayerName);
             redirectTo(MATCH_SCORE_JSP_NAME, Map.of("uuid", matchId), req, resp);
 
         } catch (PairNameValidationException e) {
-            setAttributeIfNotEmpty(req, COMMON_ERRORS, e.getCommonErrors());
-            setAttributeIfNotEmpty(req, FIRST_NAME_ERRORS, e.getFirstNameErrors());
-            setAttributeIfNotEmpty(req, SECOND_NAME_ERRORS, e.getSecondNameErrors());
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            forwardTo(MATCH_CREATION_JSP_NAME, req, resp);
+            handleValidationErrors(e, req, resp);
         }
+    }
+
+    private void handleValidationErrors(PairNameValidationException e, HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        List<String> commonErrors = e.getCommonErrors();
+        List<String> firstNameErrors = e.getFirstNameErrors();
+        List<String> secondNameErrors = e.getSecondNameErrors();
+        log.info(NAMES_VALIDATION_FAIL_MESSAGE, commonErrors, firstNameErrors, secondNameErrors);
+
+        setAttributeIfNotEmpty(req, COMMON_ERRORS, commonErrors);
+        setAttributeIfNotEmpty(req, FIRST_NAME_ERRORS, firstNameErrors);
+        setAttributeIfNotEmpty(req, SECOND_NAME_ERRORS, secondNameErrors);
+
+        resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        forwardTo(MATCH_CREATION_JSP_NAME, req, resp);
     }
 
     private void setAttributeIfNotEmpty(

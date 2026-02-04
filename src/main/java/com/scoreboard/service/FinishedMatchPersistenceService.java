@@ -2,14 +2,16 @@ package com.scoreboard.service;
 
 import com.scoreboard.dao.MatchDao;
 import com.scoreboard.dao.PlayerDao;
-import com.scoreboard.exception.ScoreboardServiceException;
-import com.scoreboard.model.domain.OngoingMatch;
-import com.scoreboard.model.entity.Match;
-import com.scoreboard.model.entity.Player;
+import com.scoreboard.dto.FinishedMatchDto;
+import com.scoreboard.entity.Match;
+import com.scoreboard.entity.Player;
+import com.scoreboard.exception.DaoException;
 import lombok.AllArgsConstructor;
 import org.hibernate.exception.ConstraintViolationException;
 
-import java.util.Optional;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 public class FinishedMatchPersistenceService {
@@ -17,37 +19,33 @@ public class FinishedMatchPersistenceService {
     private final PlayerDao playerDao;
     private final BaseTransactionalService baseTransactionalService;
 
-    public void saveFinishedMatch(OngoingMatch ongoingMatch) {
-        String firstPlayerName = ongoingMatch.getFirstPlayerName().toLowerCase();
-        String secondPlayerName = ongoingMatch.getSecondPlayerName().toLowerCase();
+    public void saveFinishedMatch(FinishedMatchDto dto) {
+        String firstPlayerName = dto.firstPlayerName();
+        String secondPlayerName = dto.secondPlayerName();
+        Set<String> namesFromMatch = Set.of(firstPlayerName, secondPlayerName);
 
         baseTransactionalService.executeInTransaction(() -> {
-            Player firstPlayer = findOrCreatePlayer(firstPlayerName);
-            Player secondPlayer = findOrCreatePlayer(secondPlayerName);
-            String winnerName = ongoingMatch.getWinnerName()
-                    .orElseThrow(() -> new IllegalStateException("Match is finished, winner should be set"));
-            Player winner = winnerName.equalsIgnoreCase(firstPlayerName) ? firstPlayer : secondPlayer;
+            Map<String, Player> players = playerDao.findByNames(namesFromMatch).stream()
+                    .collect(Collectors.toMap(
+                            player -> player.getName().toLowerCase(),
+                            player -> player
+                    ));
 
+            Player firstPlayer = players.computeIfAbsent(firstPlayerName.toLowerCase(), this::createPlayer);
+            Player secondPlayer = players.computeIfAbsent(secondPlayerName.toLowerCase(), this::createPlayer);
+
+            Player winner = dto.winnerName().equalsIgnoreCase(firstPlayerName) ? firstPlayer : secondPlayer;
             matchDao.save(new Match(firstPlayer, secondPlayer, winner));
         });
     }
 
-    private Player findOrCreatePlayer(String name) {
-        return tryFind(name)
-                .orElseGet(() -> trySave(name));
-    }
-
-    private Optional<Player> tryFind(String name) {
-        return playerDao.find(name);
-    }
-
-    private Player trySave(String name) {
+    private Player createPlayer(String name) {
         Player player = new Player(name);
         try {
             return playerDao.save(player);
         } catch (Exception e) {
             if (isConstraintViolation(e)) {
-                return tryFind(name)
+                return playerDao.find(name)
                         .orElseThrow(() -> getException(player, e));
             }
             throw getException(player, e);
@@ -65,7 +63,7 @@ public class FinishedMatchPersistenceService {
         return false;
     }
 
-    private ScoreboardServiceException getException(Player player, Exception e) {
-        return new ScoreboardServiceException("Failed to save player: " + player.getName(), e);
+    private DaoException getException(Player player, Exception e) {
+        return new DaoException("Failed to save player: " + player.getName(), e);
     }
 }

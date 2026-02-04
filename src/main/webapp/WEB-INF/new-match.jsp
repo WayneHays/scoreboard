@@ -7,6 +7,7 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,64 +24,27 @@
     </header>
 
     <main>
-        <c:if test="${not empty commonErrors}">
-          <ul>
-              <c:forEach var="error" items="${commonErrors}">
-                  <li>${error}</li>
-              </c:forEach>
-          </ul>
-        </c:if>
-
+        <t:error-list errors="${commonErrors}"/>
         <form action="${pageContext.request.contextPath}/new-match" method="POST">
-            <div>
-                <c:if test="${not empty firstNameErrors}">
-                    <ul>
-                        <c:forEach var="error" items="${firstNameErrors}">
-                            <li>${error}</li>
-                        </c:forEach>
-                    </ul>
-                </c:if>
-            </div>
-            <div class="form-group">
-                <label for="firstPlayer" class="form-label">Player 1</label>
-                <input
-                        type="text"
-                        id="firstPlayer"
-                        name="firstPlayerName"
-                        class="form-input"
-                        placeholder="First player's name"
-                        value="<c:out value='${param.firstPlayerName}'/>"
-                        required
-                >
-            </div>
+            <t:player-input text="Player 1"
+                            id="firstPlayer"
+                            name="firstPlayerName"
+                            placeholder="First player's name"
+                            value="${param.firstPlayerName}"
+                            errors="${firstNameErrors}"/>
 
             <div class="vs-divider">
                 <div class="vs-line"></div>
                 <div class="vs-text">VS</div>
                 <div class="vs-line"></div>
             </div>
-            <div>
-                <c:if test="${not empty secondNameErrors}">
-                    <ul>
-                        <c:forEach var="error" items="${secondNameErrors}">
-                            <li>${error}</li>
-                        </c:forEach>
-                    </ul>
-                </c:if>
-            </div>
-            <div class="form-group">
-                <label for="secondPlayer" class="form-label">Player 2</label>
-                <input
-                        type="text"
-                        id="secondPlayer"
-                        name="secondPlayerName"
-                        class="form-input"
-                        placeholder="Second player's name"
-                        value="<c:out value='${param.secondPlayerName}'/>"
-                        required
-                >
-            </div>
 
+            <t:player-input text="Player 2"
+                            id="secondPlayer"
+                            name="secondPlayerName"
+                            placeholder="Second player's name"
+                            value="${param.secondPlayerName}"
+                            errors="${secondNameErrors}"/>
             <button type="submit" class="start-button">
                 Start Match!
             </button>

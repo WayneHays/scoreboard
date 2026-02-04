@@ -7,6 +7,7 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,55 +31,23 @@
                 <div>Points</div>
             </div>
 
-            <div class="score-row">
-                <div class="player-name"><c:out value="${matchDto.firstPlayerName}"/></div>
-                <div class="sets-score">${matchDto.firstPlayerSets}</div>
-                <div class="games-score">${matchDto.firstPlayerGames}</div>
-                <div class="points-score">
-                    <c:choose>
-                        <c:when test="${matchDto.isTieBreak}">
-                            ${matchDto.firstPlayerTieBreakPoints}
-                        </c:when>
-                        <c:otherwise>
-                            ${matchDto.firstPlayerPoints}
-                        </c:otherwise>
-                    </c:choose>
-                </div>
-            </div>
-
-            <div class="score-row">
-                <div class="player-name"><c:out value="${matchDto.secondPlayerName}"/></div>
-                <div class="sets-score">${matchDto.secondPlayerSets}</div>
-                <div class="games-score">${matchDto.secondPlayerGames}/></div>
-                <div class="points-score">
-                    <c:choose>
-                        <c:when test="${matchDto.isTieBreak}">
-                           ${matchDto.secondPlayerTieBreakPoints}
-                        </c:when>
-                        <c:otherwise>
-                            ${matchDto.secondPlayerPoints}
-                        </c:otherwise>
-                    </c:choose>
-                </div>
-            </div>
+            <t:player-score playerName="${matchDto.firstPlayerName}"
+                            sets="${matchDto.firstPlayerSets}"
+                            games="${matchDto.firstPlayerGames}"
+                            points="${matchDto.firstPlayerPoints}"
+                            tieBreakPoints="${matchDto.firstPlayerTieBreakPoints}"
+                            isTieBreak="${matchDto.isTieBreak}"/>
+            <t:player-score playerName="${matchDto.secondPlayerName}"
+                            sets="${matchDto.secondPlayerSets}"
+                            games="${matchDto.secondPlayerGames}"
+                            points="${matchDto.secondPlayerPoints}"
+                            tieBreakPoints="${matchDto.secondPlayerTieBreakPoints}"
+                            isTieBreak="${matchDto.isTieBreak}"/>
         </section>
 
         <section class="actions-container">
-            <form action="${pageContext.request.contextPath}/match-score" method="POST" class="point-form">
-                <input type="hidden" name="uuid" value="${param.uuid}">
-                <input type="hidden" name="playerName" value="${matchDto.firstPlayerName}">
-                <button type="submit" class="action-button">
-                    <c:out value="${matchDto.firstPlayerName}"/> Wins Point
-                </button>
-            </form>
-
-            <form action="${pageContext.request.contextPath}/match-score" method="POST" class="point-form">
-                <input type="hidden" name="uuid" value="${param.uuid}">
-                <input type="hidden" name="playerName" value="${matchDto.secondPlayerName}">
-                <button type="submit" class="action-button player2-button">
-                    <c:out value="${matchDto.secondPlayerName}"/> Wins Point
-                </button>
-            </form>
+            <t:player-action-button playerName="${matchDto.firstPlayerName}"/>
+            <t:player-action-button playerName="${matchDto.secondPlayerName}"/>
         </section>
     </main>
 </div>

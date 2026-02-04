@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <c:set var="baseUrl" value="${pageContext.request.contextPath}/matches" />
 
@@ -33,7 +34,7 @@
             <input type="hidden" name="page" value="1">
 
             <c:choose>
-                <c:when test="${page.hasFilter || page.hasValidationError()}">
+                <c:when test="${not empty page.playerName and not empty page.errors}}">
                     <a href="${baseUrl}" class="search-button clear-mode">Clear</a>
                 </c:when>
                 <c:otherwise>
@@ -43,7 +44,7 @@
         </form>
     </section>
 
-    <c:if test="${page.playerName != null}">
+    <c:if test="${not empty page.playerName}">
         <div class="search-info">
             Results for: <strong><c:out value="${page.playerName}"/></strong>
         </div>
@@ -54,7 +55,7 @@
             <c:when test="${empty page.matches}">
                 <div class="no-results">
                     <c:choose>
-                        <c:when test="${page.playerName != null}">
+                        <c:when test="${not empty page.playerName}">
                             No matches found for player "<c:out value="${page.playerName}"/>"
                         </c:when>
                         <c:otherwise>
@@ -93,38 +94,7 @@
             </c:otherwise>
         </c:choose>
     </section>
-
-    <c:if test="${page.totalPages > 1}">
-        <nav class="pagination">
-            <c:choose>
-                <c:when test="${page.pageNumber > 1}">
-                    <a href="${baseUrl}?page=${page.pageNumber - 1} <c:if test='${page.playerName != null}'>&filter_by_player_name=<c:out value='${page.playerName}'/></c:if>"
-                       class="pagination-item">Previous</a>
-                </c:when>
-                <c:otherwise>
-                    <span class="pagination-item disabled">Previous</span>
-                </c:otherwise>
-            </c:choose>
-
-            <span class="pagination-item active">${page.pageNumber}</span>
-
-            <c:choose>
-                <c:when test="${page.pageNumber < page.totalPages}">
-                    <a href="${baseUrl}?page=${page.pageNumber + 1}<c:if test='${page.playerName != null}'>&filter_by_player_name=<c:out value='${page.playerName}'/></c:if>"
-                       class="pagination-item">Next</a>
-                </c:when>
-                <c:otherwise>
-                    <span class="pagination-item disabled">Next</span>
-                </c:otherwise>
-            </c:choose>
-        </nav>
-    </c:if>
-
-    <c:if test="${page.totalPages > 1}">
-        <div class="page-info">
-            Page ${page.pageNumber} of ${page.totalPages}
-        </div>
-    </c:if>
+    <t:pagination totalPages="${page.totalPages}" pageNumber="${page.pageNumber}" baseUrl="${baseUrl}"/>
 </main>
 </div>
 </body>

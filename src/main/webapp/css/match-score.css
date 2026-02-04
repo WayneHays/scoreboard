@@ -40,7 +40,6 @@ main {
     gap: 30px;
 }
 
-/* Scoreboard */
 .scoreboard {
     background: #f8f9fa;
     border-radius: 8px;
@@ -87,7 +86,6 @@ main {
     text-align: center;
 }
 
-/* Action Buttons */
 .actions-container {
     display: flex;
     gap: 20px;
@@ -114,15 +112,8 @@ main {
     background: #5a67d8;
 }
 
-.player2-button {
-    background: #962bda;
-}
 
-.player2-button:hover {
-    background: #5925a5;
-}
 
-/* Responsive */
 @media (max-width: 768px) {
     .container {
         padding: 20px;

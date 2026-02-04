@@ -30,18 +30,18 @@
         <section class="final-scoreboard">
             <div class="score-title">Final Score</div>
 
-            <div class="final-score-row ${matchResult.firstPlayerRowClass}">
+            <div class="final-score-row ${matchResult.firstPlayerSets > matchResult.secondPlayerSets ? 'winner-row' : ''}">
                 <div class="player-info">
                     <div class="player-name"><c:out value="${matchResult.firstPlayerName}"/></div>
                 </div>
-                <div class="sets-score">${matchResult.firstPlayerFinalSets}</div>
+                <div class="sets-score">${matchResult.firstPlayerSets}</div>
             </div>
 
-            <div class="final-score-row ${matchResult.secondPlayerRowClass}">
+            <div class="final-score-row ${matchResult.firstPlayerSets < matchResult.secondPlayerSets ? 'winner-row' : ''}">
                 <div class="player-info">
                     <div class="player-name"><c:out value="${matchResult.secondPlayerName}"/></div>
                 </div>
-                <div class="sets-score">${matchResult.secondPlayerFinalSets}</div>
+                <div class="sets-score">${matchResult.secondPlayerSets}</div>
             </div>
         </section>
     </main>

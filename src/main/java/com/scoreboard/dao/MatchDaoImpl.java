@@ -1,12 +1,12 @@
 package com.scoreboard.dao;
 
-import com.scoreboard.model.entity.Match;
+import com.scoreboard.entity.Match;
+import org.hibernate.query.Query;
 
 import java.util.List;
 
-public class MatchDaoImpl extends BaseDao<Match> implements MatchDao {
+public class MatchDaoImpl extends BaseDao implements MatchDao {
     private static final String NAME_PATTERN_PARAM = "namePattern";
-
     private static final String FROM_MATCH_HQL = "FROM Match m ";
     private static final String FILTER_BY_PLAYER_NAME_HQL = """
             WHERE m.firstPlayer.name ILIKE :namePattern
@@ -17,10 +17,15 @@ public class MatchDaoImpl extends BaseDao<Match> implements MatchDao {
             LEFT JOIN FETCH m.secondPlayer
             LEFT JOIN FETCH m.winner
             """;
-    private static final String FIND_ALL_HQL = FROM_MATCH_HQL + JOIN_FETCH_HQL;
-    private static final String FIND_BY_NAME_HQL = FIND_ALL_HQL + JOIN_FETCH_HQL + FILTER_BY_PLAYER_NAME_HQL;
+    private static final String ORDER_BY = " ORDER BY m.id DESC";
+    private static final String FIND_ALL_HQL = FROM_MATCH_HQL + JOIN_FETCH_HQL + ORDER_BY;
+    private static final String FIND_BY_NAME_HQL = FROM_MATCH_HQL + JOIN_FETCH_HQL + FILTER_BY_PLAYER_NAME_HQL + ORDER_BY;
     private static final String COUNT_ALL_HQL = "SELECT COUNT(m) " + FROM_MATCH_HQL;
     private static final String COUNT_BY_PLAYER_NAME_HQL = COUNT_ALL_HQL + FILTER_BY_PLAYER_NAME_HQL;
+
+    public void save(Match match) {
+        getCurrentSession().persist(match);
+    }
 
     public List<Match> find(int offset, int pageSize) {
         return createPaginatedQuery(FIND_ALL_HQL, Match.class, offset, pageSize)
@@ -44,5 +49,12 @@ public class MatchDaoImpl extends BaseDao<Match> implements MatchDao {
                 .createQuery(COUNT_BY_PLAYER_NAME_HQL, Long.class)
                 .setParameter(NAME_PATTERN_PARAM, "%" + name + "%")
                 .getSingleResult();
+    }
+
+    private <E> Query<E> createPaginatedQuery(String hql, Class<E> entityClass, int offset, int pageSize) {
+        return getCurrentSession()
+                .createQuery(hql, entityClass)
+                .setMaxResults(pageSize)
+                .setFirstResult(offset);
     }
 }

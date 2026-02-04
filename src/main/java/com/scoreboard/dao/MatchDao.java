@@ -1,6 +1,6 @@
 package com.scoreboard.dao;
 
-import com.scoreboard.model.entity.Match;
+import com.scoreboard.entity.Match;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ public interface MatchDao {
 
     List<Match> findByPlayerName(String name, int offset, int pageSize);
 
-    int countTotal();
+    long countTotal();
 
-    int countWithPlayer(String name);
+    long countWithPlayer(String name);
 }

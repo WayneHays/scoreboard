@@ -1,6 +1,6 @@
 package com.scoreboard.servlet;
 
-import com.scoreboard.dto.response.MatchesPage;
+import com.scoreboard.dto.MatchesPage;
 import com.scoreboard.service.MatchesPageService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;

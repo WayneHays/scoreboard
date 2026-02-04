@@ -1,7 +1,7 @@
 package com.scoreboard.service;
 
-import com.scoreboard.config.hibernate.HibernateUtil;
-import com.scoreboard.exception.ScoreboardServiceException;
+import com.scoreboard.exception.DaoException;
+import com.scoreboard.util.HibernateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -33,7 +33,7 @@ public class BaseTransactionalService {
             return result;
         } catch (Exception e) {
             safeRollback(transaction, e);
-            throw new ScoreboardServiceException("Failed to execute DB request",e);
+            throw new DaoException("Failed to execute DB request",e);
         }
     }
 
