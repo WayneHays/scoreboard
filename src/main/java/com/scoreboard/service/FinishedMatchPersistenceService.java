@@ -1,19 +1,19 @@
 package com.scoreboard.service;
 
-import com.scoreboard.persistence.database.MatchDao;
-import com.scoreboard.persistence.database.PlayerDao;
+import com.scoreboard.persistence.dao.MatchDao;
+import com.scoreboard.persistence.dao.PlayerDao;
 import com.scoreboard.dto.FinishedMatchDto;
 import com.scoreboard.entity.Match;
 import com.scoreboard.entity.Player;
 import com.scoreboard.exception.DaoException;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.exception.ConstraintViolationException;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class FinishedMatchPersistenceService {
     private final MatchDao matchDao;
     private final PlayerDao playerDao;
@@ -31,8 +31,8 @@ public class FinishedMatchPersistenceService {
                             player -> player
                     ));
 
-            Player firstPlayer = players.computeIfAbsent(firstPlayerName.toLowerCase(), this::createPlayer);
-            Player secondPlayer = players.computeIfAbsent(secondPlayerName.toLowerCase(), this::createPlayer);
+            Player firstPlayer = players.computeIfAbsent(firstPlayerName.toLowerCase(), this::savePlayer);
+            Player secondPlayer = players.computeIfAbsent(secondPlayerName.toLowerCase(), this::savePlayer);
             Player winner = dto.winnerName().equalsIgnoreCase(firstPlayerName) ? firstPlayer : secondPlayer;
 
             matchDao.save(new Match(firstPlayer, secondPlayer, winner));
@@ -40,7 +40,7 @@ public class FinishedMatchPersistenceService {
     }
 
 
-    private Player createPlayer(String name) {
+    private Player savePlayer(String name) {
         Player player = new Player(name);
         try {
             return playerDao.save(player);

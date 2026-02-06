@@ -1,7 +1,6 @@
 package com.scoreboard.persistence.memory;
 
 import com.scoreboard.domain.model.OngoingMatch;
-import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 import java.util.Optional;
@@ -9,7 +8,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-@RequiredArgsConstructor
 public class OngoingMatchStorage {
     private final Map<UUID, OngoingMatch> ongoingMatches = new ConcurrentHashMap<>();
 

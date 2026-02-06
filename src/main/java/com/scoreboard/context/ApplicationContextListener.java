@@ -1,9 +1,9 @@
 package com.scoreboard.context;
 
-import com.scoreboard.persistence.database.MatchDao;
-import com.scoreboard.persistence.database.MatchDaoImpl;
-import com.scoreboard.persistence.database.PlayerDao;
-import com.scoreboard.persistence.database.PlayerDaoImpl;
+import com.scoreboard.persistence.dao.MatchDao;
+import com.scoreboard.persistence.dao.MatchDaoImpl;
+import com.scoreboard.persistence.dao.PlayerDao;
+import com.scoreboard.persistence.dao.PlayerDaoImpl;
 import com.scoreboard.mapper.FinishedMatchMapper;
 import com.scoreboard.mapper.MatchResultMapper;
 import com.scoreboard.mapper.OngoingMatchMapper;

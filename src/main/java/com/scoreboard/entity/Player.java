@@ -3,7 +3,7 @@ package com.scoreboard.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
@@ -11,14 +11,14 @@ import lombok.*;
 public class Player {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column()
+    @Column
     private Long id;
 
     @Column(
-            name = "name",
             nullable = false,
             unique = true,
-            columnDefinition = "VARCHAR"
+            length = 30,
+            columnDefinition = "VARCHAR (30)"
     )
 
     @EqualsAndHashCode.Include

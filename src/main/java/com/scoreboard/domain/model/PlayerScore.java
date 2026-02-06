@@ -7,6 +7,9 @@ import lombok.Getter;
 public class PlayerScore {
     private static final Points INITIAL_POINTS = Points.ZERO;
     private static final Points DEUCE_POINTS = Points.FORTY;
+    private static final int INITIAL_GAMES = 0;
+    private static final int INITIAL_SETS = 0;
+    private static final int INITIAL_TIE_BREAK_POINTS = 0;
 
     private Points points;
     private int games;
@@ -15,6 +18,9 @@ public class PlayerScore {
 
     PlayerScore() {
         this.points = INITIAL_POINTS;
+        this.games = INITIAL_GAMES;
+        this.sets = INITIAL_SETS;
+        this.tieBreakPoints = INITIAL_TIE_BREAK_POINTS;
     }
 
     protected void addPoint() {
@@ -38,11 +44,11 @@ public class PlayerScore {
     }
 
     protected void resetGames() {
-        games = 0;
+        games = INITIAL_GAMES;
     }
 
     protected void resetTieBreakPoints() {
-        tieBreakPoints = 0;
+        tieBreakPoints = INITIAL_TIE_BREAK_POINTS;
     }
 
     protected void resetToDeuce() {

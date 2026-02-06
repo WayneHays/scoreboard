@@ -1,4 +1,4 @@
-package com.scoreboard.persistence.database;
+package com.scoreboard.persistence.dao;
 
 import com.scoreboard.entity.Match;
 

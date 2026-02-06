@@ -1,6 +1,6 @@
 package com.scoreboard.service;
 
-import com.scoreboard.persistence.database.MatchDao;
+import com.scoreboard.persistence.dao.MatchDao;
 import com.scoreboard.dto.FinishedMatchDto;
 import com.scoreboard.dto.MatchesPageDto;
 import com.scoreboard.dto.PaginationParams;

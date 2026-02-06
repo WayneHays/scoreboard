@@ -3,26 +3,30 @@ package com.scoreboard.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
-@Table(name = "Matches")
+@Table(name = "Matches",
+        check = {
+                @CheckConstraint(constraint = "firstPlayer != secondPlayer"),
+                @CheckConstraint(constraint = "winner = firstPlayer OR winner = secondPlayer")
+        }
+)
 public class Match {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "BIGINT")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "first_player", referencedColumnName = "id")
     private Player firstPlayer;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "second_player", referencedColumnName = "id")
     private Player secondPlayer;
 
-    @Setter
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "winner", referencedColumnName = "id")
     private Player winner;
 
