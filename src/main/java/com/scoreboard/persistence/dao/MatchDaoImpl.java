@@ -17,9 +17,9 @@ public class MatchDaoImpl extends BaseDao implements MatchDao {
             LEFT JOIN FETCH m.secondPlayer
             LEFT JOIN FETCH m.winner
             """;
-    private static final String ORDER_BY = " ORDER BY m.id DESC";
-    private static final String FIND_ALL_HQL = FROM_MATCH_HQL + JOIN_FETCH_HQL + ORDER_BY;
-    private static final String FIND_BY_NAME_HQL = FROM_MATCH_HQL + JOIN_FETCH_HQL + FILTER_BY_PLAYER_NAME_HQL + ORDER_BY;
+    private static final String ORDER_BY_HQL = " ORDER BY m.id DESC";
+    private static final String FIND_ALL_HQL = FROM_MATCH_HQL + JOIN_FETCH_HQL + ORDER_BY_HQL;
+    private static final String FIND_BY_NAME_HQL = FROM_MATCH_HQL + JOIN_FETCH_HQL + FILTER_BY_PLAYER_NAME_HQL + ORDER_BY_HQL;
     private static final String COUNT_ALL_HQL = "SELECT COUNT(m) " + FROM_MATCH_HQL;
     private static final String COUNT_BY_PLAYER_NAME_HQL = COUNT_ALL_HQL + FILTER_BY_PLAYER_NAME_HQL;
 

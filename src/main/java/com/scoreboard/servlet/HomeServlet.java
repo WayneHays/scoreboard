@@ -9,12 +9,12 @@ import java.io.IOException;
 
 @WebServlet("/home")
 public class HomeServlet extends BaseServlet {
-    private static final String JSP_NAME = "home";
+    private static final String JSP = "home";
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        forwardTo(JSP_NAME, req, resp);
+        forwardTo(JSP, req, resp);
     }
 }
 

@@ -1,6 +1,6 @@
 package com.scoreboard.context;
 
-import com.scoreboard.dto.FinishedMatchDto;
+import com.scoreboard.dto.MatchResponse.FinishedMatchDto;
 import com.scoreboard.service.FinishedMatchPersistenceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

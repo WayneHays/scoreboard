@@ -1,8 +1,9 @@
 package com.scoreboard.service;
 
-import com.scoreboard.dto.FinishedMatchDto;
+import com.scoreboard.dto.MatchResponse.FinishedMatchDto;
+import com.scoreboard.dto.MatchResponse.MatchResponse;
 import com.scoreboard.dto.MatchResultDto;
-import com.scoreboard.dto.OngoingMatchDto;
+import com.scoreboard.dto.MatchResponse.OngoingMatchDto;
 import com.scoreboard.mapper.FinishedMatchMapper;
 import com.scoreboard.mapper.MatchResultMapper;
 import com.scoreboard.mapper.OngoingMatchMapper;
@@ -13,42 +14,39 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.UUID;
 
-@RequiredArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
 public class MatchFacade {
+    private static final String LOG_MATCH_FINISHED = "Match is finished, start saving to db";
+
     private final OngoingMatchService ongoingMatchService;
     private final FinishedMatchPersistenceService finishedMatchPersistenceService;
     private final OngoingMatchMapper ongoingMatchMapper;
     private final FinishedMatchMapper finishedMatchMapper;
     private final MatchResultMapper resultMapper;
 
-    public OngoingMatchDto awardPoint(UUID matchId, String scorerName) {
-        TennisPlayer scorer = ongoingMatchService.ensurePlayerInMatch(matchId, scorerName);
-
+    public MatchResponse awardPoint(UUID matchId, String scorerName) {
         log.debug("Processing point for match: {}, player: {}", matchId, scorerName);
+
+        TennisPlayer scorer = ongoingMatchService.ensurePlayerInMatch(matchId, scorerName);
         OngoingMatch updatedMatch = ongoingMatchService.computeMatch(matchId, match -> match.awardPoint(scorer));
 
         if (updatedMatch.isFinished()) {
-            FinishedMatchDto dto = finishedMatchMapper.toDto(updatedMatch);
-            finishedMatchPersistenceService.saveFinishedMatch(dto);
+            log.info(LOG_MATCH_FINISHED);
+
+            FinishedMatchDto finishedMatch = finishedMatchMapper.toDto(updatedMatch);
+            finishedMatchPersistenceService.saveFinishedMatch(finishedMatch);
+            ongoingMatchService.removeMatch(matchId);
+            MatchResultDto result = resultMapper.toDto(updatedMatch);
+            return MatchResponse.finished(result);
         }
-        return ongoingMatchMapper.toDto(updatedMatch);
+
+        OngoingMatchDto matchDto = ongoingMatchMapper.toDto(updatedMatch);
+        return MatchResponse.ongoing(matchDto);
     }
 
     public OngoingMatchDto getOngoingMatch(UUID matchId) {
         OngoingMatch match = ongoingMatchService.getMatch(matchId);
         return ongoingMatchMapper.toDto(match);
-    }
-
-    public MatchResultDto getMatchResultAndRemove(UUID matchId) {
-        OngoingMatch match = ongoingMatchService.getMatch(matchId);
-        MatchResultDto result = resultMapper.toDto(match);
-
-        FinishedMatchDto finishedDto = finishedMatchMapper.toDto(match);
-        finishedMatchPersistenceService.saveFinishedMatch(finishedDto);
-
-        ongoingMatchService.removeMatch(matchId);
-
-        return result;
     }
 }

@@ -1,5 +1,6 @@
 package com.scoreboard.dto;
 
+import com.scoreboard.dto.MatchResponse.FinishedMatchDto;
 import lombok.Builder;
 
 import java.util.List;

@@ -12,7 +12,7 @@ import com.scoreboard.service.BaseTransactionalService;
 import com.scoreboard.service.FinishedMatchPersistenceService;
 import com.scoreboard.service.MatchesPageService;
 import com.scoreboard.service.OngoingMatchService;
-import com.scoreboard.persistence.memory.OngoingMatchStorage;
+import com.scoreboard.persistence.OngoingMatchStorage;
 import com.scoreboard.service.MatchFacade;
 import com.scoreboard.domain.rules.GameRules;
 import com.scoreboard.domain.rules.MatchRules;
@@ -56,7 +56,7 @@ public class ApplicationContextListener implements ServletContextListener {
         OngoingMatchStorage ongoingMatchStorage = new OngoingMatchStorage();
         OngoingMatchService ongoingMatchService = new OngoingMatchService(ongoingMatchStorage, ongoingMatchFactory);
         FinishedMatchPersistenceService finishedMatchPersistenceService = new FinishedMatchPersistenceService(matchDao, playerDao, baseTransactionalService);
-        MatchesPageService matchesPageService = new MatchesPageService(matchDao, finishedMatchMapper, baseTransactionalService);
+        MatchesPageService matchesPageService = new MatchesPageService(matchDao, playerNameValidator, finishedMatchMapper, baseTransactionalService);
         MatchFacade matchFacade = new MatchFacade(ongoingMatchService, finishedMatchPersistenceService, ongoingMatchMapper, finishedMatchMapper, matchResultMapper);
 
         applicationContext.register(TennisRules.class, tennisRules);

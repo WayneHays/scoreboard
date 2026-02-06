@@ -25,7 +25,7 @@
        class="nav-button results-button">New Match</a>
 </nav>
     <section class="search-form">
-        <t:error-list errors="${errors}"/>
+        <t:error-list errors="${page.errors}"/>
         <form method="GET" action="${baseUrl}" class="search-form-grid">
             <input type="text"
                    name="playerName"
@@ -35,7 +35,7 @@
             <input type="hidden" name="page" value="1">
 
             <c:choose>
-                <c:when test="${not empty playerName and not empty errors}}">
+                <c:when test="${not empty playerName and not empty page.errors}}">
                     <a href="${baseUrl}" class="search-button clear-mode">Clear</a>
                 </c:when>
                 <c:otherwise>
@@ -45,7 +45,7 @@
         </form>
     </section>
 
-    <c:if test="${not empty playerName and empty errors}">
+    <c:if test="${not empty playerName and empty page.errors}">
         <div class="search-info">
             Results for: <strong><c:out value="${playerName}"/></strong>
         </div>
@@ -56,7 +56,7 @@
             <c:when test="${empty page.matches}">
                 <div class="no-results">
                     <c:choose>
-                        <c:when test="${not empty playerName and empty errors}">
+                        <c:when test="${not empty playerName and empty page.errors}">
                             No matches found for player "<c:out value="${playerName}"/>"
                         </c:when>
                         <c:otherwise>

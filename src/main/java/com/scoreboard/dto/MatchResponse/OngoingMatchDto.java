@@ -1,4 +1,4 @@
-package com.scoreboard.dto;
+package com.scoreboard.dto.MatchResponse;
 
 public record OngoingMatchDto(
         String firstPlayerName,
@@ -11,7 +11,7 @@ public record OngoingMatchDto(
         int secondPlayerTieBreakPoints,
         int firstPlayerSets,
         int secondPlayerSets,
-        Boolean isTieBreak,
-        Boolean isFinished
+        boolean isTieBreak,
+        boolean isFinished
 ) {
 }

@@ -1,7 +1,7 @@
 package com.scoreboard.mapper;
 
 import com.scoreboard.domain.model.OngoingMatch;
-import com.scoreboard.dto.FinishedMatchDto;
+import com.scoreboard.dto.MatchResponse.FinishedMatchDto;
 import com.scoreboard.entity.Match;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

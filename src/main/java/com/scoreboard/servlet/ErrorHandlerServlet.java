@@ -12,6 +12,12 @@ import java.io.IOException;
 @WebServlet("/error")
 @Slf4j
 public class ErrorHandlerServlet extends BaseServlet {
+    private static final String ATTR_STATUS_CODE = "jakarta.servlet.error.status_code";
+    private static final String ATTR_ERROR_MSG = "jakarta.servlet.error.message";
+    private static final String ATTR_EXCEPTION = "jakarta.servlet.error.exception";
+    private static final String ATTR_URI = "jakarta.servlet.error.request_uri";
+    private static final String MSG_ERROR = "Error {} for URI: {}, message: {}";
+
     private ErrorHandler errorHandler;
 
     @Override
@@ -23,16 +29,16 @@ public class ErrorHandlerServlet extends BaseServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        Integer statusCode = (Integer) req.getAttribute("jakarta.servlet.error.status_code");
-        String message = (String) req.getAttribute("jakarta.servlet.error.message");
-        Throwable throwable = (Throwable) req.getAttribute("jakarta.servlet.error.exception");
-        String requestUri = (String) req.getAttribute("jakarta.servlet.error.request_uri");
+        Integer statusCode = (Integer) req.getAttribute(ATTR_STATUS_CODE);
+        String message = (String) req.getAttribute(ATTR_ERROR_MSG);
+        Throwable throwable = (Throwable) req.getAttribute(ATTR_EXCEPTION);
+        String requestUri = (String) req.getAttribute(ATTR_URI);
 
         if (statusCode == null) {
             statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
         }
 
-        log.error("Error {} for URI: {}, message: {}", statusCode, requestUri, message, throwable);
+        log.error(MSG_ERROR, statusCode, requestUri, message, throwable);
 
         errorHandler.handleHttpError(req, resp, statusCode, message);
     }

@@ -1,8 +1,8 @@
+import com.scoreboard.dto.MatchResponse.FinishedMatchDto;
 import com.scoreboard.persistence.dao.MatchDao;
 import com.scoreboard.persistence.dao.MatchDaoImpl;
 import com.scoreboard.persistence.dao.PlayerDao;
 import com.scoreboard.persistence.dao.PlayerDaoImpl;
-import com.scoreboard.dto.FinishedMatchDto;
 import com.scoreboard.service.BaseTransactionalService;
 import com.scoreboard.service.FinishedMatchPersistenceService;
 import com.scoreboard.util.HibernateUtil;
@@ -34,6 +34,7 @@ class FinishedMatchPersistenceTest {
 
     @AfterEach
     void tearDown() {
+        System.out.println("=== TEARDOWN STARTED ===");
         Session session = HibernateUtil.getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
         session.createNativeMutationQuery("DELETE FROM Matches").executeUpdate();
@@ -54,7 +55,7 @@ class FinishedMatchPersistenceTest {
         // Assert
         long queryCount = statistics.getPrepareStatementCount();
         assertEquals(4, queryCount,
-                "Expected 4 queries: 1 SELECT + 2 INSERT players + 1 INSERT match");
+                "Expected 4 queries");
     }
 
     @Test
@@ -62,7 +63,6 @@ class FinishedMatchPersistenceTest {
         // Arrange
         FinishedMatchDto setupDto = new FinishedMatchDto("Novak", "Rafael", "Novak");
         service.saveFinishedMatch(setupDto);
-
         statistics.clear();
 
         // Act
@@ -74,7 +74,7 @@ class FinishedMatchPersistenceTest {
         // Assert
         long queryCount = statistics.getPrepareStatementCount();
         assertEquals(2, queryCount,
-                "Expected 2 queries: 1 SELECT (found both) + 1 INSERT match");
+                "Expected 2 queries");
     }
 
     @Test
@@ -82,7 +82,6 @@ class FinishedMatchPersistenceTest {
         // Arrange
         FinishedMatchDto setupDto = new FinishedMatchDto("Novak", "Rafael", "Novak");
         service.saveFinishedMatch(setupDto);
-
         statistics.clear();
 
         // Act
@@ -94,6 +93,6 @@ class FinishedMatchPersistenceTest {
         // Assert
         long queryCount = statistics.getPrepareStatementCount();
         assertEquals(3, queryCount,
-                "Expected 3 queries: 1 SELECT + 1 INSERT new player + 1 INSERT match");
+                "Expected 3 queries");
     }
 }

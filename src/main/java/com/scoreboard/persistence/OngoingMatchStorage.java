@@ -1,4 +1,4 @@
-package com.scoreboard.persistence.memory;
+package com.scoreboard.persistence;
 
 import com.scoreboard.domain.model.OngoingMatch;
 

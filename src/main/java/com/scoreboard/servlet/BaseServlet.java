@@ -1,7 +1,6 @@
 package com.scoreboard.servlet;
 
 import com.scoreboard.context.ApplicationContext;
-import com.scoreboard.exception.UuidParsingException;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -9,13 +8,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -26,17 +23,14 @@ public abstract class BaseServlet extends HttpServlet {
     private static final String PARAMETER_DELIMITER = "&";
     private static final String JSP_SUB_PATH = "/WEB-INF" + PATH_DELIMITER;
     private static final String JSP_EXTENSION = ".jsp";
-
-    private static final String UUID_REQUIRED_MSG = "UUID is required";
-    private static final String INVALID_UUID_FORMAT = "Invalid UUID format";
-
-    protected static final String UUID_PARAM = "uuid";
+    private static final String MSG_CONTEXT_NOT_FOUND = "ApplicationContext not found in ServletContext";
+    private static final String MSG_SERVLET_INIT_SUCCESS = "Servlet {} initialized successfully";
 
     @Override
     public void init() throws ServletException {
         super.init();
         getApplicationContext();
-        log.debug("Servlet {} initialized successfully", getClass().getSimpleName());
+        log.debug(MSG_SERVLET_INIT_SUCCESS, getClass().getSimpleName());
     }
 
     protected void forwardTo(String pageName, HttpServletRequest request, HttpServletResponse response)
@@ -84,24 +78,12 @@ public abstract class BaseServlet extends HttpServlet {
         return context.get(serviceClass);
     }
 
-    protected UUID parse(String str) {
-        if (StringUtils.isBlank(str)) {
-            throw new UuidParsingException(UUID_REQUIRED_MSG);
-        }
-
-        try {
-            return UUID.fromString(str);
-        } catch (IllegalArgumentException e) {
-            throw new UuidParsingException(INVALID_UUID_FORMAT);
-        }
-    }
-
     private ApplicationContext getApplicationContext() {
         ServletContext servletContext = getServletContext();
         ApplicationContext context = (ApplicationContext) servletContext.getAttribute(ServletContext.class.getSimpleName());
 
         if (context == null) {
-            String message = "ApplicationContext not found in ServletContext";
+            String message = MSG_CONTEXT_NOT_FOUND;
             log.error(message);
             throw new IllegalStateException(message);
         }

@@ -8,8 +8,8 @@ import lombok.*;
 @Entity
 @Table(name = "Matches",
         check = {
-                @CheckConstraint(constraint = "firstPlayer != secondPlayer"),
-                @CheckConstraint(constraint = "winner = firstPlayer OR winner = secondPlayer")
+                @CheckConstraint(constraint = "first_player != second_player"),
+                @CheckConstraint(constraint = "winner = first_player OR winner = second_player")
         }
 )
 public class Match {
@@ -18,15 +18,15 @@ public class Match {
     @Column(columnDefinition = "BIGINT")
     private Long id;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "first_player", referencedColumnName = "id")
     private Player firstPlayer;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "second_player", referencedColumnName = "id")
     private Player secondPlayer;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "winner", referencedColumnName = "id")
     private Player winner;
 

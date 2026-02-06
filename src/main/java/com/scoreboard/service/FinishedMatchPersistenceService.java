@@ -1,20 +1,23 @@
 package com.scoreboard.service;
 
-import com.scoreboard.persistence.dao.MatchDao;
-import com.scoreboard.persistence.dao.PlayerDao;
-import com.scoreboard.dto.FinishedMatchDto;
+import com.scoreboard.dto.MatchResponse.FinishedMatchDto;
 import com.scoreboard.entity.Match;
 import com.scoreboard.entity.Player;
-import com.scoreboard.exception.DaoException;
+import com.scoreboard.persistence.dao.MatchDao;
+import com.scoreboard.persistence.dao.PlayerDao;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.exception.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 public class FinishedMatchPersistenceService {
+    private static final String LOG_START = "Saving match with players: {}, {}, winner: {}";
+    private static final String LOG_SUCCESS = "Saving succeed";
+
     private final MatchDao matchDao;
     private final PlayerDao playerDao;
     private final BaseTransactionalService baseTransactionalService;
@@ -22,49 +25,36 @@ public class FinishedMatchPersistenceService {
     public void saveFinishedMatch(FinishedMatchDto dto) {
         String firstPlayerName = dto.firstPlayerName();
         String secondPlayerName = dto.secondPlayerName();
+        String winnerName = dto.winnerName();
+
+        log.info(LOG_START, firstPlayerName, secondPlayerName, winnerName);
+
         Set<String> namesFromMatch = Set.of(firstPlayerName, secondPlayerName);
 
         baseTransactionalService.executeInTransaction(() -> {
-            Map<String, Player> players = playerDao.findByNames(namesFromMatch).stream()
+            Map<String, Player> existingPlayers = playerDao.findByNames(namesFromMatch).stream()
                     .collect(Collectors.toMap(
                             player -> player.getName().toLowerCase(),
                             player -> player
                     ));
 
-            Player firstPlayer = players.computeIfAbsent(firstPlayerName.toLowerCase(), this::savePlayer);
-            Player secondPlayer = players.computeIfAbsent(secondPlayerName.toLowerCase(), this::savePlayer);
-            Player winner = dto.winnerName().equalsIgnoreCase(firstPlayerName) ? firstPlayer : secondPlayer;
+            Player firstPlayer = existingPlayers.getOrDefault(
+                    firstPlayerName.toLowerCase(),
+                    new Player(firstPlayerName)
+            );
+
+            Player secondPlayer = existingPlayers.getOrDefault(
+                    secondPlayerName.toLowerCase(),
+                    new Player(secondPlayerName)
+            );
+
+            Player winner = winnerName.equalsIgnoreCase(firstPlayerName)
+                    ? firstPlayer
+                    : secondPlayer;
 
             matchDao.save(new Match(firstPlayer, secondPlayer, winner));
         });
-    }
 
-
-    private Player savePlayer(String name) {
-        Player player = new Player(name);
-        try {
-            return playerDao.save(player);
-        } catch (Exception e) {
-            if (isConstraintViolation(e)) {
-                return playerDao.find(name)
-                        .orElseThrow(() -> getException(player, e));
-            }
-            throw getException(player, e);
-        }
-    }
-
-    private boolean isConstraintViolation(Exception e) {
-        Throwable cause = e;
-        while (cause != null) {
-            if (cause instanceof ConstraintViolationException) {
-                return true;
-            }
-            cause = cause.getCause();
-        }
-        return false;
-    }
-
-    private DaoException getException(Player player, Exception e) {
-        return new DaoException("Failed to save player: " + player.getName(), e);
+        log.info(LOG_SUCCESS);
     }
 }
