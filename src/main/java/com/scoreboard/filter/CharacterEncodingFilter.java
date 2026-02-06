@@ -15,11 +15,13 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 @WebFilter( filterName = "CharacterEncodingFilter",  urlPatterns = "/*")
 public class CharacterEncodingFilter extends HttpFilter {
+    private static final String MSG_INIT_SUCCESS = "=== CharacterEncodingFilter initialized with encoding: {} ===";
+    private static final String MSG_DESTROY_SUCCESS = "=== CharacterEncodingFilter destroyed ===";
     private static final String ENCODING = StandardCharsets.UTF_8.name();
 
     @Override
     public void init(FilterConfig filterConfig) {
-        log.info("=== CharacterEncodingFilter initialized with encoding: {} ===", ENCODING);
+        log.info(MSG_INIT_SUCCESS, ENCODING);
     }
 
     @Override
@@ -37,6 +39,6 @@ public class CharacterEncodingFilter extends HttpFilter {
 
     @Override
     public void destroy() {
-        log.info("=== CharacterEncodingFilter destroyed ===");
+        log.info(MSG_DESTROY_SUCCESS);
     }
 }
