@@ -1,4 +1,4 @@
-package com.scoreboard.context;
+package com.scoreboard.startup;
 
 import com.scoreboard.dto.MatchResponse.FinishedMatchDto;
 import com.scoreboard.service.FinishedMatchPersistenceService;

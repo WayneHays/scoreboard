@@ -1,6 +1,6 @@
 package com.scoreboard.servlet;
 
-import com.scoreboard.context.ApplicationContext;
+import com.scoreboard.startup.ApplicationContext;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;

@@ -1,4 +1,4 @@
-package com.scoreboard.context;
+package com.scoreboard.startup;
 
 import com.scoreboard.persistence.dao.MatchDao;
 import com.scoreboard.persistence.dao.MatchDaoImpl;

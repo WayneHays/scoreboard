@@ -1,4 +1,4 @@
-package com.scoreboard.context;
+package com.scoreboard.startup;
 
 import lombok.extern.slf4j.Slf4j;
 

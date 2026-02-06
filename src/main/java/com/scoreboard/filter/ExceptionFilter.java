@@ -1,6 +1,6 @@
 package com.scoreboard.filter;
 
-import com.scoreboard.context.ApplicationContext;
+import com.scoreboard.startup.ApplicationContext;
 import com.scoreboard.exception.DaoException;
 import com.scoreboard.exception.MatchNotFoundException;
 import com.scoreboard.exception.PlayerNotInMatchException;
