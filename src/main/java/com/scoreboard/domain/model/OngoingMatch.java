@@ -1,7 +1,10 @@
 package com.scoreboard.domain.model;
 
 import com.scoreboard.domain.handler.Handler;
-import com.scoreboard.domain.handler.PointResult;
+import com.scoreboard.domain.model.state.OngoingMatchState;
+import com.scoreboard.domain.model.state.PointResult;
+import com.scoreboard.domain.model.state.Points;
+import com.scoreboard.exception.PlayerNotInMatchException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -11,13 +14,15 @@ import java.util.function.Consumer;
 @Slf4j
 @Getter
 public class OngoingMatch {
+    private static final String PLAYER_NOT_IN_MATCH = "Player not in match: ";
+
     private final TennisPlayer firstPlayer;
     private final TennisPlayer secondPlayer;
     private final Handler tieBreakChain;
     private final Handler regularChain;
     private final PlayerScore firstPlayerScore;
     private final PlayerScore secondPlayerScore;
-    private MatchState matchState;
+    private OngoingMatchState ongoingMatchState;
 
     public OngoingMatch(TennisPlayer firstPlayer, TennisPlayer secondPlayer,
                         Handler regularChain, Handler tieBreakChain) {
@@ -27,7 +32,7 @@ public class OngoingMatch {
         this.regularChain = regularChain;
         this.firstPlayerScore = new PlayerScore();
         this.secondPlayerScore = new PlayerScore();
-        this.matchState = MatchState.REGULAR;
+        this.ongoingMatchState = OngoingMatchState.REGULAR;
     }
 
     public void awardPoint(TennisPlayer scorer) {
@@ -42,23 +47,23 @@ public class OngoingMatch {
         switch (pointResult) {
             case POINT_AWARDED, ADVANTAGE -> {
                 score.addPoint();
-                matchState = MatchState.REGULAR;
+
+                if (isTieBreak()) {
+                    ongoingMatchState = OngoingMatchState.TIEBREAK;
+                    return;
+                }
+                ongoingMatchState = OngoingMatchState.REGULAR;
             }
 
             case GAME_FINISHED -> {
                 resetPointsForBoth();
-
-                if (this.isTieBreak()) {
-                    resetTieBreakPointsForBoth();
-                }
-
                 score.addGame();
-                matchState = MatchState.REGULAR;
+                ongoingMatchState = OngoingMatchState.REGULAR;
             }
 
             case DEUCE -> {
                 resetToDeuce();
-                matchState = MatchState.REGULAR;
+                ongoingMatchState = OngoingMatchState.REGULAR;
             }
 
             case SET_FINISHED -> {
@@ -66,25 +71,26 @@ public class OngoingMatch {
                 resetGamesForBoth();
                 resetTieBreakPointsForBoth();
                 score.addSet();
-                matchState = MatchState.REGULAR;
+                ongoingMatchState = OngoingMatchState.REGULAR;
             }
 
             case TIE_BREAK_STARTED -> {
                 resetPointsForBoth();
-                matchState = MatchState.TIEBREAK;
+                score.addGame();
+                ongoingMatchState = OngoingMatchState.TIEBREAK;
             }
 
             case TIE_BREAK_POINT_AWARDED -> {
                 score.addTieBreakPoint();
-                matchState = MatchState.TIEBREAK;
+                ongoingMatchState = OngoingMatchState.TIEBREAK;
             }
 
-            case MATCH_OVER -> {
+            case MATCH_FINISHED -> {
                 resetPointsForBoth();
                 resetGamesForBoth();
                 resetTieBreakPointsForBoth();
                 score.addSet();
-                matchState = MatchState.FINISHED;
+                ongoingMatchState = OngoingMatchState.FINISHED;
             }
         }
     }
@@ -102,11 +108,11 @@ public class OngoingMatch {
     }
 
     public boolean isTieBreak() {
-        return matchState == MatchState.TIEBREAK;
+        return ongoingMatchState == OngoingMatchState.TIEBREAK;
     }
 
     public boolean isFinished() {
-        return matchState == MatchState.FINISHED;
+        return ongoingMatchState == OngoingMatchState.FINISHED;
     }
 
     public Optional<String> getWinnerName() {
@@ -123,7 +129,7 @@ public class OngoingMatch {
         if (player.equals(secondPlayer)) {
             return firstPlayer;
         }
-        throw new IllegalArgumentException("Player not in match: " + player);
+        throw new PlayerNotInMatchException(PLAYER_NOT_IN_MATCH + player.name());
     }
 
     public Points getPoints(TennisPlayer player) {
@@ -149,7 +155,7 @@ public class OngoingMatch {
         if (player.equals(secondPlayer)) {
             return secondPlayerScore;
         }
-        throw new IllegalArgumentException("Player not in match: " + player);
+        throw new PlayerNotInMatchException(PLAYER_NOT_IN_MATCH + player.name());
     }
 
     private void resetToDeuce() {

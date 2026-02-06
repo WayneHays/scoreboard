@@ -1,4 +1,4 @@
-package com.scoreboard.domain.model;
+package com.scoreboard.domain.model.state;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.scoreboard.domain.handler;
+package com.scoreboard.domain.model.state;
 
 public enum PointResult {
     POINT_AWARDED,
@@ -8,7 +8,7 @@ public enum PointResult {
     SET_FINISHED,
     TIE_BREAK_STARTED,
     TIE_BREAK_POINT_AWARDED,
-    MATCH_OVER
+    MATCH_FINISHED
 }
 
 

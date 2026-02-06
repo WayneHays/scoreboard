@@ -3,7 +3,7 @@ package com.scoreboard.dto;
 import lombok.Builder;
 
 @Builder
-public record MatchResult(
+public record MatchResultDto(
         String winnerName,
         String firstPlayerName,
         String secondPlayerName,

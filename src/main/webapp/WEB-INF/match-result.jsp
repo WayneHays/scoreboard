@@ -23,25 +23,25 @@
 
     <main>
         <div class="winner-announcement">
-            <span class="winner-name"><c:out value="${matchResult.winnerName}"/></span>
+            <span class="winner-name"><c:out value="${result.winnerName}"/></span>
             wins!
         </div>
 
         <section class="final-scoreboard">
             <div class="score-title">Final Score</div>
 
-            <div class="final-score-row ${matchResult.firstPlayerSets > matchResult.secondPlayerSets ? 'winner-row' : ''}">
+            <div class="final-score-row ${result.firstPlayerSets > result.secondPlayerSets ? 'winner-row' : ''}">
                 <div class="player-info">
-                    <div class="player-name"><c:out value="${matchResult.firstPlayerName}"/></div>
+                    <div class="player-name"><c:out value="${result.firstPlayerName}"/></div>
                 </div>
-                <div class="sets-score">${matchResult.firstPlayerSets}</div>
+                <div class="sets-score">${result.firstPlayerSets}</div>
             </div>
 
-            <div class="final-score-row ${matchResult.firstPlayerSets < matchResult.secondPlayerSets ? 'winner-row' : ''}">
+            <div class="final-score-row ${result.firstPlayerSets < result.secondPlayerSets ? 'winner-row' : ''}">
                 <div class="player-info">
-                    <div class="player-name"><c:out value="${matchResult.secondPlayerName}"/></div>
+                    <div class="player-name"><c:out value="${result.secondPlayerName}"/></div>
                 </div>
-                <div class="sets-score">${matchResult.secondPlayerSets}</div>
+                <div class="sets-score">${result.secondPlayerSets}</div>
             </div>
         </section>
     </main>

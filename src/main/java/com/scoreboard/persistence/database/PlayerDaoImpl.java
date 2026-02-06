@@ -1,11 +1,10 @@
-package com.scoreboard.dao;
+package com.scoreboard.persistence.database;
 
 import com.scoreboard.entity.Player;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class PlayerDaoImpl extends BaseDao implements PlayerDao {
     private static final String NAME_PARAM = "name";

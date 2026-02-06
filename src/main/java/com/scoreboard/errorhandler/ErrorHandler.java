@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class ErrorHandler {
     private static final String ERROR_JSP = "/WEB-INF/error.jsp";
-    private static final String ERROR_DTO = "errorDto";
+    private static final String ERROR_DTO = "error";
 
     private static final String NOT_FOUND_ICON = "❌";
     private static final String SERVER_ERROR_ICON = "💥";
@@ -34,8 +34,8 @@ public class ErrorHandler {
 
         ErrorDto dto = ErrorDto.builder()
                 .statusCode(statusCode)
-                .errorIcon(errorIcon)
-                .errorTitle(errorTitle)
+                .icon(errorIcon)
+                .title(errorTitle)
                 .defaultMessage(defaultMessage)
                 .message(message)
                 .requestedUrl(requestedUrl)

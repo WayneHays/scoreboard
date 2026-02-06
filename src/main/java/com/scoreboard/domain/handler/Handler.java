@@ -1,6 +1,7 @@
 package com.scoreboard.domain.handler;
 
 import com.scoreboard.domain.model.OngoingMatch;
+import com.scoreboard.domain.model.state.PointResult;
 import com.scoreboard.domain.model.TennisPlayer;
 import lombok.Setter;
 

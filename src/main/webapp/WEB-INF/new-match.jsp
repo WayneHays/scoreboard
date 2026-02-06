@@ -24,14 +24,14 @@
     </header>
 
     <main>
-        <t:error-list errors="${commonErrors}"/>
+        <t:error-list errors="${validationResult.commonErrors}"/>
         <form action="${pageContext.request.contextPath}/new-match" method="POST">
             <t:player-input text="Player 1"
                             id="firstPlayer"
                             name="firstPlayerName"
                             placeholder="First player's name"
                             value="${param.firstPlayerName}"
-                            errors="${firstNameErrors}"/>
+                            errors="${validationResult.firstNameErrors}"/>
 
             <div class="vs-divider">
                 <div class="vs-line"></div>
@@ -44,7 +44,7 @@
                             name="secondPlayerName"
                             placeholder="Second player's name"
                             value="${param.secondPlayerName}"
-                            errors="${secondNameErrors}"/>
+                            errors="${validationResult.secondNameErrors}"/>
             <button type="submit" class="start-button">
                 Start Match!
             </button>

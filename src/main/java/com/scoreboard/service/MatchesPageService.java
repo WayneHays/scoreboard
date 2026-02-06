@@ -1,15 +1,12 @@
 package com.scoreboard.service;
 
-import com.scoreboard.dao.MatchDao;
+import com.scoreboard.persistence.database.MatchDao;
 import com.scoreboard.dto.FinishedMatchDto;
-import com.scoreboard.dto.MatchesPage;
+import com.scoreboard.dto.MatchesPageDto;
 import com.scoreboard.dto.PaginationParams;
 import com.scoreboard.mapper.FinishedMatchMapper;
-import com.scoreboard.validation.PlayerNameValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -17,26 +14,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MatchesPageService {
     private final MatchDao matchDao;
-    private final PlayerNameValidator playerNameValidator;
     private final FinishedMatchMapper finishedMatchMapper;
     private final BaseTransactionalService baseTransactionalService;
 
-    public MatchesPage getPage(String playerName, int pageNumber, int matchesPerPage) {
-        if (StringUtils.isBlank(playerName)) {
-            return getMatchesPage(pageNumber, matchesPerPage);
-        }
-
-        List<String> errors = playerNameValidator.validate(playerName);
-
-        if (ObjectUtils.isNotEmpty(errors)) {
-            return getEmptyPageWithErrors(playerName, pageNumber, errors);
-        }
-
-        return getMatchesPageFiltered(playerName, pageNumber, matchesPerPage);
-    }
-
-    private MatchesPage getMatchesPage(int pageNumber, int matchesPerPage) {
-        log.info("Loading all matches, page {} ({} per page", pageNumber, matchesPerPage);
+    public MatchesPageDto getAllMatchesPage(int pageNumber, int matchesPerPage) {
+        log.info("Loading all matches, page {} ({} per page)", pageNumber, matchesPerPage);
 
         return baseTransactionalService.executeInTransaction(() -> {
             long totalMatches = matchDao.countTotal();
@@ -47,7 +29,7 @@ public class MatchesPageService {
                     .map(finishedMatchMapper::toDto)
                     .toList();
 
-            return MatchesPage.builder()
+            return MatchesPageDto.builder()
                     .pageNumber(pagination.actualPage())
                     .matches(matches)
                     .totalPages(pagination.totalPages())
@@ -56,18 +38,7 @@ public class MatchesPageService {
         });
     }
 
-    private MatchesPage getEmptyPageWithErrors(String playerName, int pageNumber, List<String> errors) {
-        log.info("Loading empty page with errors");
-        return MatchesPage.builder()
-                .pageNumber(pageNumber)
-                .matches(List.of())
-                .totalPages(0)
-                .playerName(playerName)
-                .errors(errors)
-                .build();
-    }
-
-    private MatchesPage getMatchesPageFiltered(String playerName, int pageNumber, int matchesPerPage) {
+    public MatchesPageDto getMatchesPageFiltered(String playerName, int pageNumber, int matchesPerPage) {
         log.info("Loading matches for player {} by page {}", playerName, pageNumber);
 
         return baseTransactionalService.executeInTransaction(() -> {
@@ -79,7 +50,7 @@ public class MatchesPageService {
                     .map(finishedMatchMapper::toDto)
                     .toList();
 
-            return MatchesPage.builder()
+            return MatchesPageDto.builder()
                     .pageNumber(pagination.actualPage())
                     .matches(matches)
                     .totalPages(pagination.totalPages())

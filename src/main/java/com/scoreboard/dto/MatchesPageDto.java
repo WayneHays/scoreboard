@@ -5,7 +5,7 @@ import lombok.Builder;
 import java.util.List;
 
 @Builder
-public record MatchesPage(
+public record MatchesPageDto(
         int pageNumber,
         List<FinishedMatchDto> matches,
         int totalPages,

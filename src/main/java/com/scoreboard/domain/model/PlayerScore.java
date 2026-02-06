@@ -1,47 +1,51 @@
 package com.scoreboard.domain.model;
 
+import com.scoreboard.domain.model.state.Points;
 import lombok.Getter;
 
 @Getter
 public class PlayerScore {
+    private static final Points INITIAL_POINTS = Points.ZERO;
+    private static final Points DEUCE_POINTS = Points.FORTY;
+
     private Points points;
     private int games;
     private int sets;
     private int tieBreakPoints;
 
     PlayerScore() {
-        this.points = Points.ZERO;
+        this.points = INITIAL_POINTS;
     }
 
-    void addPoint() {
+    protected void addPoint() {
         this.points = points.next();
     }
 
-    void addGame() {
+    protected void addGame() {
         games++;
     }
 
-    void addSet() {
+    protected void addSet() {
         sets++;
     }
 
-    void addTieBreakPoint() {
+    protected void addTieBreakPoint() {
         tieBreakPoints++;
     }
 
-    void resetPoints() {
-        this.points = Points.ZERO;
+    protected void resetPoints() {
+        this.points = INITIAL_POINTS;
     }
 
-    void resetGames() {
+    protected void resetGames() {
         games = 0;
     }
 
-    void resetTieBreakPoints() {
+    protected void resetTieBreakPoints() {
         tieBreakPoints = 0;
     }
 
-    void resetToDeuce() {
-        this.points = Points.FORTY;
+    protected void resetToDeuce() {
+        this.points = DEUCE_POINTS;
     }
 }

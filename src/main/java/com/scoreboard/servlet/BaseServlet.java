@@ -1,6 +1,7 @@
 package com.scoreboard.servlet;
 
 import com.scoreboard.context.ApplicationContext;
+import com.scoreboard.exception.UuidParsingException;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -8,11 +9,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -23,6 +26,11 @@ public abstract class BaseServlet extends HttpServlet {
     private static final String PARAMETER_DELIMITER = "&";
     private static final String JSP_SUB_PATH = "/WEB-INF" + PATH_DELIMITER;
     private static final String JSP_EXTENSION = ".jsp";
+
+    private static final String UUID_REQUIRED_MSG = "UUID is required";
+    private static final String INVALID_UUID_FORMAT = "Invalid UUID format";
+
+    protected static final String UUID_PARAM = "uuid";
 
     @Override
     public void init() throws ServletException {
@@ -36,10 +44,12 @@ public abstract class BaseServlet extends HttpServlet {
         request.getRequestDispatcher(JSP_SUB_PATH + pageName + JSP_EXTENSION).forward(request, response);
     }
 
-    protected void redirectTo(String subPath, Map<String, ?> requestParameters,
+    protected void redirectTo(String servletPath, Map<String, ?> requestParameters,
                               HttpServletRequest request, HttpServletResponse response) throws IOException {
         String parameters = buildParameters(requestParameters);
-        response.sendRedirect(request.getContextPath() + PATH_DELIMITER + subPath + parameters);
+        String fullUrl = request.getContextPath() + servletPath + parameters;
+
+        response.sendRedirect(fullUrl);
     }
 
     private String buildParameters(Map<String, ?> requestParameters) {
@@ -72,6 +82,18 @@ public abstract class BaseServlet extends HttpServlet {
     protected <T> T getService(Class<T> serviceClass) {
         ApplicationContext context = getApplicationContext();
         return context.get(serviceClass);
+    }
+
+    protected UUID parse(String str) {
+        if (StringUtils.isBlank(str)) {
+            throw new UuidParsingException(UUID_REQUIRED_MSG);
+        }
+
+        try {
+            return UUID.fromString(str);
+        } catch (IllegalArgumentException e) {
+            throw new UuidParsingException(INVALID_UUID_FORMAT);
+        }
     }
 
     private ApplicationContext getApplicationContext() {

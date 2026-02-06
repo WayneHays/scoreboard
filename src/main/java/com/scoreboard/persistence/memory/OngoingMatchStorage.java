@@ -1,7 +1,6 @@
-package com.scoreboard.service;
+package com.scoreboard.persistence.memory;
 
 import com.scoreboard.domain.model.OngoingMatch;
-import com.scoreboard.exception.MatchNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
@@ -14,7 +13,7 @@ import java.util.function.Consumer;
 public class OngoingMatchStorage {
     private final Map<UUID, OngoingMatch> ongoingMatches = new ConcurrentHashMap<>();
 
-    public void add(UUID id, OngoingMatch match) {
+    public void put(UUID id, OngoingMatch match) {
         ongoingMatches.put(id, match);
     }
 
@@ -26,13 +25,15 @@ public class OngoingMatchStorage {
         ongoingMatches.remove(id);
     }
 
-    public OngoingMatch compute(UUID id, Consumer<OngoingMatch> action) {
-        return ongoingMatches.compute(id, (key, match) -> {
+    public Optional<OngoingMatch> compute(UUID id, Consumer<OngoingMatch> action) {
+        OngoingMatch result = ongoingMatches.compute(id, (key, match) -> {
             if (match == null) {
-                throw new MatchNotFoundException("Match with id " + id + " not found");
+                return null;
             }
             action.accept(match);
             return match;
         });
+
+        return Optional.ofNullable(result);
     }
 }

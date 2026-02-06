@@ -1,7 +1,7 @@
 package com.scoreboard.service;
 
-import com.scoreboard.dao.MatchDao;
-import com.scoreboard.dao.PlayerDao;
+import com.scoreboard.persistence.database.MatchDao;
+import com.scoreboard.persistence.database.PlayerDao;
 import com.scoreboard.dto.FinishedMatchDto;
 import com.scoreboard.entity.Match;
 import com.scoreboard.entity.Player;
@@ -33,11 +33,12 @@ public class FinishedMatchPersistenceService {
 
             Player firstPlayer = players.computeIfAbsent(firstPlayerName.toLowerCase(), this::createPlayer);
             Player secondPlayer = players.computeIfAbsent(secondPlayerName.toLowerCase(), this::createPlayer);
-
             Player winner = dto.winnerName().equalsIgnoreCase(firstPlayerName) ? firstPlayer : secondPlayer;
+
             matchDao.save(new Match(firstPlayer, secondPlayer, winner));
         });
     }
+
 
     private Player createPlayer(String name) {
         Player player = new Player(name);
