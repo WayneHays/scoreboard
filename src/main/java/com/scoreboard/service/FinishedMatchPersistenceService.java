@@ -38,15 +38,8 @@ public class FinishedMatchPersistenceService {
                             player -> player
                     ));
 
-            Player firstPlayer = existingPlayers.getOrDefault(
-                    firstPlayerName.toLowerCase(),
-                    new Player(firstPlayerName)
-            );
-
-            Player secondPlayer = existingPlayers.getOrDefault(
-                    secondPlayerName.toLowerCase(),
-                    new Player(secondPlayerName)
-            );
+            Player firstPlayer = getOrCreate(existingPlayers, firstPlayerName);
+            Player secondPlayer = getOrCreate(existingPlayers, secondPlayerName);
 
             Player winner = winnerName.equalsIgnoreCase(firstPlayerName)
                     ? firstPlayer
@@ -56,5 +49,9 @@ public class FinishedMatchPersistenceService {
         });
 
         log.info(LOG_SUCCESS);
+    }
+
+    private Player getOrCreate(Map<String, Player> players, String name) {
+        return players.getOrDefault(name.toLowerCase(), new Player(name));
     }
 }

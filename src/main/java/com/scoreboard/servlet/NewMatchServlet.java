@@ -45,11 +45,11 @@ public class NewMatchServlet extends BaseServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
         String firstPlayerName = req.getParameter(PARAM_FIRST_PLAYER_NAME).trim();
         String secondPlayerName = req.getParameter(PARAM_SECOND_PLAYER_NAME).trim();
-        PairValidationResult result = validator.validatePair(firstPlayerName, secondPlayerName);
+        PairValidationResult validationResult = validator.validatePair(firstPlayerName, secondPlayerName);
 
-        if (result.hasErrors()) {
-            log.info(MSG_VALIDATION_FAIL, result);
-            req.setAttribute(ATTR_VALIDATION_RESULT, result);
+        if (validationResult.hasErrors()) {
+            log.info(MSG_VALIDATION_FAIL, validationResult);
+            req.setAttribute(ATTR_VALIDATION_RESULT, validationResult);
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             forwardTo(JSP_NEW_MATCH, req, resp);
             return;

@@ -8,27 +8,24 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class ErrorHandler {
-    private static final String ERROR_JSP = "/WEB-INF/error.jsp";
-    private static final String ERROR_DTO = "error";
-
-    private static final String NOT_FOUND_ICON = "❌";
-    private static final String SERVER_ERROR_ICON = "💥";
-    private static final String DEFAULT_ICON = "⚠️";
-
-    private static final String BAD_REQUEST_TITLE = "Bad Request";
-    private static final String PAGE_NOT_FOUND_TITLE = "Page Not Found";
-    private static final String SERVER_ERROR_TITLE = "Internal Server Error";
-    private static final String UNEXPECTED_ERROR_TITLE = "Unexpected error";
-
-    private static final String BAD_REQUEST_MESSAGE = "Your request contains invalid data or parameters.";
-    private static final String NOT_FOUND_MESSAGE = "The page you are looking for doesn't exist or has been moved.";
-    private static final String SERVER_ERROR_MESSAGE = "Something went wrong on our server. We're working to fix this issue.";
-    private static final String UNEXPECTED_ERROR_MESSAGE = "An unexpected error occurred.";
+    private static final String JSP = "/WEB-INF/error.jsp";
+    private static final String DTO = "error";
+    private static final String ICON_NOT_FOUND = "❌";
+    private static final String ICON_SERVER_ERROR = "💥";
+    private static final String ICON_DEFAULT = "⚠️";
+    private static final String TITLE_BAD_REQUEST = "Bad Request";
+    private static final String TITLE_PAGE_NOT_FOUND = "Page Not Found";
+    private static final String TITLE_SERVER_ERROR = "Internal Server Error";
+    private static final String TITLE_UNEXPECTED_ERROR = "Unexpected error";
+    private static final String MSG_BAD_REQUEST = "Your request contains invalid data or parameters.";
+    private static final String MSG_NOT_FOUND = "The page you are looking for doesn't exist or has been moved.";
+    private static final String MSG_SERVER_ERROR = "Something went wrong on our server. We're working to fix this issue.";
+    private static final String MSG_UNEXPECTED_ERROR = "An unexpected error occurred.";
 
     public void handleHttpError(HttpServletRequest req, HttpServletResponse resp,
                                        int statusCode, String message) throws ServletException, IOException {
-        String errorIcon = getErrorIcon(statusCode);
-        String errorTitle = getErrorTitle(statusCode);
+        String errorIcon = getIcon(statusCode);
+        String errorTitle = getTitle(statusCode);
         String defaultMessage = getDefaultMessage(statusCode);
         String requestedUrl = buildUrl(req);
 
@@ -42,36 +39,36 @@ public class ErrorHandler {
                 .build();
 
         resp.setStatus(statusCode);
-        req.setAttribute(ERROR_DTO, dto);
+        req.setAttribute(DTO, dto);
 
         req.getServletContext()
-                .getRequestDispatcher(ERROR_JSP)
+                .getRequestDispatcher(JSP)
                 .forward(req, resp);
     }
 
-    private String getErrorIcon(int statusCode) {
+    private String getIcon(int statusCode) {
         return switch (statusCode) {
-            case HttpServletResponse.SC_NOT_FOUND -> NOT_FOUND_ICON;
-            case HttpServletResponse.SC_INTERNAL_SERVER_ERROR -> SERVER_ERROR_ICON;
-            default -> DEFAULT_ICON;
+            case HttpServletResponse.SC_NOT_FOUND -> ICON_NOT_FOUND;
+            case HttpServletResponse.SC_INTERNAL_SERVER_ERROR -> ICON_SERVER_ERROR;
+            default -> ICON_DEFAULT;
         };
     }
 
-    private String getErrorTitle(int statusCode) {
+    private String getTitle(int statusCode) {
         return switch (statusCode) {
-            case HttpServletResponse.SC_BAD_REQUEST -> BAD_REQUEST_TITLE;
-            case HttpServletResponse.SC_NOT_FOUND -> PAGE_NOT_FOUND_TITLE;
-            case HttpServletResponse.SC_INTERNAL_SERVER_ERROR -> SERVER_ERROR_TITLE;
-            default -> UNEXPECTED_ERROR_TITLE;
+            case HttpServletResponse.SC_BAD_REQUEST -> TITLE_BAD_REQUEST;
+            case HttpServletResponse.SC_NOT_FOUND -> TITLE_PAGE_NOT_FOUND;
+            case HttpServletResponse.SC_INTERNAL_SERVER_ERROR -> TITLE_SERVER_ERROR;
+            default -> TITLE_UNEXPECTED_ERROR;
         };
     }
 
     private String getDefaultMessage(int statusCode) {
         return switch (statusCode) {
-            case HttpServletResponse.SC_BAD_REQUEST -> BAD_REQUEST_MESSAGE;
-            case HttpServletResponse.SC_NOT_FOUND -> NOT_FOUND_MESSAGE;
-            case HttpServletResponse.SC_INTERNAL_SERVER_ERROR -> SERVER_ERROR_MESSAGE;
-            default -> UNEXPECTED_ERROR_MESSAGE;
+            case HttpServletResponse.SC_BAD_REQUEST -> MSG_BAD_REQUEST;
+            case HttpServletResponse.SC_NOT_FOUND -> MSG_NOT_FOUND;
+            case HttpServletResponse.SC_INTERNAL_SERVER_ERROR -> MSG_SERVER_ERROR;
+            default -> MSG_UNEXPECTED_ERROR;
         };
     }
 

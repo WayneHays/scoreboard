@@ -16,9 +16,10 @@ import java.io.IOException;
 public class MatchesServlet extends BaseServlet {
     private static final String JSP = "matches";
     private static final String ATTR_PAGE = "page";
+    private static final String ATTR_PLAYER_NAME = "playerName";
+    private static final String PARAM_PAGE = "page";
     private static final String PARAM_PLAYER_NAME = "playerName";
     private static final String MSG_INVALID_PAGE = "Invalid page number: must be digit > 0, got '%s'";
-
     private static final int DEFAULT_MATCHES_PER_PAGE = 10;
     private static final int DEFAULT_PAGE_NUMBER = 1;
 
@@ -34,21 +35,22 @@ public class MatchesServlet extends BaseServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         String playerName = req.getParameter(PARAM_PLAYER_NAME);
-        int pageNumber = resolve(req.getParameter(ATTR_PAGE));
+        String pageNumber = req.getParameter(PARAM_PAGE);
+        int actualPageNumber = resolve(pageNumber);
 
-        MatchesPageDto matchesPage = matchesPageService.getMatchesPage(playerName, pageNumber, DEFAULT_MATCHES_PER_PAGE);
+        MatchesPageDto page = matchesPageService.getMatchesPage(playerName, actualPageNumber, DEFAULT_MATCHES_PER_PAGE);
 
-        req.setAttribute(PARAM_PLAYER_NAME, playerName);
-        req.setAttribute(ATTR_PAGE, matchesPage);
+        req.setAttribute(ATTR_PLAYER_NAME, playerName);
+        req.setAttribute(ATTR_PAGE, page);
         forwardTo(JSP, req, resp);
     }
 
-    private int resolve(String pageNumberStr) {
-        if (StringUtils.isBlank(pageNumberStr)) {
+    private int resolve(String numberStr) {
+        if (StringUtils.isBlank(numberStr)) {
             return DEFAULT_PAGE_NUMBER;
         }
 
-        int pageNumber = Integer.parseInt(pageNumberStr);
+        int pageNumber = Integer.parseInt(numberStr);
 
         if (pageNumber < 0) {
             throw new NumberFormatException(MSG_INVALID_PAGE.formatted(pageNumber));

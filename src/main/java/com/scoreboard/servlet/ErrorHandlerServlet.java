@@ -32,13 +32,13 @@ public class ErrorHandlerServlet extends BaseServlet {
         Integer statusCode = (Integer) req.getAttribute(ATTR_STATUS_CODE);
         String message = (String) req.getAttribute(ATTR_ERROR_MSG);
         Throwable throwable = (Throwable) req.getAttribute(ATTR_EXCEPTION);
-        String requestUri = (String) req.getAttribute(ATTR_URI);
+        String uri = (String) req.getAttribute(ATTR_URI);
 
         if (statusCode == null) {
             statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
         }
 
-        log.error(MSG_ERROR, statusCode, requestUri, message, throwable);
+        log.error(MSG_ERROR, statusCode, uri, message, throwable);
 
         errorHandler.handleHttpError(req, resp, statusCode, message);
     }

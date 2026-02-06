@@ -18,8 +18,8 @@ import java.util.UUID;
 public class MatchScoreServlet extends BaseServlet {
     private static final String JSP_SCORE = "match-score";
     private static final String JSP_RESULT = "match-result";
-    private static final String DTO_MATCH = "matchDto";
-    private static final String DTO_MATCH_RESULT = "result";
+    private static final String ATTR_MATCH = "match";
+    private static final String ATTR_RESULT = "result";
     private static final String PARAM_PLAYER_NAME = "playerName";
     private static final String PARAM_UUID = "uuid";
     private static final String MSG_UUID_REQUIRED = "UUID is required";
@@ -38,7 +38,7 @@ public class MatchScoreServlet extends BaseServlet {
         UUID matchId = parse(req.getParameter(PARAM_UUID));
         OngoingMatchDto match = matchFacade.getOngoingMatch(matchId);
 
-        req.setAttribute(DTO_MATCH, match);
+        req.setAttribute(ATTR_MATCH, match);
         forwardTo(JSP_SCORE, req, resp);
     }
 
@@ -47,10 +47,10 @@ public class MatchScoreServlet extends BaseServlet {
         UUID matchId = parse(req.getParameter(PARAM_UUID));
         String playerName = req.getParameter(PARAM_PLAYER_NAME);
 
-        MatchResponse response = matchFacade.processPoint(matchId, playerName);
+        MatchResponse matchResponse = matchFacade.processPoint(matchId, playerName);
 
-        if (response.isFinished()) {
-            req.setAttribute(DTO_MATCH_RESULT, response.matchResult());
+        if (matchResponse.isFinished()) {
+            req.setAttribute(ATTR_RESULT, matchResponse.matchResult());
             forwardTo(JSP_RESULT, req, resp);
             return;
         }

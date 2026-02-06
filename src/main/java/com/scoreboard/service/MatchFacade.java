@@ -29,7 +29,7 @@ public class MatchFacade {
         log.debug("Processing point for match: {}, player: {}", matchId, scorerName);
 
         TennisPlayer scorer = ongoingMatchService.ensurePlayerInMatch(matchId, scorerName);
-        OngoingMatch updatedMatch = ongoingMatchService.computeMatch(matchId, match -> match.awardPoint(scorer));
+        OngoingMatch updatedMatch = ongoingMatchService.computeMatch(matchId, match -> match.processPoint(scorer));
 
         if (updatedMatch.isFinished()) {
             log.info(LOG_MATCH_FINISHED);
@@ -41,8 +41,8 @@ public class MatchFacade {
             return MatchResponse.finished(result);
         }
 
-        OngoingMatchDto matchDto = ongoingMatchMapper.toDto(updatedMatch);
-        return MatchResponse.ongoing(matchDto);
+        OngoingMatchDto match = ongoingMatchMapper.toDto(updatedMatch);
+        return MatchResponse.ongoing(match);
     }
 
     public OngoingMatchDto getOngoingMatch(UUID matchId) {

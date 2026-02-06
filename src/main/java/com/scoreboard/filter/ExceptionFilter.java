@@ -30,7 +30,6 @@ public class ExceptionFilter extends HttpFilter {
     private static final String MSG_INVALID_UUID_FORMAT = "Incorrect UUID format";
     private static final String MSG_PLAYER_NOT_IN_MATCH = "Scorer is not playing in this match";
     private static final String MSG_GENERIC_ERROR = "An error occurred while processing your request. Please try again later.";
-
     private static final String LOG_INVALID_PAGE_NUMBER = "Invalid page number format in request: {}";
     private static final String LOG_MATCH_NOT_FOUND = "Match not found: {} {} - {}";
     private static final String LOG_INVALID_UUID = "Invalid match uuid format in request: {}";

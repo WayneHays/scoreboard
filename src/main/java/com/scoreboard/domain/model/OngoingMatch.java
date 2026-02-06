@@ -35,7 +35,7 @@ public class OngoingMatch {
         this.ongoingMatchState = OngoingMatchState.REGULAR;
     }
 
-    public void awardPoint(TennisPlayer scorer) {
+    public void processPoint(TennisPlayer scorer) {
         Handler chain = isTieBreak() ? tieBreakChain : regularChain;
         PointResult pointResult = chain.handle(this, scorer);
         applyResult(pointResult, scorer);

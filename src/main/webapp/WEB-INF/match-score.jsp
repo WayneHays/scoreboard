@@ -31,23 +31,23 @@
                 <div>Points</div>
             </div>
 
-            <t:player-score playerName="${matchDto.firstPlayerName}"
-                            sets="${matchDto.firstPlayerSets}"
-                            games="${matchDto.firstPlayerGames}"
-                            points="${matchDto.firstPlayerPoints}"
-                            tieBreakPoints="${matchDto.firstPlayerTieBreakPoints}"
-                            isTieBreak="${matchDto.isTieBreak}"/>
-            <t:player-score playerName="${matchDto.secondPlayerName}"
-                            sets="${matchDto.secondPlayerSets}"
-                            games="${matchDto.secondPlayerGames}"
-                            points="${matchDto.secondPlayerPoints}"
-                            tieBreakPoints="${matchDto.secondPlayerTieBreakPoints}"
-                            isTieBreak="${matchDto.isTieBreak}"/>
+            <t:player-score playerName="${match.firstPlayerName}"
+                            sets="${match.firstPlayerSets}"
+                            games="${match.firstPlayerGames}"
+                            points="${match.firstPlayerPoints}"
+                            tieBreakPoints="${match.firstPlayerTieBreakPoints}"
+                            isTieBreak="${match.isTieBreak}"/>
+            <t:player-score playerName="${match.secondPlayerName}"
+                            sets="${match.secondPlayerSets}"
+                            games="${match.secondPlayerGames}"
+                            points="${match.secondPlayerPoints}"
+                            tieBreakPoints="${match.secondPlayerTieBreakPoints}"
+                            isTieBreak="${match.isTieBreak}"/>
         </section>
 
         <section class="actions-container">
-            <t:player-action-button playerName="${matchDto.firstPlayerName}"/>
-            <t:player-action-button playerName="${matchDto.secondPlayerName}"/>
+            <t:player-action-button playerName="${match.firstPlayerName}"/>
+            <t:player-action-button playerName="${match.secondPlayerName}"/>
         </section>
     </main>
 </div>
