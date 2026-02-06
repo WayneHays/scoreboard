@@ -47,7 +47,7 @@ public class MatchScoreServlet extends BaseServlet {
         UUID matchId = parse(req.getParameter(PARAM_UUID));
         String playerName = req.getParameter(PARAM_PLAYER_NAME);
 
-        MatchResponse response = matchFacade.awardPoint(matchId, playerName);
+        MatchResponse response = matchFacade.processPoint(matchId, playerName);
 
         if (response.isFinished()) {
             req.setAttribute(DTO_MATCH_RESULT, response.matchResult());

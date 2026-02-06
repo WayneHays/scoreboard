@@ -25,7 +25,7 @@ public class MatchFacade {
     private final FinishedMatchMapper finishedMatchMapper;
     private final MatchResultMapper resultMapper;
 
-    public MatchResponse awardPoint(UUID matchId, String scorerName) {
+    public MatchResponse processPoint(UUID matchId, String scorerName) {
         log.debug("Processing point for match: {}, player: {}", matchId, scorerName);
 
         TennisPlayer scorer = ongoingMatchService.ensurePlayerInMatch(matchId, scorerName);
