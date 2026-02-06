@@ -20,14 +20,14 @@ public class PlayerNameValidator {
             "player", "user", "test", "demo"
     );
 
-    private static final String ERROR_TOO_SHORT = "Name must be at least " + MIN_NAME_LENGTH + " characters";
-    private static final String ERROR_TOO_LONG = "Name cannot exceed " + MAX_NAME_LENGTH + " characters";
-    private static final String ERROR_INVALID_CHARS = """
+    private static final String MSG_TOO_SHORT = "Name must be at least " + MIN_NAME_LENGTH + " characters";
+    private static final String MSG_TOO_LONG = "Name cannot exceed " + MAX_NAME_LENGTH + " characters";
+    private static final String MSG_INVALID_CHARS = """
             Name can contain letters, single spaces, hyphens or apostrophes.
             Cannot start/end with special characters or have them consecutively
             """;
-    private static final String ERROR_RESERVED_WORDS = "Name cannot be a reserved word";
-    private static final String ERROR_SAME_NAME = "Names must be different";
+    private static final String MSG_RESERVED_WORDS = "Name cannot be a reserved word";
+    private static final String MSG_SAME_NAME = "Names must be different";
 
     public PairValidationResult validatePair(String firstName, String secondName) {
         SingleValidationResult firstNameResult = validate(firstName, MIN_NAME_LENGTH);
@@ -41,19 +41,19 @@ public class PlayerNameValidator {
         List<String> errors = new ArrayList<>();
 
         if (name.length() < minLength) {
-            errors.add(ERROR_TOO_SHORT);
+            errors.add(MSG_TOO_SHORT);
         }
 
         if (name.length() > MAX_NAME_LENGTH) {
-            errors.add(ERROR_TOO_LONG);
+            errors.add(MSG_TOO_LONG);
         }
 
         if (!VALID_NAME_PATTERN.matcher(name).matches()) {
-            errors.add(ERROR_INVALID_CHARS);
+            errors.add(MSG_INVALID_CHARS);
         }
 
         if (RESERVED_NAMES.contains(name.toLowerCase())) {
-            errors.add(ERROR_RESERVED_WORDS);
+            errors.add(MSG_RESERVED_WORDS);
         }
 
         return new SingleValidationResult(errors);
@@ -63,7 +63,7 @@ public class PlayerNameValidator {
         List<String> errors = new ArrayList<>();
 
         if (firstName.equalsIgnoreCase(secondName)) {
-            errors.add(ERROR_SAME_NAME);
+            errors.add(MSG_SAME_NAME);
         }
         return errors;
     }
